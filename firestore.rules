@@ -1,0 +1,112 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isHouseholdMember(householdId) {
+      return isSignedIn() &&
+        get(/databases/$(database)/documents/households/$(householdId)).data.memberRoles != null &&
+        request.auth.uid in get(/databases/$(database)/documents/households/$(householdId)).data.memberRoles;
+    }
+
+    function householdRole(householdId) {
+      return get(/databases/$(database)/documents/households/$(householdId))
+        .data.memberRoles[request.auth.uid];
+    }
+
+    function isHouseholdAdmin(householdId) {
+      return isHouseholdMember(householdId) &&
+        (householdRole(householdId) == "owner" ||
+         householdRole(householdId) == "admin");
+    }
+
+    function isSelfJoin(householdId) {
+      return isSignedIn()
+        && !isHouseholdMember(householdId)
+        // Only one new uid added
+        && request.resource.data.memberUids.size() ==
+          resource.data.memberUids.size() + 1
+        && request.resource.data.memberUids.hasAll(resource.data.memberUids)
+        && request.resource.data.memberUids.hasAny([request.auth.uid])
+        // Only one new role key added
+        && request.resource.data.memberRoles.keys().size() ==
+          resource.data.memberRoles.keys().size() + 1
+        && request.resource.data.memberRoles.keys().hasAll(
+          resource.data.memberRoles.keys()
+        )
+        // Force lowest role for self-join
+        && request.resource.data.memberRoles[request.auth.uid] == "member"
+        // Only allow these fields to change
+        && request.resource.data
+          .diff(resource.data)
+          .changedKeys()
+          .hasOnly(["memberUids", "memberRoles", "members"]);
+    }
+
+    // -- Personal User Data -----------------------------------------
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, write: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+    // -- Households -------------------------------------------------
+    match /households/{householdId} {
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.memberUids;
+
+      allow read: if isSignedIn() && request.auth.uid in resource.data.memberUids;
+
+      // Owners/admins can mutate; invited user can self-join
+      allow update: if isHouseholdAdmin(householdId) || isSelfJoin(householdId);
+      allow delete: if isHouseholdAdmin(householdId);
+
+      match /{subcollection}/{documentId=**} {
+        allow read, write: if isHouseholdMember(householdId);
+      }
+    }
+
+    // -- Household Invites ------------------------------------------
+    match /householdInvites/{inviteId} {
+      allow read: if isSignedIn() && (
+        request.auth.token.email == resource.data.invitedEmail ||
+        request.auth.uid == resource.data.invitedBy ||
+        isHouseholdMember(resource.data.householdId)
+      );
+
+      // Only household owners/admins can create invites
+      allow create: if isSignedIn() &&
+        isHouseholdAdmin(request.resource.data.householdId);
+
+      // Only household owners/admins can delete invites
+      allow delete: if isSignedIn() &&
+        isHouseholdAdmin(resource.data.householdId);
+
+      // Allow invited user to accept only (status-only)
+      allow update: if isSignedIn() && (
+        isHouseholdAdmin(resource.data.householdId) ||
+        (
+          request.auth.token.email == resource.data.invitedEmail &&
+          resource.data.status == "pending" &&
+          request.resource.data.status == "accepted" &&
+          request.resource.data
+            .diff(resource.data)
+            .changedKeys()
+            .hasOnly(["status"])
+        )
+      );
+    }
+
+    // -- Feedback --------------------------------------------------
+    match /feedback/{docId} {
+      allow read, create: if isSignedIn();
+      allow update, delete: if isSignedIn() &&
+        request.auth.token.email == "jainshr21@gmail.com";
+    }
+  }
+}

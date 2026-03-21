@@ -1,0 +1,414 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Default to light scheme */
+    color-scheme: light;
+  }
+
+  /* When dark mode class is applied, switch browser inputs to dark scheme */
+  .dark {
+    color-scheme: dark;
+  }
+
+  body {
+    font-family: "Inter", sans-serif;
+  }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+  }
+
+  .dark .glass {
+    background: rgba(24, 24, 27, 0.6);
+  }
+
+  /* Liquid Glass 2.0 - Enhanced glassmorphism for premium cards */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.05),
+      0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  }
+
+  .dark .glass-card {
+    background: rgba(24, 24, 27, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* Premium Bottom Nav — Frosted Glass */
+  .bottom-nav-blur {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: saturate(180%) blur(24px);
+    -webkit-backdrop-filter: saturate(180%) blur(24px);
+  }
+  .dark .bottom-nav-blur {
+    background: rgba(12, 12, 14, 0.78);
+  }
+
+  .bottom-nav-floating {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(24px) saturate(180%);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.05),
+      0 20px 50px -12px rgba(0, 0, 0, 0.15),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  }
+
+  .dark .bottom-nav-floating {
+    background: rgba(24, 24, 27, 0.85);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.2),
+      0 20px 50px -12px rgba(0, 0, 0, 0.5),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  /* Bottom nav active pill indicator */
+  .bottom-nav-item {
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  .bottom-nav-item::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%) scaleX(0);
+    width: 24px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+    background: var(--brand-500, #6366f1);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .bottom-nav-item.active::before {
+    transform: translateX(-50%) scaleX(1);
+  }
+
+  /* Skeleton loading pulse animation */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(226, 232, 240, 0.6) 0%,
+      rgba(241, 245, 249, 0.8) 50%,
+      rgba(226, 232, 240, 0.6) 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-pulse 1.8s ease-in-out infinite;
+    border-radius: 0.75rem;
+  }
+
+  .dark .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(39, 39, 42, 0.6) 0%,
+      rgba(63, 63, 70, 0.4) 50%,
+      rgba(39, 39, 42, 0.6) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Bottom nav native-feel glass */
+  .bottom-nav-blur {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-top: 0.5px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -1px 12px rgba(0, 0, 0, 0.04);
+  }
+
+  .dark .bottom-nav-blur {
+    background: rgba(9, 9, 11, 0.85);
+    border-top: 0.5px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 -1px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes skeleton-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 20px;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #3f3f46;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Custom Date Picker Styling */
+  input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    color: inherit;
+    font-family: inherit;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2394a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 1.25rem;
+  }
+
+  /* Customize the calendar icon */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  .dark input[type="date"] {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2352525b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>');
+  }
+
+  /* Hide Number Input Spinners */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+    appearance: textfield;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*                          Driver.js Tour Customization                      */
+/* -------------------------------------------------------------------------- */
+
+.driver-popover {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-radius: 1.5rem !important; /* rounded-3xl */
+  padding: 2rem !important;
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1) !important; /* shadow-xl */
+  border: none !important;
+  min-width: 320px !important;
+  max-width: 400px !important;
+}
+
+.dark .driver-popover {
+  background-color: #18181b !important; /* zinc-900 */
+  color: #f1f5f9 !important; /* slate-100 */
+  border: 1px solid #27272a !important; /* zinc-800 */
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5) !important;
+}
+
+.driver-popover-title {
+  font-family: "Inter", sans-serif !important;
+  font-size: 1.5rem !important; /* text-2xl */
+  font-weight: 800 !important; /* font-extrabold */
+  margin-bottom: 0.75rem !important;
+  line-height: 1.1 !important;
+  letter-spacing: -0.025em !important;
+  color: #0f172a !important;
+}
+
+.dark .driver-popover-title {
+  color: #ffffff !important;
+}
+
+.driver-popover-description {
+  font-family: "Inter", sans-serif !important;
+  font-size: 1rem !important;
+  line-height: 1.6 !important;
+  color: #64748b !important; /* slate-500 */
+  margin-bottom: 2rem !important;
+  font-weight: 500 !important;
+}
+
+.dark .driver-popover-description {
+  color: #a1a1aa !important; /* zinc-400 */
+}
+
+/* Footer Layout */
+.driver-popover-footer {
+  margin-top: 1.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important; /* Push buttons to right */
+  gap: 12px !important; /* Space between buttons */
+}
+
+/* Buttons General */
+/* Buttons General */
+.driver-popover-next-btn,
+.driver-popover-prev-btn {
+  border-radius: 1rem !important; /* rounded-2xl */
+  padding: 0.5rem 1rem !important; /* px-8 py-4 */
+  font-family: "Inter", sans-serif !important;
+  font-size: 1rem !important; /* text-base (slightly larger for bigger buttons) */
+  font-weight: 700 !important; /* font-bold */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  text-shadow: none !important;
+  border: none !important;
+  cursor: pointer !important;
+  line-height: 1.5 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-shadow: none !important;
+  box-shadow: none !important; /* Reset default shadow first */
+  outline: none !important;
+  transform: translateZ(0) !important; /* Fix blurriness */
+  backface-visibility: hidden !important;
+}
+
+.driver-popover-next-btn *,
+.driver-popover-prev-btn * {
+  text-shadow: none !important;
+}
+
+/* Next / Finish Button (Matches Primary Button) */
+.driver-popover-next-btn {
+  background-color: #059669 !important; /* brand-600 (Emerald) */
+  color: white !important;
+  border: 1px solid transparent !important; /* Remove any default border */
+  box-shadow:
+    0 10px 15px -3px rgba(16, 185, 129, 0.25),
+    0 4px 6px -2px rgba(16, 185, 129, 0.1) !important; /* Re-apply specific shadow */
+  text-shadow: none !important; /* Double force removal */
+}
+
+.driver-popover-next-btn:hover {
+  background-color: #047857 !important; /* brand-700 (Emerald) */
+  transform: scale(1.05) !important;
+}
+
+/* Add Arrow Icon to Next Button */
+.driver-popover-next-btn::after {
+  content: "" !important;
+  display: inline-block !important; /* Required for width/height */
+  width: 1.25rem !important; /* w-5 */
+  height: 1.25rem !important; /* h-5 */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E") !important;
+  background-size: contain !important;
+  background-repeat: no-repeat !important;
+  background-position: center !important;
+  margin-top: 0px !important; /* Reset margin */
+  transform: translateY(1px) !important; /* Micro-adjust down */
+}
+
+.driver-popover-next-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Previous Button (Matches Secondary/Cancel Button) */
+.driver-popover-prev-btn {
+  background-color: #ffffff !important; /* bg-white */
+  color: #334155 !important; /* text-slate-700 */
+  border: 1px solid #e2e8f0 !important; /* border-slate-200 */
+}
+
+.driver-popover-prev-btn:hover {
+  background-color: #f8fafc !important; /* hover:bg-slate-50 */
+}
+
+.dark .driver-popover-prev-btn {
+  background-color: #18181b !important; /* dark:bg-zinc-900 */
+  color: #e2e8f0 !important; /* dark:text-slate-200 */
+  border: 1px solid #27272a !important; /* dark:border-zinc-800 */
+}
+
+.dark .driver-popover-prev-btn:hover {
+  background-color: #27272a !important; /* dark:hover:bg-zinc-800 */
+}
+
+/* Close Button */
+.driver-popover-close-btn {
+  background: transparent !important;
+  border-radius: 50% !important;
+  padding: 8px !important;
+  color: #94a3b8 !important;
+  transition: all 0.2s !important;
+  top: 12px !important;
+  right: 12px !important;
+  width: 32px !important;
+  height: 32px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.driver-popover-close-btn:hover {
+  background: #f1f5f9 !important;
+  color: #ef4444 !important; /* red-500 */
+  transform: rotate(90deg) !important;
+}
+
+.dark .driver-popover-close-btn:hover {
+  background: #27272a !important;
+}
+
+/* Progress Text */
+.driver-popover-progress-text {
+  font-family: "Inter", sans-serif !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  color: #cbd5e1 !important;
+  margin-right: auto !important; /* Pushes buttons to the right */
+  order: -1 !important;
+}
+
+.dark .driver-popover-progress-text {
+  color: #52525b !important; /* zinc-600 */
+}
+
+/* Arrow/Pointer */
+.driver-popover-arrow {
+  border-width: 0 !important; /* Hide arrow for cleaner floating look (optional, but cleaner) */
+}
