@@ -25,3 +25,6 @@ service-account.json
 .eslintcache
 .parcel-cache
 .turbo
+
+# Agent settings
+.agents/
