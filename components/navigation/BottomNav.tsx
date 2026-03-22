@@ -27,6 +27,8 @@ import { useData } from "../../context/DataContext";
 import NavMoreSheet from "./NavMoreSheet";
 
 interface BottomNavProps {
+  isMoreOpen: boolean;
+  setIsMoreOpen: (open: boolean) => void;
   onAddClick: () => void;
   onInviteClick: () => void;
   onFeedbackClick: () => void;
@@ -36,6 +38,8 @@ interface BottomNavProps {
 }
 
 const BottomNav: React.FC<BottomNavProps> = ({
+  isMoreOpen,
+  setIsMoreOpen,
   onAddClick,
   onInviteClick,
   onFeedbackClick,
@@ -46,7 +50,6 @@ const BottomNav: React.FC<BottomNavProps> = ({
   const { t } = useTranslation();
   const location = useLocation();
   const { navPreferences } = useData();
-  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
   const isDesktop = useMediaQuery("(min-width: 1024px)");

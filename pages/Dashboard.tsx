@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useData } from "../context/DataContext";
 import { Reorder, motion, AnimatePresence } from "framer-motion";
 import {
@@ -20,6 +20,8 @@ import { NetWorthWidget } from "../components/dashboard/NetWorthWidget";
 import { WalletOverviewWidget } from "../components/dashboard/WalletOverviewWidget";
 import { ActiveGoalsWidget } from "../components/dashboard/ActiveGoalsWidget";
 import { RecentTransactionsWidget } from "../components/dashboard/RecentTransactionsWidget";
+import { filterTransactionsByRange } from "../utils/analytics";
+import { useNavigate } from "react-router-dom";
 import { MonthlySpendingWidget } from "../components/dashboard/MonthlySpendingWidget";
 import { BudgetProgressWidget } from "../components/dashboard/BudgetProgressWidget";
 import { QuickActionsWidget } from "../components/dashboard/QuickActionsWidget";
@@ -28,6 +30,45 @@ import { SnapshotWidget } from "../components/dashboard/SnapshotWidget";
 import { PlannedSpendingWidget } from "../components/dashboard/PlannedSpendingWidget";
 import { BalanceTrendWidget } from "../components/dashboard/BalanceTrendWidget";
 import { WidgetSkeleton } from "../components/dashboard/WidgetSkeleton";
+
+// Import Analytics Widgets for Dashboard
+import { CategoryDistribution } from "../components/analytics/CategoryDistribution";
+import { SmartInsights } from "../components/analytics/SmartInsights";
+import { SmallPurchaseLeak } from "../components/analytics/SmallPurchaseLeak";
+import { SpendingPersonality } from "../components/analytics/SpendingPersonality";
+
+// Wrapper for Analytics Widgets on Dashboard
+const AnalyticsWidgetWrapper: React.FC<{
+  Component: any;
+  timeRange: TimeRange;
+  customStartDate?: string;
+  customEndDate?: string;
+  onCategorySelect?: (id: string) => void;
+}> = ({ Component, timeRange, customStartDate, customEndDate, onCategorySelect }) => {
+  const { transactions } = useData();
+  const navigate = useNavigate();
+
+  const filteredTransactions = useMemo(
+    () => filterTransactionsByRange(transactions, timeRange, customStartDate, customEndDate),
+    [transactions, timeRange, customStartDate, customEndDate]
+  );
+
+  const handleDrillDown = (filters: { category?: string; type?: string; wallet?: string }) => {
+    const params = new URLSearchParams();
+    if (filters.category) params.append("category", filters.category);
+    if (filters.type) params.append("type", filters.type);
+    if (filters.wallet) params.append("wallet", filters.wallet);
+    navigate(`/transactions?${params.toString()}`);
+  };
+
+  return (
+    <Component 
+      transactions={filteredTransactions} 
+      onDrillDown={handleDrillDown}
+      onCategorySelect={onCategorySelect}
+    />
+  );
+};
 
 const widgetComponents: Record<string, React.FC<{ 
   timeRange: TimeRange;
@@ -45,6 +86,10 @@ const widgetComponents: Record<string, React.FC<{
   snapshot: SnapshotWidget as any,
   planned: PlannedSpendingWidget as any,
   trend: BalanceTrendWidget as any,
+  category_dist: (props: any) => <AnalyticsWidgetWrapper Component={CategoryDistribution} {...props} />,
+  insights: (props: any) => <AnalyticsWidgetWrapper Component={SmartInsights} {...props} />,
+  leak: (props: any) => <AnalyticsWidgetWrapper Component={SmallPurchaseLeak} {...props} />,
+  personality: (props: any) => <AnalyticsWidgetWrapper Component={SpendingPersonality} {...props} />,
 };
 
 const widgetLabels: Record<string, string> = {
@@ -59,6 +104,10 @@ const widgetLabels: Record<string, string> = {
   snapshot: "Savings & Burn Rate",
   planned: "Planned Spending",
   trend: "Balance Trend",
+  category_dist: "Spending by Category",
+  insights: "Smart Insights",
+  leak: "Small Purchase Leak",
+  personality: "Spending Personality",
 };
 
 const timeRangeOptions: { value: TimeRange; label: string }[] = [
@@ -102,20 +151,28 @@ const Dashboard: React.FC = () => {
     "snapshot",
     "planned",
     "trend",
+    "category_dist",
+    "insights",
+    "leak",
+    "personality",
   ];
 
   const DASHBOARD_WIDGET_DEFAULTS: DashboardWidgetConfig[] = [
     { id: "networth", enabled: true, order: 1 },
-    { id: "income_expense", enabled: true, order: 2 },
-    { id: "snapshot", enabled: true, order: 3 },
-    { id: "wallets", enabled: true, order: 4 },
-    { id: "trend", enabled: true, order: 5 },
-    { id: "goals", enabled: true, order: 6 },
-    { id: "transactions", enabled: true, order: 7 },
-    { id: "spending", enabled: false, order: 8 },
-    { id: "budgets", enabled: false, order: 9 },
-    { id: "actions", enabled: false, order: 10 },
-    { id: "planned", enabled: false, order: 11 },
+    { id: "actions", enabled: true, order: 2 },
+    { id: "income_expense", enabled: true, order: 3 },
+    { id: "snapshot", enabled: true, order: 4 },
+    { id: "wallets", enabled: true, order: 5 },
+    { id: "category_dist", enabled: true, order: 6 },
+    { id: "insights", enabled: true, order: 7 },
+    { id: "trend", enabled: true, order: 8 },
+    { id: "goals", enabled: true, order: 9 },
+    { id: "transactions", enabled: true, order: 10 },
+    { id: "leak", enabled: false, order: 11 },
+    { id: "personality", enabled: false, order: 12 },
+    { id: "spending", enabled: false, order: 13 },
+    { id: "budgets", enabled: false, order: 14 },
+    { id: "planned", enabled: false, order: 15 },
   ];
 
   // Sync local state when not editing

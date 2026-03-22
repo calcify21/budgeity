@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -24,9 +24,11 @@ import {
   Plus,
   Pin,
   PinOff,
-  GripVertical,
   Edit2,
   Check,
+  Search,
+  GripVertical,
+  Zap
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../utils";
@@ -60,7 +62,7 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
   const Icon = item.icon;
 
   const content = (
-    <div className="flex items-center gap-3 group/item relative select-none">
+    <div className="flex items-center gap-3 group/item relative select-none w-full">
       {isCustomizing && (
         <button
           onClick={onToggle}
@@ -119,34 +121,33 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
         <Link
           to={item.to}
           className={cn(
-            "flex-1 flex items-center justify-between p-3.5 rounded-2xl transition-all group",
+            "flex-1 flex items-center justify-between py-2.5 px-3 rounded-2xl transition-all group",
             isActive
-              ? "bg-brand-500 text-white shadow-lg shadow-brand-500/30"
-              : "text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98]",
+              ? "bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 font-bold"
+              : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98]",
           )}
         >
           <div className="flex items-center gap-4">
             <div
               className={cn(
-                "w-11 h-11 rounded-xl flex items-center justify-center transition-colors",
+                "w-10 h-10 rounded-[14px] flex items-center justify-center transition-colors",
                 isActive
-                  ? "bg-white/20"
-                  : "bg-slate-100 dark:bg-zinc-800 group-hover:bg-brand-500/10 dark:group-hover:bg-brand-500/20",
+                  ? "bg-brand-500/20 text-brand-600 dark:bg-brand-500/30 dark:text-brand-400"
+                  : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-slate-400 group-hover:bg-brand-50 dark:group-hover:bg-brand-500/20 group-hover:text-brand-500",
               )}
             >
               <Icon
                 size={22}
                 strokeWidth={isActive ? 2.5 : 1.5}
-                fill={isActive ? "white" : "none"}
-                className={cn(isActive && "text-white")}
+                fill={isActive ? "currentColor" : "none"}
               />
             </div>
-            <span className="text-base font-bold tracking-tight">
+            <span className={cn("text-[16px] tracking-tight", isActive ? "font-bold text-brand-700 dark:text-brand-300" : "font-medium group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors")}>
               {item.label}
             </span>
           </div>
           {isActive && (
-            <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+            <div className="w-1.5 h-1.5 bg-brand-500 rounded-full mr-2" />
           )}
         </Link>
       )}
@@ -159,14 +160,14 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
         value={item.to}
         dragListener={false}
         dragControls={controls}
-        className="list-none"
+        className="list-none w-full"
       >
         {content}
       </ReorderItem>
     );
   }
 
-  return <motion.div variants={itemVariants}>{content}</motion.div>;
+  return <motion.div variants={itemVariants} className="w-full">{content}</motion.div>;
 };
 
 interface NavMoreSheetProps {
@@ -194,8 +195,10 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
   const location = useLocation();
   const { navPreferences, updateNavPreferences } = useData();
   const { error } = useToast();
+  const navigate = useNavigate();
   const [isCustomizing, setIsCustomizing] = React.useState(false);
   const [localPinnedIds, setLocalPinnedIds] = React.useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = React.useState("");
 
   // Close on route change
   useEffect(() => {
@@ -329,8 +332,13 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 
   // Regular filtered links
   const visibleLinks = navLinks.filter(
-    (link) => !excludedPaths.includes(link.to),
+    (link) => !excludedPaths.includes(link.to) &&
+      (!searchQuery || link.label.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+  
+  const searchResults = searchQuery
+    ? navLinks.filter((link) => link.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    : [];
 
   const actions = [
     {
@@ -395,18 +403,18 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-2xl rounded-t-[2.5rem] z-[70] shadow-2xl border-t border-slate-200 dark:border-white/5 pb-[env(safe-area-inset-bottom,24px)] overflow-hidden"
+            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] rounded-t-[2.5rem] z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-slate-200 dark:border-white/5 pb-[env(safe-area-inset-bottom,24px)] overflow-hidden"
           >
             {/* Handle */}
             <div className="flex justify-center pt-4 pb-2">
               <div className="w-12 h-1.5 bg-slate-200 dark:bg-zinc-800 rounded-full" />
             </div>
 
-            <div className="px-8 py-4 flex items-center justify-between mb-2">
+            <div className="px-6 py-4 flex items-center justify-between mb-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-                    {isCustomizing ? "Customize Nav" : "Expand Menu"}
+                  <h2 className="text-[22px] font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    {isCustomizing ? "Customize Nav" : "Menu"}
                   </h2>
                   {isCustomizing && (
                     <motion.div
@@ -418,31 +426,31 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                     </motion.div>
                   )}
                 </div>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                   {isCustomizing
-                    ? "Select items to pin to bar"
-                    : "Explore Budgeity"}
+                    ? "Drag items to pin them to your nav bar."
+                    : "Navigate Budgeity faster."}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={handleToggleCustomize}
                   className={cn(
-                    "h-10 px-4 flex items-center gap-2 rounded-2xl font-black text-xs uppercase tracking-wider transition-all active:scale-95",
+                    "flex items-center justify-center w-9 h-9 rounded-full transition-all active:scale-90",
                     isCustomizing
                       ? "bg-brand-500 text-white shadow-lg shadow-brand-500/30"
-                      : "bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-white/10",
+                      : "bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-slate-400 hover:text-brand-500",
                   )}
+                  aria-label={isCustomizing ? "Done" : "Edit Nav"}
                 >
-                  {isCustomizing ? <Check size={16} /> : <Edit2 size={16} />}
-                  <span>{isCustomizing ? "Done" : "Edit Nav"}</span>
+                  {isCustomizing ? <Check size={18} strokeWidth={2.5} /> : <Edit2 size={16} />}
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-10 h-10 flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors active:scale-90"
+                  className="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors active:scale-90 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
                 >
-                  <X size={20} className="text-slate-600 dark:text-zinc-400" />
+                  <X size={20} />
                 </button>
               </div>
             </div>
@@ -455,7 +463,77 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                 className="grid grid-cols-1 gap-2"
               >
                 <div className="space-y-4">
-                  {isCustomizing ? (
+                  {/* Quick Links Row */}
+                  {!isCustomizing && !searchQuery && (
+                    <motion.div variants={itemVariants} className="px-2 pt-2">
+                       <div className="flex items-center gap-2 mb-3">
+                        <Zap size={14} className="text-brand-500 fill-brand-500" />
+                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
+                          Quick Links
+                        </span>
+                      </div>
+                      <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-2 px-2">
+                        {[
+                          { label: "Add Tx", icon: Plus, color: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400", to: "?add=true", iconSize: 24, stroke: 2.5 },
+                          { label: "Invite", icon: Share2, color: "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400", onClick: onInviteClick },
+                          { label: "Analytics", icon: BarChart3, color: "bg-brand-500/10 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400", to: "/analytics" },
+                          { label: "Wallets", icon: Wallet, color: "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400", to: "/wallets" },
+                          { label: "Settings", icon: Settings, color: "bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300", to: "/settings" }
+                        ].map((link, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => {
+                              if (link.to) navigate(link.to);
+                              if (link.onClick) link.onClick();
+                              onClose();
+                            }}
+                            className="flex flex-col items-center gap-2 min-w-[64px]"
+                          >
+                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm active:scale-95 transition-transform", link.color)}>
+                              <link.icon size={link.iconSize || 22} strokeWidth={link.stroke || 2} />
+                            </div>
+                            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">
+                              {link.label}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Search Bar */}
+                  {!isCustomizing && (
+                    <div className="mb-2 px-2">
+                      <div className="relative group">
+                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <input
+                          type="text"
+                          placeholder={t("common.search", "Search...")}
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="w-full pl-11 pr-4 py-3 bg-slate-100 dark:bg-white/5 rounded-2xl text-[15px] focus:outline-none focus:ring-2 focus:ring-brand-500/30 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {searchQuery ? (
+                     <div className="space-y-1">
+                      {searchResults.length === 0 ? (
+                        <div className="text-center py-6 px-4">
+                          <p className="text-sm text-slate-500 dark:text-zinc-500">No results found.</p>
+                        </div>
+                      ) : (
+                        searchResults.map((item) => (
+                          <ReorderItemPin
+                            key={item.to}
+                            item={item}
+                            itemVariants={itemVariants}
+                          />
+                        ))
+                      )}
+                    </div>
+                  ) : isCustomizing ? (
                     <>
                       {/* Pinned Section */}
                       <div className="space-y-2">
@@ -518,7 +596,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                 <div className="h-px bg-slate-100 dark:bg-white/5 my-2 mx-4" />
 
                 {/* Actions */}
-                <div className="grid grid-cols-1 gap-2">
+                <div className="grid grid-cols-1 gap-1">
                   {actions.map((action) => {
                     const Icon = action.icon;
                     return (
@@ -528,27 +606,27 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                             action.onClick();
                             if (!action.isToggle) onClose();
                           }}
-                          className="w-full flex items-center justify-between p-3.5 rounded-2xl text-slate-600 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-white/5 transition-all active:scale-[0.98] group"
+                          className="w-full flex items-center justify-between py-2.5 px-3 rounded-2xl transition-all group hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98] text-slate-700 dark:text-slate-300"
                         >
                           <div className="flex items-center gap-4">
-                            <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-zinc-800 flex items-center justify-center group-hover:bg-indigo-500/10 dark:group-hover:bg-indigo-500/20 transition-colors">
+                            <div className="w-10 h-10 rounded-[14px] bg-slate-100 dark:bg-zinc-800 flex items-center justify-center group-hover:bg-brand-50 dark:group-hover:bg-brand-500/20 transition-colors">
                               <Icon
-                                size={22}
-                                strokeWidth={1.5}
-                                className="group-hover:text-indigo-500 transition-colors"
+                                size={20}
+                                strokeWidth={2}
+                                className="text-slate-500 dark:text-slate-400 group-hover:text-brand-500 transition-colors"
                               />
                             </div>
-                            <span className="text-base font-bold tracking-tight">
+                            <span className="text-[16px] font-medium tracking-tight group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
                               {action.label}
                             </span>
                           </div>
                           {action.isToggle && (
                             <div
                               className={cn(
-                                "w-1.5 h-1.5 rounded-full",
+                                "w-1.5 h-1.5 rounded-full mr-2",
                                 action.active
-                                  ? "bg-brand-500 animate-pulse"
-                                  : "bg-slate-300 dark:bg-slate-700",
+                                  ? "bg-brand-500"
+                                  : "bg-slate-300 dark:bg-slate-600",
                               )}
                             />
                           )}

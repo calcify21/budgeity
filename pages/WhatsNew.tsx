@@ -106,6 +106,36 @@ const WhatsNew: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChangeItem
+          icon={PieChart}
+          title="Expanded Dashboard Analytics"
+          description="Your dashboard is now more powerful! We've ported 4 high-value widgets from Analytics V2: Category Distribution, Smart Insights, Small Purchase Leak, and Spending Personality."
+        />
+        <ChangeItem
+          icon={Zap}
+          title="Global Modal System"
+          description="Trigger 'Add Transaction', 'New Goal', and 'New Budget' modals from anywhere in the app (including PWA shortcuts) without losing your current page context."
+        />
+        <ChangeItem
+          icon={Smartphone}
+          title="Home Screen PWA Widgets"
+          description="Budgeity now supports experimental Home Screen widgets for PWA users! Add a 'Summary' or 'Balance' view directly to your mobile home screen."
+        />
+        <ChangeItem
+          icon={Plus}
+          title="One-Tap Mobile Actions"
+          description="The mobile navigation sheet now features a dedicated 'Quick Links' row for instant access to your most-used features like Add, Invite, and Settings."
+        />
+        <ChangeItem
+          icon={Target}
+          title="Standalone Goal Modals"
+          description="Managing your savings targets is easier than ever. Goals can now be created and edited via standalone modals directly from your dashboard."
+        />
+        <ChangeItem
+          icon={CheckCircle2}
+          title="Label & Dash Fixes"
+          description="We've polished the dashboard experience by fixing several translation labels and ensuring all analytics widgets adapt perfectly to your chosen time range."
+        />
+        <ChangeItem
           icon={Sparkles}
           title="Brand New Visual Identity"
           description="Budgeity has a fresh new look! Experience our stunning new high-resolution logo, refined brand colors, and a completely overhauled visual system designed for a premium fintech feel."

@@ -8,6 +8,7 @@ import {
   Tags,
   Settings,
   Menu,
+  Search,
   Plus,
   Eye,
   EyeOff,
@@ -41,6 +42,8 @@ import { useHousehold } from "../context/HouseholdContext";
 import { useToast } from "../context/ToastContext";
 import { cn, ICON_MAP } from "../utils";
 import AddTransactionModal from "./AddTransactionModal";
+import GoalModal from "./GoalModal";
+import BudgetModal from "./BudgetModal";
 import InviteFriendsModal from "./InviteFriendsModal";
 import FeedbackModal from "./FeedbackModal";
 import HouseholdModal from "./HouseholdModal";
@@ -155,11 +158,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+  const [isMobileNavSheetOpen, setIsMobileNavSheetOpen] = useState(false);
+  const [_isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem("budgeity_sidebar_collapsed");
     return saved === "true";
   });
+  const [isDesktop, setIsDesktop] = useState(true);
+  
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+  
+  const isSidebarCollapsed = _isSidebarCollapsed && isDesktop;
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     main: true,
     planning: true,
@@ -167,17 +180,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     general: true,
     admin: true,
   });
+  const [searchQuery, setSearchQuery] = useState("");
   
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
   };
   
   const toggleSidebar = () => {
-    const newVal = !isSidebarCollapsed;
+    const newVal = !_isSidebarCollapsed;
     setIsSidebarCollapsed(newVal);
     localStorage.setItem("budgeity_sidebar_collapsed", String(newVal));
   };
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
+  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isHouseholdModalOpen, setIsHouseholdModalOpen] = useState(false);
@@ -233,7 +249,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleNavClick = () => {
-    setIsMobileMenuOpen(false);
+    // setIsMobileNavSheetOpen(false); // Handled explicitly by the sheet via location change
   };
 
   const mainContentRef = React.useRef<HTMLDivElement>(null);
@@ -246,7 +262,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         behavior: "instant",
       });
     }
-  }, [location.pathname]);
+
+    // Handle Modal Triggers from URL Params
+    const params = new URLSearchParams(location.search);
+    if (params.get("add") === "true") {
+      setIsTxModalOpen(true);
+      // Clear param without refreshing
+      navigate(location.pathname, { replace: true });
+    } else if (params.get("add_goal") === "true") {
+      setIsGoalModalOpen(true);
+      navigate(location.pathname, { replace: true });
+    } else if (params.get("add_budget") === "true") {
+      setIsBudgetModalOpen(true);
+      navigate(location.pathname, { replace: true });
+    } else if (params.get("invite") === "true") {
+      setIsInviteModalOpen(true);
+      navigate(location.pathname, { replace: true });
+    } else if (params.get("feedback") === "true") {
+      setIsFeedbackModalOpen(true);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.pathname, location.search, navigate]);
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 overflow-hidden relative selection:bg-brand-500/30">
@@ -256,24 +292,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[100px] animate-blob animation-delay-2000" />
       </div>
 
-      {/* Mobile Backdrop */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
+      {/* Sidebar - Desktop Only */}
       <aside
         className={cn(
           "fixed lg:static inset-y-0 left-0 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-white/5 transform transition-all duration-300 ease-in-out flex flex-col shadow-2xl lg:shadow-none",
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          "-translate-x-full lg:translate-x-0",
           isSidebarCollapsed ? "w-20" : "w-72"
         )}
       >
@@ -308,6 +331,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
            </button>
         </div>
 
+        {/* Search Bar */}
+        <div className={cn("px-4 mb-2 transition-all duration-300", isSidebarCollapsed ? "hidden lg:hidden" : "block")}>
+          <div className="relative">
+            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <input
+              type="text"
+              placeholder={t("common.search", "Search...")}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 border border-transparent dark:border-white/5 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 transition-all"
+            />
+          </div>
+        </div>
+
         
         {(() => {
           const NavHeader = ({ title, section }: { title: string, section: string }) => {
@@ -320,107 +357,108 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             );
           };
 
-          return (
-            <nav className={cn("flex-1 space-y-1 overflow-y-auto custom-scrollbar", isSidebarCollapsed ? "px-2" : "px-4")}>
-              <NavHeader title="Main" section="main" />
-              <AnimatePresence>
-                {(isSidebarCollapsed || expandedSections.main) && (
-                  <MotionDiv
-                    initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="overflow-hidden space-y-1"
-                  >
-                    <SidebarItem to="/dashboard" icon={LayoutDashboard} label={t("common.dashboard")} onClick={handleNavClick} location={location} isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/analytics" icon={BarChart3} label={t("common.analytics")} onClick={handleNavClick} location={location} className="tour-nav-analytics" isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/analytics-v2" icon={BarChart3} label={t("common.analytics_v2")} onClick={handleNavClick} location={location} isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/transactions" icon={ArrowRightLeft} label={t("common.transactions")} onClick={handleNavClick} location={location} className="tour-nav-transactions" isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/wallets" icon={Wallet} label={t("common.wallets")} onClick={handleNavClick} location={location} className="tour-nav-wallets" isCollapsed={isSidebarCollapsed} />
-                  </MotionDiv>
-                )}
-              </AnimatePresence>
+          const navItems = [
+            {
+              section: "main",
+              title: "Main",
+              items: [
+                { to: "/dashboard", icon: LayoutDashboard, label: t("common.dashboard"), onClick: handleNavClick, className: undefined },
+                { to: "/analytics", icon: BarChart3, label: t("common.analytics"), onClick: handleNavClick, className: "tour-nav-analytics" },
+                { to: "/analytics-v2", icon: BarChart3, label: t("common.analytics_v2"), onClick: handleNavClick, className: undefined },
+                { to: "/transactions", icon: ArrowRightLeft, label: t("common.transactions"), onClick: handleNavClick, className: "tour-nav-transactions" },
+                { to: "/wallets", icon: Wallet, label: t("common.wallets"), onClick: handleNavClick, className: "tour-nav-wallets" }
+              ]
+            },
+            {
+              section: "planning",
+              title: "Planning",
+              items: [
+                { to: "/budgets", icon: PiggyBank, label: t("common.budgets"), onClick: handleNavClick, className: "tour-nav-budgets" },
+                { to: "/goals", icon: Target, label: t("common.goals"), onClick: handleNavClick, className: "tour-nav-goals" },
+                { to: "/recurring", icon: Repeat, label: t("common.recurring"), onClick: handleNavClick, className: "tour-nav-recurring" },
+                { to: "/shopping-list", icon: ShoppingCart, label: t("common.shopping_list"), onClick: handleNavClick, className: "tour-nav-shopping" }
+              ]
+            },
+            {
+              section: "management",
+              title: "Management",
+              items: [
+                { to: "/categories", icon: Tags, label: t("common.categories"), onClick: handleNavClick, className: "tour-nav-categories" },
+                { to: "/export", icon: Download, label: t("common.export"), onClick: handleNavClick, className: "tour-nav-export" }
+              ]
+            },
+            {
+              section: "general",
+              title: "General",
+              items: [
+                { to: "/settings", icon: Settings, label: t("common.settings"), onClick: handleNavClick, className: undefined },
+                { to: "/account-info", icon: UserCircle, label: t("common.account_info"), onClick: handleNavClick, className: undefined },
+                { to: "/whats-new", icon: Sparkles, label: t("common.whats_new"), onClick: handleNavClick, className: undefined }
+              ]
+            }
+          ];
 
-              <NavHeader title="Planning" section="planning" />
-              <AnimatePresence>
-                {(isSidebarCollapsed || expandedSections.planning) && (
-                  <MotionDiv
-                    initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="overflow-hidden space-y-1"
-                  >
-                    <SidebarItem to="/budgets" icon={PiggyBank} label={t("common.budgets")} onClick={handleNavClick} location={location} className="tour-nav-budgets" isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/goals" icon={Target} label={t("common.goals")} onClick={handleNavClick} location={location} className="tour-nav-goals" isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/recurring" icon={Repeat} label={t("common.recurring")} onClick={handleNavClick} location={location} className="tour-nav-recurring" isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/shopping-list" icon={ShoppingCart} label={t("common.shopping_list")} onClick={handleNavClick} location={location} className="tour-nav-shopping" isCollapsed={isSidebarCollapsed} />
-                  </MotionDiv>
-                )}
-              </AnimatePresence>
-
-              <NavHeader title="Management" section="management" />
-              <AnimatePresence>
-                {(isSidebarCollapsed || expandedSections.management) && (
-                  <MotionDiv
-                    initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="overflow-hidden space-y-1"
-                  >
-                    <SidebarItem to="/categories" icon={Tags} label={t("common.categories")} onClick={handleNavClick} location={location} className="tour-nav-categories" isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/export" icon={Download} label={t("common.export")} onClick={handleNavClick} location={location} className="tour-nav-export" isCollapsed={isSidebarCollapsed} />
-                  </MotionDiv>
-                )}
-              </AnimatePresence>
-
-              <NavHeader title="General" section="general" />
-              <AnimatePresence>
-                {(isSidebarCollapsed || expandedSections.general) && (
-                  <MotionDiv
-                    initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="overflow-hidden space-y-1"
-                  >
-                    <SidebarItem to="/settings" icon={Settings} label={t("common.settings")} onClick={handleNavClick} location={location} isCollapsed={isSidebarCollapsed} />
-                    <SidebarItem to="/account-info" icon={UserCircle} label={t("common.account_info")} onClick={handleNavClick} location={location} isCollapsed={isSidebarCollapsed} />
-                    
-                    <SidebarItem to="/whats-new" icon={Sparkles} label={t("common.whats_new")} onClick={handleNavClick} location={location} isCollapsed={isSidebarCollapsed} />
-                  </MotionDiv>
-                )}
-              </AnimatePresence>
-
-              {user?.email === "jainshr21@gmail.com" && (
-                <>
-                  <NavHeader title="Admin" section="admin" />
-                  <AnimatePresence>
-                    {(isSidebarCollapsed || expandedSections.admin) && (
-                      <MotionDiv
-                        initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="overflow-hidden space-y-1"
-                      >
-                        <SidebarItem
-                          to="/admin/feedback"
-                          icon={Shield}
-                          label={t("common.user_feedback")}
-                          onClick={handleNavClick}
-                          location={location}
-                          className={location.pathname === "/admin/feedback" 
+          if (user?.email === "jainshr21@gmail.com") {
+            navItems.push({
+              section: "admin",
+              title: "Admin",
+              items: [
+                {
+                  to: "/admin/feedback",
+                  icon: Shield,
+                  label: t("common.user_feedback"),
+                  onClick: handleNavClick,
+                  className: location.pathname === "/admin/feedback" 
                             ? "shadow-none" 
                             : "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 font-bold"
-                          }
-                          isCollapsed={isSidebarCollapsed}
-                        />
-                      </MotionDiv>
-                    )}
-                  </AnimatePresence>
-                </>
+                }
+              ]
+            });
+          }
+
+          const filteredNavItems = navItems.map(section => ({
+            ...section,
+            items: section.items.filter(item => 
+              !searchQuery || item.label.toLowerCase().includes(searchQuery.toLowerCase())
+            )
+          })).filter(section => section.items.length > 0);
+
+          return (
+            <nav className={cn("flex-1 space-y-1 overflow-y-auto custom-scrollbar", isSidebarCollapsed && !searchQuery ? "px-2" : "px-4")}>
+              {filteredNavItems.length === 0 ? (
+                <div className="text-center py-6 px-4">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">No results found.</p>
+                </div>
+              ) : (
+                filteredNavItems.map(({ title, section, items }) => (
+                  <React.Fragment key={section}>
+                    <NavHeader title={title} section={section} />
+                    <AnimatePresence>
+                      {(isSidebarCollapsed || expandedSections[section] || searchQuery) && (
+                        <MotionDiv
+                          initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.3, ease: "easeInOut" }}
+                          className="overflow-hidden space-y-1"
+                        >
+                          {items.map((item) => (
+                            <SidebarItem
+                              key={item.to}
+                              to={item.to}
+                              icon={item.icon}
+                              label={item.label}
+                              onClick={item.onClick}
+                              location={location}
+                              className={item.className}
+                              isCollapsed={isSidebarCollapsed && !searchQuery}
+                            />
+                          ))}
+                        </MotionDiv>
+                      )}
+                    </AnimatePresence>
+                  </React.Fragment>
+                ))
               )}
             </nav>
           );
@@ -521,7 +559,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             <Tooltip content="Menu" side="right">
               <button
-                onClick={() => setIsMobileMenuOpen(true)}
+                onClick={() => setIsMobileNavSheetOpen(true)}
                 className="p-2 -ml-2 text-slate-600 dark:text-slate-300 hover:scale-110 active:scale-95 transition-transform lg:hidden"
               >
                 <Menu className="w-6 h-6" />
@@ -932,6 +970,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
 
         <BottomNav
+          isMoreOpen={isMobileNavSheetOpen}
+          setIsMoreOpen={setIsMobileNavSheetOpen}
           onAddClick={() => setIsTxModalOpen(true)}
           onInviteClick={() => setIsInviteModalOpen(true)}
           onFeedbackClick={() => setIsFeedbackModalOpen(true)}
@@ -944,6 +984,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <AnimatePresence>
         {isTxModalOpen && (
           <AddTransactionModal onClose={() => setIsTxModalOpen(false)} />
+        )}
+        {isGoalModalOpen && (
+          <GoalModal isOpen={isGoalModalOpen} onClose={() => setIsGoalModalOpen(false)} />
+        )}
+        {isBudgetModalOpen && (
+          <BudgetModal onClose={() => setIsBudgetModalOpen(false)} />
         )}
         {isInviteModalOpen && (
           <InviteFriendsModal onClose={() => setIsInviteModalOpen(false)} />
