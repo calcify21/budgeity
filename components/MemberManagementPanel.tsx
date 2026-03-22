@@ -232,7 +232,7 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({
               {/* Avatar */}
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-600 to-brand-700 flex items-center justify-center text-white font-bold text-sm shrink-0 overflow-hidden relative">
                 {(member.displayName || "?")[0].toUpperCase()}
-                {member.avatarBase64 ? (
+                {member.avatarBase64 && member.avatarBase64 !== "removed" ? (
                   <img
                     src={member.avatarBase64}
                     alt={member.displayName}
@@ -244,7 +244,8 @@ const MemberManagementPanel: React.FC<MemberManagementPanelProps> = ({
                 ) : (
                   member.photoURL &&
                   member.photoURL !== "undefined" &&
-                  member.photoURL !== "null" && (
+                  member.photoURL !== "null" &&
+                  member.avatarBase64 !== "removed" && (
                     <img
                       src={member.photoURL}
                       alt={member.displayName}

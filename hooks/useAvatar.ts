@@ -55,7 +55,7 @@ export function useAvatar() {
     try {
       const userRef = doc(db, "users", user.uid);
       await setDoc(userRef, {
-        _meta: { avatarBase64: null }
+        _meta: { avatarBase64: "removed" }
       }, { merge: true });
     } catch (error) {
       console.error("Error removing avatar:", error);

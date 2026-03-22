@@ -182,7 +182,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
                         const m = currentMembers.find(
                           (member) => member.email === transaction.createdBy,
                         );
-                        if (m?.avatarBase64) {
+                        if (m?.avatarBase64 && m.avatarBase64 !== "removed") {
                           return (
                             <img
                               src={m.avatarBase64}
@@ -197,7 +197,8 @@ const TransactionDetailsModal: React.FC<Props> = ({
                         if (
                           m?.photoURL &&
                           m.photoURL !== "undefined" &&
-                          m.photoURL !== "null"
+                          m.photoURL !== "null" &&
+                          m?.avatarBase64 !== "removed"
                         ) {
                           return (
                             <img
@@ -240,7 +241,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
                             (member) =>
                               member.email === transaction.lastModifiedBy,
                           );
-                          if (m?.avatarBase64) {
+                          if (m?.avatarBase64 && m.avatarBase64 !== "removed") {
                             return (
                               <img
                                 src={m.avatarBase64}
@@ -255,7 +256,8 @@ const TransactionDetailsModal: React.FC<Props> = ({
                           if (
                             m?.photoURL &&
                             m.photoURL !== "undefined" &&
-                            m.photoURL !== "null"
+                            m.photoURL !== "null" &&
+                            m?.avatarBase64 !== "removed"
                           ) {
                             return (
                               <img

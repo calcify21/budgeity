@@ -102,14 +102,17 @@ export const NetWorthWidget: React.FC<NetWorthWidgetProps> = ({
                       }}
                       title={m.displayName}
                     >
-                      {m.avatarBase64 ? (
+                      {m.avatarBase64 && m.avatarBase64 !== "removed" ? (
                         <img
                           src={m.avatarBase64}
                           alt=""
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover"
                         />
-                      ) : m.photoURL ? (
+                      ) : m.photoURL &&
+                        m.photoURL !== "undefined" &&
+                        m.photoURL !== "null" &&
+                        m.avatarBase64 !== "removed" ? (
                         <img
                           src={m.photoURL}
                           alt=""
