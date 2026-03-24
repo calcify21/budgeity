@@ -29,9 +29,13 @@ const ACTION_LABELS: Record<string, string> = {
   member_join: "joined the household",
   member_leave: "left the household",
   member_remove: "removed a member",
+  member_invite: "invited a new member",
+  member_invite_decline: "declined an invitation",
+  member_invite_cancel: "cancelled an invitation",
   role_change: "changed a member's role",
   household_create: "created the household",
   household_edit: "updated household settings",
+  household_delete: "deleted the household",
 };
 
 interface ActivityLogViewerProps {
@@ -145,7 +149,10 @@ const ActivityLogViewer: React.FC<ActivityLogViewerProps> = ({
             </p>
             {log.metadata && Object.keys(log.metadata).length > 0 && (
               <p className="text-xs text-slate-400 mt-0.5 truncate">
-                {JSON.stringify(log.metadata).slice(0, 80)}
+                {Object.entries(log.metadata)
+                  .map(([k, v]) => `${k}: ${v}`)
+                  .join(" • ")
+                  .slice(0, 80)}
               </p>
             )}
           </div>

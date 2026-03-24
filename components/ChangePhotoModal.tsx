@@ -13,6 +13,7 @@ interface ChangePhotoModalProps {
   onFileSelected: (file: File) => void;
   onUseGooglePhoto: () => void;
   onRemovePhoto: () => void;
+  onViewPhoto?: () => void;
   hasGooglePhoto: boolean;
   hasCustomPhoto: boolean;
 }
@@ -23,6 +24,7 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({
   onFileSelected,
   onUseGooglePhoto,
   onRemovePhoto,
+  onViewPhoto,
   hasGooglePhoto,
   hasCustomPhoto,
 }) => {
@@ -108,7 +110,8 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({
                 {/* Use Google Photo */}
                 {hasGooglePhoto && (
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       onUseGooglePhoto();
                       onClose();
                     }}
@@ -128,10 +131,35 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({
                   </button>
                 )}
 
+                {/* View Photo (if available) */}
+                {(hasCustomPhoto || hasGooglePhoto) && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onViewPhoto?.();
+                      onClose();
+                    }}
+                    className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-left group"
+                  >
+                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-zinc-800 flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:scale-110 transition-transform">
+                      <Image size={20} />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-slate-900 dark:text-white text-sm">
+                        View Photo
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        See your profile photo in full
+                      </p>
+                    </div>
+                  </button>
+                )}
+
                 {/* Remove Photo */}
                 {(hasCustomPhoto || hasGooglePhoto) && (
                   <button
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       onRemovePhoto();
                       onClose();
                     }}

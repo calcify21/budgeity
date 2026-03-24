@@ -130,7 +130,7 @@ const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
               </div>
 
               {/* Crop Area */}
-              <div className="relative w-full aspect-square bg-black/90 mx-auto">
+              <div className="relative h-[320px] sm:h-[400px] w-full bg-black/95 mx-auto overflow-hidden">
                 <Cropper
                   image={imageSrc}
                   crop={crop}
@@ -143,6 +143,11 @@ const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
                   onZoomChange={setZoom}
                   onRotationChange={setRotation}
                   onCropComplete={onCropComplete}
+                  classes={{
+                    containerClassName: "rounded-none",
+                    cropAreaClassName: "border-2 border-white/80 shadow-[0_0_0_9999px_rgba(0,0,0,0.6)]",
+                    mediaClassName: "object-contain !h-full !w-full"
+                  }}
                 />
               </div>
 

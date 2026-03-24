@@ -80,9 +80,13 @@ export type ActivityActionType =
   | "member_join"
   | "member_leave"
   | "member_remove"
+  | "member_invite"
+  | "member_invite_decline"
+  | "member_invite_cancel"
   | "role_change"
   | "household_create"
-  | "household_edit";
+  | "household_edit"
+  | "household_delete";
 
 export interface ActivityLog {
   id: string;

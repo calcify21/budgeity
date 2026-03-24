@@ -159,13 +159,12 @@ function EditOverlay({
         e.stopPropagation();
         onClick?.();
       }}
-      className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all duration-200 rounded-full flex items-center justify-center cursor-pointer group"
-      style={{ width: size, height: size }}
+      className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-all duration-200 rounded-full flex items-center justify-center cursor-pointer group w-full h-full"
       title="Change photo"
     >
       <Camera
         size={iconSize}
-        className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200 drop-shadow-lg"
+        className="text-white opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110 drop-shadow-xl"
       />
     </button>
   );

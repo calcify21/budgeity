@@ -16,9 +16,10 @@ import {
   TrendingDown,
   CalendarDays,
   Activity,
-  Check,
   X,
   CheckCircle2,
+  Edit2,
+  Check,
 } from "lucide-react";
 import { Transaction } from "../types";
 import {
@@ -29,6 +30,7 @@ import {
 import AddTransactionModal from "../components/AddTransactionModal";
 import TransactionDetailsModal from "../components/TransactionDetailsModal";
 import CustomSelect from "../components/CustomSelect";
+import BulkEditModal from "../components/BulkEditModal";
 import { ConfirmModal } from "../components/ConfirmModal";
 import { motion, AnimatePresence } from "framer-motion";
 import Tooltip from "../components/Tooltip";
@@ -64,6 +66,7 @@ const Transactions: React.FC = () => {
   const [viewingTx, setViewingTx] = useState<Transaction | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false);
 
   // Selection Helpers
   const toggleSelect = (id: string, event?: React.MouseEvent) => {
@@ -326,43 +329,54 @@ const Transactions: React.FC = () => {
             {t("common.transactions")}
           </h2>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative group">
-            <Search
-              size={18}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors"
-            />
-            <input
-              type="text"
-              placeholder={t("transactions.searchPlaceholder")}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none w-full sm:w-48 md:w-64 shadow-sm transition-all"
-            />
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 w-full lg:w-auto">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <div className="relative group flex-1">
+              <Search
+                size={18}
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors"
+              />
+              <input
+                type="text"
+                placeholder={t("transactions.searchPlaceholder")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none w-full sm:w-48 md:w-64 shadow-sm transition-all"
+              />
+            </div>
+
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={cn(
+                "tour-transaction-filters flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm shrink-0",
+                showFilters
+                  ? "bg-brand-500 text-white border-brand-500 shadow-brand-500/30"
+                  : "bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50",
+              )}
+            >
+              <Filter size={18} />
+            </button>
           </div>
 
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={cn(
-              "tour-transaction-filters flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm",
-              showFilters
-                ? "bg-brand-500 text-white border-brand-500 shadow-brand-500/30"
-                : "bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50",
-            )}
-          >
-            <Filter size={18} />
-          </button>
-
           {filtered.length > 0 && !isSelectionMode && (
-            <button
-              onClick={() => setShowDeleteConfirm(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-rose-100 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-400 font-bold text-sm hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-all shadow-sm"
-            >
-              <Trash2 size={18} />
-              <span className="hidden lg:inline">
-                {t("transactions.deleteAll")}
-              </span>
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={selectAllFiltered}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-100 dark:border-brand-900/30 bg-brand-50 dark:bg-brand-900/10 text-brand-600 dark:text-brand-400 font-bold text-sm hover:bg-brand-100 dark:hover:bg-brand-900/20 transition-all shadow-sm"
+              >
+                <CheckCircle2 size={18} />
+                <span>{t("transactions.selectAll")}</span>
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-rose-100 dark:border-rose-900/30 bg-rose-50 dark:bg-rose-900/10 text-rose-600 dark:text-rose-400 font-bold text-sm hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-all shadow-sm"
+              >
+                <Trash2 size={18} />
+                <span className="hidden lg:inline">
+                  {t("transactions.deleteAll")}
+                </span>
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -746,10 +760,8 @@ const Transactions: React.FC = () => {
                                             />
                                           );
                                         }
-                                        return (
-                                          (m?.displayName ||
-                                            tx.createdBy)[0].toUpperCase()
-                                        );
+                                        return (m?.displayName ||
+                                          tx.createdBy)[0].toUpperCase();
                                       })()}
                                     </div>
                                     <span className="text-[9px] font-bold text-brand-600 dark:text-brand-400">
@@ -902,12 +914,9 @@ const Transactions: React.FC = () => {
                 <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-black text-sm shadow-lg shadow-emerald-500/20">
                   {selectedIds.size}
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider leading-none mb-1">
+                <div className="flex flex-col justify-center">
+                  <span className="text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-wider leading-none">
                     {t("transactions.selected")}
-                  </span>
-                  <span className="text-sm font-bold text-slate-900 dark:text-white leading-none">
-                    {formatAmount(Math.abs(selectedTotal))}
                   </span>
                 </div>
               </div>
@@ -939,9 +948,16 @@ const Transactions: React.FC = () => {
                 <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
                 <button
                   onClick={clearSelection}
-                  className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                  className="p-2 text-slate-400 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-full transition-colors"
                 >
                   <X size={18} />
+                </button>
+                <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
+                <button
+                  onClick={() => setShowBulkEditModal(true)}
+                  className="p-2 text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-900/20 rounded-full transition-colors"
+                >
+                  <Edit2 size={18} />
                 </button>
                 <button
                   onClick={() => setShowBulkDeleteConfirm(true)}
@@ -952,6 +968,19 @@ const Transactions: React.FC = () => {
               </div>
             </div>
           </MotionDiv>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showBulkEditModal && (
+          <BulkEditModal
+            selectedTransactions={selectedTransactions}
+            onClose={() => setShowBulkEditModal(false)}
+            onSuccess={() => {
+              setShowBulkEditModal(false);
+              clearSelection();
+            }}
+          />
         )}
       </AnimatePresence>
     </div>

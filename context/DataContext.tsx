@@ -10,6 +10,7 @@ import {
   ShoppingItem,
   Transaction,
   Wallet,
+  ActivityActionType,
 } from "../types";
 import {
   DEFAULT_CATEGORIES,
@@ -31,6 +32,7 @@ import {
   disableNetwork,
 } from "firebase/firestore";
 import { adjustEntityBalance } from "../utils/transactionUtils";
+import { logActivity } from "../utils/activityLogger";
 
 interface DataContextType extends AppState {
   systemStatus: "online" | "syncing" | "offline" | "error";
@@ -45,6 +47,7 @@ interface DataContextType extends AppState {
   ) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, "id">) => void;
   updateTransaction: (transaction: Transaction) => void;
+  updateMultipleTransactions: (transactions: Transaction[]) => void;
   addMultipleTransactions: (transactions: Omit<Transaction, "id">[]) => void;
   deleteTransaction: (id: string) => void;
   deleteMultipleTransactions: (ids: string[]) => void;
@@ -392,6 +395,20 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
   };
+  const logInHousehold = async (
+    actionType: ActivityActionType,
+    metadata: Record<string, any>,
+  ) => {
+    if (activeWorkspace.type === "household" && user) {
+      await logActivity(activeWorkspace.id, {
+        actorUid: user.uid,
+        actorName: user.displayName || "Unknown",
+        actionType,
+        metadata,
+      });
+    }
+  };
+
   const completeOnboarding = async (
     currency: string,
     initialBalance: number,
@@ -489,6 +506,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       goals: g1,
       transactions: [newTx, ...state.transactions],
     });
+    logInHousehold("transaction_add", {
+      amount: t.amount,
+      note: t.note,
+      type: t.type,
+    });
   };
 
   const updateTransaction = (updatedTx: Transaction) => {
@@ -583,6 +605,72 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         : t,
     );
     syncState({ ...state, wallets: w1, goals: g1, transactions: txs });
+    logInHousehold("transaction_edit", {
+      amount: updatedTx.amount,
+      note: updatedTx.note,
+      type: updatedTx.type,
+    });
+  };
+
+  const updateMultipleTransactions = (updatedTxs: Transaction[]) => {
+    let { wallets: w1, goals: g1 } = {
+      wallets: state.wallets,
+      goals: state.goals,
+    };
+
+    // Process all reversions and applications sequentially
+    updatedTxs.forEach((updatedTx) => {
+      const oldTx = state.transactions.find((t) => t.id === updatedTx.id);
+      if (!oldTx) return;
+
+      // 1. Revert Old Transaction
+      if (oldTx.type === "income") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, oldTx.toWalletId, -oldTx.amount));
+      } else if (oldTx.type === "expense") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, oldTx.fromWalletId, oldTx.amount));
+      } else if (oldTx.type === "transfer") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, oldTx.fromWalletId, oldTx.amount));
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, oldTx.toWalletId, -oldTx.amount));
+      }
+
+      // 2. Apply New Transaction
+      if (updatedTx.type === "income") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, updatedTx.toWalletId, updatedTx.amount));
+      } else if (updatedTx.type === "expense") {
+        const w = w1.find((wa) => wa.id === updatedTx.fromWalletId);
+        if (w && w.type === "cash" && w.balance - updatedTx.amount < 0) {
+          throw new Error(`Insufficient funds in Cash wallet '${w.name}'.`);
+        }
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, updatedTx.fromWalletId, -updatedTx.amount));
+      } else if (updatedTx.type === "transfer") {
+        const w = w1.find((wa) => wa.id === updatedTx.fromWalletId);
+        if (w && w.type === "cash" && w.balance - updatedTx.amount < 0) {
+          throw new Error(`Insufficient funds in Cash wallet '${w.name}'.`);
+        }
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, updatedTx.fromWalletId, -updatedTx.amount));
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(w1, g1, updatedTx.toWalletId, updatedTx.amount));
+      }
+    });
+
+    const updatedIds = new Set(updatedTxs.map((t) => t.id));
+    const txs = state.transactions.map((t) => {
+      if (updatedIds.has(t.id)) {
+        const u = updatedTxs.find((ut) => ut.id === t.id)!;
+        return {
+          ...t,
+          ...u,
+          createdBy: t.createdBy || u.createdBy || user?.email || "User",
+          lastModifiedBy: user?.email || "User",
+        };
+      }
+      return t;
+    });
+
+    syncState({ ...state, wallets: w1, goals: g1, transactions: txs });
+    logInHousehold("transaction_edit", {
+      count: updatedTxs.length,
+      note: "Bulk edit of transactions",
+    });
   };
 
   const addMultipleTransactions = (txs: Omit<Transaction, "id">[]) => {
@@ -741,6 +829,17 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       goals: g1,
       transactions: state.transactions.filter((t) => !ids.includes(t.id)),
     });
+    // Assuming the instruction meant to add this to deleteMultipleTransactions
+    // and that `oldTx` refers to the first transaction in `txsToDelete` if only one is deleted.
+    // For multiple transactions, this logging might need to be inside the forEach loop or aggregated.
+    // Sticking to the instruction's provided snippet structure.
+    if (txsToDelete.length === 1) {
+      const oldTx = txsToDelete[0];
+      logInHousehold("transaction_delete", {
+        amount: oldTx.amount,
+        note: oldTx.note,
+      });
+    }
   };
 
   // --- Wallets ---
@@ -761,6 +860,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       ],
     });
+    logInHousehold("wallet_create", { name: w.name, type: w.type });
     return id;
   };
 
@@ -779,10 +879,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           : wallet,
       ),
     });
+    logInHousehold("wallet_edit", { name: w.name, type: w.type });
   };
 
   const deleteWallet = (id: string) => {
+    const w = state.wallets.find((wallet) => wallet.id === id);
     syncState({ ...state, wallets: state.wallets.filter((w) => w.id !== id) });
+    if (w) logInHousehold("wallet_delete", { name: w.name });
   };
 
   const archiveWallet = (id: string, archive: boolean) => {
@@ -790,6 +893,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       w.id === id ? { ...w, archived: archive } : w,
     );
     syncState({ ...state, wallets: updatedWallets });
+    logInHousehold("wallet_archive", { 
+      id, 
+      archive, 
+      name: state.wallets.find(w => w.id === id)?.name 
+    });
   };
 
   const deleteWalletWithTransactions = (id: string) => {
@@ -1125,6 +1233,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       lastModifiedBy: user?.email || "User",
     };
     syncState({ ...state, budgets: [...state.budgets, newBudget] });
+    logInHousehold("budget_create", { name: budget.name, amount: budget.amount });
   };
   const updateBudget = (budget: Budget) => {
     const oldBudget = state.budgets.find((b) => b.id === budget.id);
@@ -1145,9 +1254,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
           : b,
       ),
     });
+    logInHousehold("budget_edit", { name: budget.name, amount: budget.amount });
   };
-  const deleteBudget = (id: string) =>
+
+  const deleteBudget = (id: string) => {
+    const b = state.budgets.find((budget) => budget.id === id);
     syncState({ ...state, budgets: state.budgets.filter((b) => b.id !== id) });
+    if (b) logInHousehold("budget_delete", { name: b.name });
+  };
 
   // --- Goals ---
   const addGoal = (
@@ -1174,6 +1288,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ...state,
       goals: [...state.goals, newGoal],
     });
+    logInHousehold("goal_create", { name: goalInput.name, targetAmount: goalInput.targetAmount });
   };
 
   const updateGoal = (goal: Goal) => {
@@ -1199,6 +1314,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ...state,
       goals: updatedGoals,
     });
+    logInHousehold("goal_edit", { name: goal.name, targetAmount: goal.targetAmount });
   };
 
   const deleteGoal = (
@@ -1245,6 +1361,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       wallets: nextWallets,
       transactions: nextTransactions,
     });
+    logInHousehold("goal_delete", { name: goal.name });
   };
 
   // --- Recurring ---
@@ -1465,6 +1582,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         completeTour,
         addTransaction,
         updateTransaction,
+        updateMultipleTransactions,
         addMultipleTransactions,
         deleteTransaction,
         deleteMultipleTransactions,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useData } from "../context/DataContext";
 import { Reorder, motion, AnimatePresence } from "framer-motion";
 import {
@@ -9,9 +9,13 @@ import {
   RotateCcw,
   Calendar,
   ChevronDown,
+  Home,
+  Users,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import CustomDatePicker from "../components/CustomDatePicker";
 import { useTranslation } from "react-i18next";
+import { useHousehold } from "../context/HouseholdContext";
 import { DashboardWidgetConfig, TimeRange } from "../types";
 import { cn } from "../utils";
 
@@ -20,8 +24,6 @@ import { NetWorthWidget } from "../components/dashboard/NetWorthWidget";
 import { WalletOverviewWidget } from "../components/dashboard/WalletOverviewWidget";
 import { ActiveGoalsWidget } from "../components/dashboard/ActiveGoalsWidget";
 import { RecentTransactionsWidget } from "../components/dashboard/RecentTransactionsWidget";
-import { filterTransactionsByRange } from "../utils/analytics";
-import { useNavigate } from "react-router-dom";
 import { MonthlySpendingWidget } from "../components/dashboard/MonthlySpendingWidget";
 import { BudgetProgressWidget } from "../components/dashboard/BudgetProgressWidget";
 import { QuickActionsWidget } from "../components/dashboard/QuickActionsWidget";
@@ -30,45 +32,6 @@ import { SnapshotWidget } from "../components/dashboard/SnapshotWidget";
 import { PlannedSpendingWidget } from "../components/dashboard/PlannedSpendingWidget";
 import { BalanceTrendWidget } from "../components/dashboard/BalanceTrendWidget";
 import { WidgetSkeleton } from "../components/dashboard/WidgetSkeleton";
-
-// Import Analytics Widgets for Dashboard
-import { CategoryDistribution } from "../components/analytics/CategoryDistribution";
-import { SmartInsights } from "../components/analytics/SmartInsights";
-import { SmallPurchaseLeak } from "../components/analytics/SmallPurchaseLeak";
-import { SpendingPersonality } from "../components/analytics/SpendingPersonality";
-
-// Wrapper for Analytics Widgets on Dashboard
-const AnalyticsWidgetWrapper: React.FC<{
-  Component: any;
-  timeRange: TimeRange;
-  customStartDate?: string;
-  customEndDate?: string;
-  onCategorySelect?: (id: string) => void;
-}> = ({ Component, timeRange, customStartDate, customEndDate, onCategorySelect }) => {
-  const { transactions } = useData();
-  const navigate = useNavigate();
-
-  const filteredTransactions = useMemo(
-    () => filterTransactionsByRange(transactions, timeRange, customStartDate, customEndDate),
-    [transactions, timeRange, customStartDate, customEndDate]
-  );
-
-  const handleDrillDown = (filters: { category?: string; type?: string; wallet?: string }) => {
-    const params = new URLSearchParams();
-    if (filters.category) params.append("category", filters.category);
-    if (filters.type) params.append("type", filters.type);
-    if (filters.wallet) params.append("wallet", filters.wallet);
-    navigate(`/transactions?${params.toString()}`);
-  };
-
-  return (
-    <Component 
-      transactions={filteredTransactions} 
-      onDrillDown={handleDrillDown}
-      onCategorySelect={onCategorySelect}
-    />
-  );
-};
 
 const widgetComponents: Record<string, React.FC<{ 
   timeRange: TimeRange;
@@ -86,10 +49,6 @@ const widgetComponents: Record<string, React.FC<{
   snapshot: SnapshotWidget as any,
   planned: PlannedSpendingWidget as any,
   trend: BalanceTrendWidget as any,
-  category_dist: (props: any) => <AnalyticsWidgetWrapper Component={CategoryDistribution} {...props} />,
-  insights: (props: any) => <AnalyticsWidgetWrapper Component={SmartInsights} {...props} />,
-  leak: (props: any) => <AnalyticsWidgetWrapper Component={SmallPurchaseLeak} {...props} />,
-  personality: (props: any) => <AnalyticsWidgetWrapper Component={SpendingPersonality} {...props} />,
 };
 
 const widgetLabels: Record<string, string> = {
@@ -104,10 +63,6 @@ const widgetLabels: Record<string, string> = {
   snapshot: "Savings & Burn Rate",
   planned: "Planned Spending",
   trend: "Balance Trend",
-  category_dist: "Spending by Category",
-  insights: "Smart Insights",
-  leak: "Small Purchase Leak",
-  personality: "Spending Personality",
 };
 
 const timeRangeOptions: { value: TimeRange; label: string }[] = [
@@ -130,6 +85,8 @@ const Dashboard: React.FC = () => {
     dashboardWidgets = [],
     updateDashboardWidgets,
   } = useData();
+  const { activeWorkspace, currentHousehold, currentMembers } = useHousehold();
+  const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
   const [localWidgets, setLocalWidgets] = useState<DashboardWidgetConfig[]>([]);
@@ -151,28 +108,20 @@ const Dashboard: React.FC = () => {
     "snapshot",
     "planned",
     "trend",
-    "category_dist",
-    "insights",
-    "leak",
-    "personality",
   ];
 
   const DASHBOARD_WIDGET_DEFAULTS: DashboardWidgetConfig[] = [
     { id: "networth", enabled: true, order: 1 },
-    { id: "actions", enabled: true, order: 2 },
-    { id: "income_expense", enabled: true, order: 3 },
-    { id: "snapshot", enabled: true, order: 4 },
-    { id: "wallets", enabled: true, order: 5 },
-    { id: "category_dist", enabled: true, order: 6 },
-    { id: "insights", enabled: true, order: 7 },
-    { id: "trend", enabled: true, order: 8 },
-    { id: "goals", enabled: true, order: 9 },
-    { id: "transactions", enabled: true, order: 10 },
-    { id: "leak", enabled: false, order: 11 },
-    { id: "personality", enabled: false, order: 12 },
-    { id: "spending", enabled: false, order: 13 },
-    { id: "budgets", enabled: false, order: 14 },
-    { id: "planned", enabled: false, order: 15 },
+    { id: "income_expense", enabled: true, order: 2 },
+    { id: "snapshot", enabled: true, order: 3 },
+    { id: "wallets", enabled: true, order: 4 },
+    { id: "trend", enabled: true, order: 5 },
+    { id: "goals", enabled: true, order: 6 },
+    { id: "transactions", enabled: true, order: 7 },
+    { id: "spending", enabled: false, order: 8 },
+    { id: "budgets", enabled: false, order: 9 },
+    { id: "actions", enabled: false, order: 10 },
+    { id: "planned", enabled: false, order: 11 },
   ];
 
   // Sync local state when not editing
@@ -323,6 +272,50 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Household Header/Banner */}
+      {activeWorkspace.type === "household" && currentHousehold && !isEditing && (
+        <motion.div
+           initial={{ opacity: 0, y: -20 }}
+           animate={{ opacity: 1, y: 0 }}
+           className="relative group cursor-pointer overflow-hidden rounded-[2rem] bg-brand-500/5 dark:bg-brand-500/10 border border-brand-500/20 p-5 sm:p-6 mb-2 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-brand-500/10 dark:hover:bg-brand-500/15 transition-all duration-300"
+           onClick={() => navigate("/household-settings")}
+        >
+          {/* Decorative glass elements */}
+          <div className="absolute top-0 right-0 w-[400px] h-full bg-brand-500/10 blur-[90px] -translate-y-1/4 translate-x-1/4 pointer-events-none group-hover:bg-brand-500/20 transition-all duration-700" />
+          
+          <div className="flex items-center gap-5 relative z-10 w-full md:w-auto">
+            <div className="w-14 h-14 rounded-3xl bg-brand-500 text-white flex items-center justify-center shadow-2xl shadow-brand-500/40 group-hover:scale-105 group-hover:rotate-3 transition-transform duration-500">
+               <Home size={28} />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-base-900 dark:text-white flex items-center gap-3">
+                 {currentHousehold.name}
+                 <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full bg-brand-500 text-white text-[10px] font-black uppercase tracking-widest shadow-md shadow-brand-500/20">
+                    ACTIVE
+                 </span>
+              </h3>
+              <div className="flex items-center gap-2 mt-1">
+                 <div className="flex -space-x-2">
+                   {currentMembers.filter(m => m.status === 'active').slice(0, 3).map((m, i) => (
+                     <div key={m.uid} className="w-6 h-6 rounded-full border-2 border-white dark:border-zinc-900 bg-brand-100 overflow-hidden" style={{ zIndex: 3-i }}>
+                       {m.avatarBase64 ? <img src={m.avatarBase64} alt="" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-brand-500 text-[10px] text-white">{m.displayName[0]}</div>}
+                     </div>
+                   ))}
+                 </div>
+                 <p className="text-sm text-slate-500 dark:text-zinc-400 font-semibold ml-1">
+                   {currentMembers.filter(m => m.status === 'active').length} members collaborating
+                 </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 px-5 py-3 bg-white/60 dark:bg-black/40 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl text-sm font-bold text-slate-700 dark:text-zinc-200 shadow-sm group-hover:border-brand-500 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-all group-hover:shadow-lg w-full md:w-auto justify-center">
+             <Settings size={18} className="text-brand-500 group-hover:rotate-90 transition-transform duration-700" />
+             Manage Household
+          </div>
+        </motion.div>
+      )}
 
       {timeRange === "custom" && !isEditing && (
         <motion.div 

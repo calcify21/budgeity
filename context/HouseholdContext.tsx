@@ -252,6 +252,29 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, [user, activeWorkspace]);
 
+  // ── Sync active workspace with household changes ──────────────────
+  useEffect(() => {
+    if (activeWorkspace.type === "household" && !isLoadingHouseholds) {
+      const match = households.find((h) => h.id === activeWorkspace.id);
+      if (match) {
+        if (match.name !== activeWorkspace.name) {
+          const updated = { ...activeWorkspace, name: match.name };
+          setActiveWorkspace(updated);
+          localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(updated));
+        }
+      } else if (user) {
+        // The user is no longer a member of this household or it was deleted
+        const personal: Workspace = {
+          type: "personal",
+          id: user.uid,
+          name: "Personal",
+        };
+        setActiveWorkspace(personal);
+        localStorage.setItem(WORKSPACE_STORAGE_KEY, JSON.stringify(personal));
+      }
+    }
+  }, [households, activeWorkspace, isLoadingHouseholds, user]);
+
   // ── Workspace switching ──────────────────────────────────────────
   const switchWorkspace = useCallback((workspace: Workspace) => {
     setActiveWorkspace(workspace);
@@ -313,6 +336,12 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
   const deleteHousehold = useCallback(
     async (id: string) => {
       if (!user) throw new Error("Not authenticated");
+      await logActivity(id, {
+        actorUid: user.uid,
+        actorName: user.displayName || "Unknown",
+        actionType: "household_delete",
+        metadata: {},
+      });
       await deleteDoc(doc(db, "households", id));
       // Switch back to personal if deleting active household
       if (activeWorkspace.type === "household" && activeWorkspace.id === id) {
@@ -340,15 +369,15 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
       const updatedRoles = { ...data.memberRoles };
       delete updatedRoles[user.uid];
 
-      await updateDoc(docRef, {
-        members: updatedMembers,
-        memberUids: data.memberUids.filter((uid) => uid !== user.uid),
-        memberRoles: updatedRoles,
-      });
       await logActivity(id, {
         actorUid: user.uid,
         actorName: user.displayName || "Unknown",
         actionType: "member_leave",
+      });
+      await updateDoc(docRef, {
+        members: updatedMembers,
+        memberUids: data.memberUids.filter((uid) => uid !== user.uid),
+        memberRoles: updatedRoles,
       });
       if (activeWorkspace.type === "household" && activeWorkspace.id === id) {
         switchWorkspace({
@@ -443,6 +472,12 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
       };
 
       await addDoc(collection(db, "householdInvites"), invite);
+      await logActivity(householdId, {
+        actorUid: user.uid,
+        actorName: user.displayName || "Unknown",
+        actionType: "member_invite",
+        metadata: { invitedEmail: email.toLowerCase().trim(), role },
+      });
     },
     [user, households],
   );
@@ -462,7 +497,7 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
         email: user.email || "",
         displayName: user.displayName || "User",
         photoURL: user.photoURL || "",
-        role: "member",
+        role: invite.role,
         joinedAt: new Date().toISOString(),
         status: "active",
       };
@@ -471,7 +506,7 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
       await updateDoc(householdRef, {
         members: arrayUnion(newMember),
         memberUids: arrayUnion(user.uid),
-        [`memberRoles.${user.uid}`]: "member",
+        [`memberRoles.${user.uid}`]: invite.role,
       });
 
       await updateDoc(inviteRef, { status: "accepted" });
@@ -480,18 +515,46 @@ export const HouseholdProvider: React.FC<{ children: React.ReactNode }> = ({
         actorUid: user.uid,
         actorName: user.displayName || "Unknown",
         actionType: "member_join",
-        metadata: { role: "member" },
+        metadata: { role: invite.role },
       });
     },
     [user],
   );
   const declineInvite = useCallback(async (inviteId: string) => {
-    await deleteDoc(doc(db, "householdInvites", inviteId));
-  }, []);
+    const inviteRef = doc(db, "householdInvites", inviteId);
+    const snap = await getDoc(inviteRef);
+    if (!snap.exists()) return;
+    const invite = snap.data() as HouseholdInvite;
+    
+    if (user) {
+      await logActivity(invite.householdId, {
+        actorUid: user.uid,
+        actorName: user.displayName || "Unknown",
+        actionType: "member_invite_decline",
+        metadata: { invitedEmail: invite.invitedEmail },
+      });
+    }
+
+    await updateDoc(inviteRef, { status: "declined" });
+  }, [user]);
 
   const cancelInvite = useCallback(async (inviteId: string) => {
-    await deleteDoc(doc(db, "householdInvites", inviteId));
-  }, []);
+    const inviteRef = doc(db, "householdInvites", inviteId);
+    const snap = await getDoc(inviteRef);
+    if (!snap.exists()) return;
+    const invite = snap.data() as HouseholdInvite;
+
+    if (user) {
+      await logActivity(invite.householdId, {
+        actorUid: user.uid,
+        actorName: user.displayName || "Unknown",
+        actionType: "member_invite_cancel",
+        metadata: { invitedEmail: invite.invitedEmail },
+      });
+    }
+
+    await deleteDoc(inviteRef);
+  }, [user]);
 
   // ── Current household helpers ────────────────────────────────────
   const currentHousehold =

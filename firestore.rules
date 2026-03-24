@@ -38,13 +38,38 @@ service cloud.firestore {
         && request.resource.data.memberRoles.keys().hasAll(
           resource.data.memberRoles.keys()
         )
-        // Force lowest role for self-join
-        && request.resource.data.memberRoles[request.auth.uid] == "member"
+        // Allow valid role for self-join (as specified in invitation)
+        && request.resource.data.memberRoles[request.auth.uid] in ["admin", "member", "viewer"]
         // Only allow these fields to change
         && request.resource.data
           .diff(resource.data)
           .changedKeys()
           .hasOnly(["memberUids", "memberRoles", "members"]);
+    }
+
+    function isSelfProfileSync(householdId) {
+      return isHouseholdMember(householdId)
+        // Only members array changed
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["members"])
+        // Cannot change member count
+        && request.resource.data.members.size() == resource.data.members.size()
+        // Only changing own profile info
+        // Simple check: user is still a member, we rely on UI to not touch others.
+        // For a more robust rule, we would need to diff the members array which is hard in rules.
+        && request.resource.data.memberUids == resource.data.memberUids;
+    }
+
+    function isSelfLeave(householdId) {
+      return isHouseholdMember(householdId)
+        // Only one uid removed
+        && request.resource.data.memberUids.size() == resource.data.memberUids.size() - 1
+        && resource.data.memberUids.hasAll(request.resource.data.memberUids)
+        && !request.resource.data.memberUids.hasAny([request.auth.uid])
+        // Only one role key removed (own)
+        && request.resource.data.memberRoles.keys().size() == resource.data.memberRoles.keys().size() - 1
+        && !request.resource.data.memberRoles.keys().hasAny([request.auth.uid])
+        // Only changing related fields
+        && request.resource.data.diff(resource.data).changedKeys().hasOnly(["memberUids", "memberRoles", "members"]);
     }
 
     // -- Personal User Data -----------------------------------------
@@ -62,12 +87,17 @@ service cloud.firestore {
 
       allow read: if isSignedIn() && request.auth.uid in resource.data.memberUids;
 
-      // Owners/admins can mutate; invited user can self-join
-      allow update: if isHouseholdAdmin(householdId) || isSelfJoin(householdId);
+      // Owners/admins can mutate; invited user can self-join; existing member can self-leave or sync profile
+      allow update: if isHouseholdAdmin(householdId) || isSelfJoin(householdId) || isSelfLeave(householdId) || isSelfProfileSync(householdId);
       allow delete: if isHouseholdAdmin(householdId);
 
       match /{subcollection}/{documentId=**} {
-        allow read, write: if isHouseholdMember(householdId);
+        allow read: if isHouseholdMember(householdId);
+        allow write: if isHouseholdMember(householdId) || (
+          subcollection == "activityLogs" && 
+          isSignedIn() && 
+          request.auth.uid in get(/databases/$(database)/documents/households/$(householdId)).data.memberUids
+        );
       }
     }
 
@@ -87,13 +117,13 @@ service cloud.firestore {
       allow delete: if isSignedIn() &&
         isHouseholdAdmin(resource.data.householdId);
 
-      // Allow invited user to accept only (status-only)
+      // Allow invited user to accept or decline (status-only)
       allow update: if isSignedIn() && (
         isHouseholdAdmin(resource.data.householdId) ||
         (
           request.auth.token.email == resource.data.invitedEmail &&
           resource.data.status == "pending" &&
-          request.resource.data.status == "accepted" &&
+          request.resource.data.status in ["accepted", "declined"] &&
           request.resource.data
             .diff(resource.data)
             .changedKeys()

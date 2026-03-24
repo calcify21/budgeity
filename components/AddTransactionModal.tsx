@@ -28,6 +28,7 @@ import { useEscapeKey } from "../hooks/useEscapeKey";
 interface Props {
   onClose: () => void;
   transactionToEdit?: Transaction;
+  defaultType?: TransactionType;
 }
 
 // Fix: Cast motion components to any to resolve type errors
@@ -39,6 +40,7 @@ const STEPS = ["Amount", "Category", "Details"];
 const AddTransactionModal: React.FC<Props> = ({
   onClose,
   transactionToEdit,
+  defaultType,
 }) => {
   const {
     wallets,
@@ -58,7 +60,7 @@ const AddTransactionModal: React.FC<Props> = ({
   const [direction, setDirection] = useState(0); // -1 for back, 1 for next
 
   // Data State (Draft)
-  const [type, setType] = useState<TransactionType>("expense");
+  const [type, setType] = useState<TransactionType>(defaultType || "expense");
   const [amountExpr, setAmountExpr] = useState(""); // Stores the raw string, e.g. "50+50"
   const [amountValue, setAmountValue] = useState(0); // Stores the evaluated number
   const [date, setDate] = useState(new Date().toISOString().split("T")[0]);

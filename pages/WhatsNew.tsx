@@ -106,34 +106,54 @@ const WhatsNew: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChangeItem
-          icon={PieChart}
-          title="Expanded Dashboard Analytics"
-          description="Your dashboard is now more powerful! We've ported 4 high-value widgets from Analytics V2: Category Distribution, Smart Insights, Small Purchase Leak, and Spending Personality."
+          icon={LayoutDashboard}
+          title="Premium Household Banners"
+          description="Instant clarity for your shared spaces! A beautiful glassmorphic banner now appears at the top of your dashboard whenever you enter a shared Household workspace."
+        />
+        <ChangeItem
+          icon={Eye}
+          title="Full-Screen Profile View"
+          description="See yourself in high resolution. Tapping your profile picture now opens a stunning, full-screen preview of your custom avatar or Google profile photo."
+        />
+        <ChangeItem
+          icon={ShieldCheck}
+          title="Role-Based Invitations"
+          description="Granular control from the start. Household invitations now perfectly honor Admin, Member, or Viewer roles upon acceptance — no more manual adjustments needed."
+        />
+        <ChangeItem
+          icon={Lock}
+          title="Integrated Privacy Toggles"
+          description="Control your privacy with speed. The 'Hide Balances' toggle is now available directly in the main App Settings, persistent across all your sessions."
+        />
+        <ChangeItem
+          icon={Camera}
+          title="Refined Avatar Cropping"
+          description="Overhauled cropping UI! Enjoy a larger workspace and high-contrast circular guides to ensure your profile photo is always perfectly framed."
+        />
+        <ChangeItem
+          icon={ArrowUpDown}
+          title="Intelligent Bulk Editing"
+          description="Smarter bulk actions! When editing multiple transactions, Budgeity now intelligently detects mixed income/expense types, locking mismatched category changes to prevent data corruption while streamlining your workflow."
+        />
+        <ChangeItem
+          icon={History}
+          title="Smart Data Auditing"
+          description="Full transparency for every rupee. Every change to your wallets, budgets, and goals is now captured in a detailed audit log, showing exactly who did what and when, ensuring total accountability in shared spaces."
         />
         <ChangeItem
           icon={Zap}
-          title="Global Modal System"
-          description="Trigger 'Add Transaction', 'New Goal', and 'New Budget' modals from anywhere in the app (including PWA shortcuts) without losing your current page context."
+          title="Instant PWA App Shortcuts"
+          description="Efficiency at your fingertips! Long-press the app icon on your home screen or right-click the taskbar on desktop to instantly Add Expense, Add Income, or jump to your Shopping List without even opening the main menu."
         />
         <ChangeItem
-          icon={Smartphone}
-          title="Home Screen PWA Widgets"
-          description="Budgeity now supports experimental Home Screen widgets for PWA users! Add a 'Summary' or 'Balance' view directly to your mobile home screen."
+          icon={UserPlus}
+          title="Member Self-Management"
+          description="Take control of your household membership! You can now leave a shared household or update your profile data (name and avatar) within a shared space independently."
         />
         <ChangeItem
-          icon={Plus}
-          title="One-Tap Mobile Actions"
-          description="The mobile navigation sheet now features a dedicated 'Quick Links' row for instant access to your most-used features like Add, Invite, and Settings."
-        />
-        <ChangeItem
-          icon={Target}
-          title="Standalone Goal Modals"
-          description="Managing your savings targets is easier than ever. Goals can now be created and edited via standalone modals directly from your dashboard."
-        />
-        <ChangeItem
-          icon={CheckCircle2}
-          title="Label & Dash Fixes"
-          description="We've polished the dashboard experience by fixing several translation labels and ensuring all analytics widgets adapt perfectly to your chosen time range."
+          icon={ShieldCheck}
+          title="Real-Time Household Activity"
+          description="We've re-engineered our database security protocols to allow high-speed, real-time activity logging within shared households. Your family's spending history now syncs instantly across all devices."
         />
         <ChangeItem
           icon={Sparkles}

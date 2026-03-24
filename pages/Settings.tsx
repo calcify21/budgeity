@@ -32,6 +32,8 @@ const Settings: React.FC = () => {
     setDefaultWallet,
     numberSystem,
     setNumberSystem,
+    hideAmounts,
+    toggleHideAmounts,
   } = useData();
   const { user } = useAuth();
   const { success, error } = useToast();
@@ -240,6 +242,29 @@ const Settings: React.FC = () => {
           >
             <span
               className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${theme === "dark" ? "translate-x-[1.625rem]" : "translate-x-1"}`}
+            />
+          </button>
+        </div>
+
+        {/* Hide Balances */}
+        <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-slate-100 dark:bg-zinc-800 rounded-2xl text-slate-600 dark:text-slate-300">
+              <Lock size={24} />
+            </div>
+            <div>
+              <div className="font-bold text-lg">Hide Balances</div>
+              <div className="text-sm text-slate-500">
+                Hide your wallet balances from the dashboard
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={toggleHideAmounts}
+            className={`relative inline-flex h-8 w-14 shrink-0 items-center rounded-full transition-colors focus:outline-none ${hideAmounts ? "bg-brand-500" : "bg-slate-200 dark:bg-zinc-700"}`}
+          >
+            <span
+              className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${hideAmounts ? "translate-x-[1.625rem]" : "translate-x-1"}`}
             />
           </button>
         </div>

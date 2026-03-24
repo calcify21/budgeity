@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import logo from "../assets/logo-927x1024.png";
 import {
   LayoutDashboard,
@@ -42,8 +42,6 @@ import { useHousehold } from "../context/HouseholdContext";
 import { useToast } from "../context/ToastContext";
 import { cn, ICON_MAP } from "../utils";
 import AddTransactionModal from "./AddTransactionModal";
-import GoalModal from "./GoalModal";
-import BudgetModal from "./BudgetModal";
 import InviteFriendsModal from "./InviteFriendsModal";
 import FeedbackModal from "./FeedbackModal";
 import HouseholdModal from "./HouseholdModal";
@@ -56,6 +54,7 @@ import UserAvatar from "./ui/UserAvatar";
 import { useAvatar } from "../hooks/useAvatar";
 import ChangePhotoModal from "./ChangePhotoModal";
 import AvatarCropModal from "./AvatarCropModal";
+import FullPhotoViewModal from "./FullPhotoViewModal";
 
 // Fix: Cast motion components to any to resolve type errors
 const MotionDiv = motion.div as any;
@@ -106,7 +105,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   const isActive =
     location.pathname === to ||
     (to !== "/" && (location.pathname + "/").startsWith(to + "/"));
-  
+
   const contentElement = (
     <Link
       to={to}
@@ -128,7 +127,12 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
       )}
-      <div className={cn("relative z-10 flex items-center gap-3", isCollapsed ? "justify-center" : "")}>
+      <div
+        className={cn(
+          "relative z-10 flex items-center gap-3",
+          isCollapsed ? "justify-center" : "",
+        )}
+      >
         <Icon
           size={20}
           className={cn(
@@ -137,7 +141,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           )}
         />
         {!isCollapsed && (
-          <span className="font-medium whitespace-nowrap overflow-hidden transition-all duration-300 w-auto opacity-100">{label}</span>
+          <span className="font-medium whitespace-nowrap overflow-hidden transition-all duration-300 w-auto opacity-100">
+            {label}
+          </span>
         )}
       </div>
     </Link>
@@ -147,7 +153,9 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
     <Tooltip content={label} side="right">
       {contentElement}
     </Tooltip>
-  ) : contentElement;
+  ) : (
+    contentElement
+  );
 };
 
 interface LayoutProps {
@@ -158,22 +166,39 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isMobileNavSheetOpen, setIsMobileNavSheetOpen] = useState(false);
+  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
+  const [txModalDefaultType, setTxModalDefaultType] = useState<"expense" | "income" | "transfer">("expense");
+
+  useEffect(() => {
+    const addParam = searchParams.get("add");
+    if (addParam === "expense" || addParam === "income" || addParam === "true") {
+      setTxModalDefaultType(addParam === "income" ? "income" : "expense");
+      setIsTxModalOpen(true);
+      // Clean up the URL after opening the modal
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [_isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem("budgeity_sidebar_collapsed");
     return saved === "true";
   });
   const [isDesktop, setIsDesktop] = useState(true);
-  
+
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  
+
   const isSidebarCollapsed = _isSidebarCollapsed && isDesktop;
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+  const [expandedSections, setExpandedSections] = useState<
+    Record<string, boolean>
+  >({
     main: true,
     planning: true,
     management: true,
@@ -181,19 +206,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     admin: true,
   });
   const [searchQuery, setSearchQuery] = useState("");
-  
+
   const toggleSection = (section: string) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
-  
+
   const toggleSidebar = () => {
     const newVal = !_isSidebarCollapsed;
     setIsSidebarCollapsed(newVal);
     localStorage.setItem("budgeity_sidebar_collapsed", String(newVal));
   };
-  const [isTxModalOpen, setIsTxModalOpen] = useState(false);
-  const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
-  const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isHouseholdModalOpen, setIsHouseholdModalOpen] = useState(false);
@@ -214,6 +236,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { avatarBase64, saveAvatar, removeAvatar, setProviderPhoto } =
     useAvatar();
   const [isChangePhotoOpen, setIsChangePhotoOpen] = useState(false);
+  const [showFullPhoto, setShowFullPhoto] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
 
   // PWA Install Prompt State
@@ -262,27 +285,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         behavior: "instant",
       });
     }
-
-    // Handle Modal Triggers from URL Params
-    const params = new URLSearchParams(location.search);
-    if (params.get("add") === "true") {
-      setIsTxModalOpen(true);
-      // Clear param without refreshing
-      navigate(location.pathname, { replace: true });
-    } else if (params.get("add_goal") === "true") {
-      setIsGoalModalOpen(true);
-      navigate(location.pathname, { replace: true });
-    } else if (params.get("add_budget") === "true") {
-      setIsBudgetModalOpen(true);
-      navigate(location.pathname, { replace: true });
-    } else if (params.get("invite") === "true") {
-      setIsInviteModalOpen(true);
-      navigate(location.pathname, { replace: true });
-    } else if (params.get("feedback") === "true") {
-      setIsFeedbackModalOpen(true);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.pathname, location.search, navigate]);
+  }, [location.pathname]);
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 overflow-hidden relative selection:bg-brand-500/30">
@@ -297,14 +300,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         className={cn(
           "fixed lg:static inset-y-0 left-0 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-r border-slate-200 dark:border-white/5 transform transition-all duration-300 ease-in-out flex flex-col shadow-2xl lg:shadow-none",
           "-translate-x-full lg:translate-x-0",
-          isSidebarCollapsed ? "w-20" : "w-72"
+          isSidebarCollapsed ? "w-20" : "w-72",
         )}
       >
-        
-        <div className={cn("p-6 flex items-center transition-all duration-300", isSidebarCollapsed ? "justify-center flex-col gap-4" : "justify-between")}>
+        <div
+          className={cn(
+            "p-6 flex items-center transition-all duration-300",
+            isSidebarCollapsed
+              ? "justify-center flex-col gap-4"
+              : "justify-between",
+          )}
+        >
           <Link
             to="/dashboard"
-            className={cn("flex items-center gap-3 hover:opacity-80 transition-opacity", isSidebarCollapsed ? "justify-center" : "")}
+            className={cn(
+              "flex items-center gap-3 hover:opacity-80 transition-opacity",
+              isSidebarCollapsed ? "justify-center" : "",
+            )}
           >
             <div className="w-10 h-10 flex items-center justify-center shrink-0">
               <img
@@ -319,22 +331,34 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </h1>
             )}
           </Link>
-          
-          <button 
-             onClick={toggleSidebar}
-             className={cn(
-               "p-1.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-brand-500 transition-colors hidden lg:flex items-center justify-center shadow-sm"
-             )}
-             title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-           >
-             {isSidebarCollapsed ? <ChevronRight size={14} strokeWidth={3} /> : <ChevronLeft size={14} strokeWidth={3} />}
-           </button>
+
+          <button
+            onClick={toggleSidebar}
+            className={cn(
+              "p-1.5 rounded-full bg-slate-100 dark:bg-white/5 text-slate-500 hover:bg-slate-200 dark:hover:bg-brand-500 transition-colors hidden lg:flex items-center justify-center shadow-sm",
+            )}
+            title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isSidebarCollapsed ? (
+              <ChevronRight size={14} strokeWidth={3} />
+            ) : (
+              <ChevronLeft size={14} strokeWidth={3} />
+            )}
+          </button>
         </div>
 
         {/* Search Bar */}
-        <div className={cn("px-4 mb-2 transition-all duration-300", isSidebarCollapsed ? "hidden lg:hidden" : "block")}>
+        <div
+          className={cn(
+            "px-4 mb-2 transition-all duration-300",
+            isSidebarCollapsed ? "hidden lg:hidden" : "block",
+          )}
+        >
           <div className="relative">
-            <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            />
             <input
               type="text"
               placeholder={t("common.search", "Search...")}
@@ -345,15 +369,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
 
-        
         {(() => {
-          const NavHeader = ({ title, section }: { title: string, section: string }) => {
-            if (isSidebarCollapsed) return <div className="h-px bg-slate-200 dark:bg-white/5 my-3 mx-4"></div>;
+          const NavHeader = ({
+            title,
+            section,
+          }: {
+            title: string;
+            section: string;
+          }) => {
+            if (isSidebarCollapsed)
+              return (
+                <div className="h-px bg-slate-200 dark:bg-white/5 my-3 mx-4"></div>
+              );
             return (
-               <button onClick={() => toggleSection(section)} className="w-full flex items-center justify-between px-4 py-1.5 mt-4 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition-colors group">
-                 <span>{title}</span>
-                 <ChevronDown size={14} className={cn("transition-transform", expandedSections[section] ? "rotate-180" : "")} />
-               </button>
+              <button
+                onClick={() => toggleSection(section)}
+                className="w-full flex items-center justify-between px-4 py-1.5 mt-4 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition-colors group"
+              >
+                <span>{title}</span>
+                <ChevronDown
+                  size={14}
+                  className={cn(
+                    "transition-transform",
+                    expandedSections[section] ? "rotate-180" : "",
+                  )}
+                />
+              </button>
             );
           };
 
@@ -362,40 +403,135 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               section: "main",
               title: "Main",
               items: [
-                { to: "/dashboard", icon: LayoutDashboard, label: t("common.dashboard"), onClick: handleNavClick, className: undefined },
-                { to: "/analytics", icon: BarChart3, label: t("common.analytics"), onClick: handleNavClick, className: "tour-nav-analytics" },
-                { to: "/analytics-v2", icon: BarChart3, label: t("common.analytics_v2"), onClick: handleNavClick, className: undefined },
-                { to: "/transactions", icon: ArrowRightLeft, label: t("common.transactions"), onClick: handleNavClick, className: "tour-nav-transactions" },
-                { to: "/wallets", icon: Wallet, label: t("common.wallets"), onClick: handleNavClick, className: "tour-nav-wallets" }
-              ]
+                {
+                  to: "/dashboard",
+                  icon: LayoutDashboard,
+                  label: t("common.dashboard"),
+                  onClick: handleNavClick,
+                  className: undefined,
+                },
+                {
+                  to: "/analytics",
+                  icon: BarChart3,
+                  label: t("common.analytics"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-analytics",
+                },
+                {
+                  to: "/analytics-v2",
+                  icon: BarChart3,
+                  label: t("common.analytics_v2"),
+                  onClick: handleNavClick,
+                  className: undefined,
+                },
+                {
+                  to: "/transactions",
+                  icon: ArrowRightLeft,
+                  label: t("common.transactions"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-transactions",
+                },
+                {
+                  to: "/wallets",
+                  icon: Wallet,
+                  label: t("common.wallets"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-wallets",
+                },
+              ],
             },
             {
               section: "planning",
               title: "Planning",
               items: [
-                { to: "/budgets", icon: PiggyBank, label: t("common.budgets"), onClick: handleNavClick, className: "tour-nav-budgets" },
-                { to: "/goals", icon: Target, label: t("common.goals"), onClick: handleNavClick, className: "tour-nav-goals" },
-                { to: "/recurring", icon: Repeat, label: t("common.recurring"), onClick: handleNavClick, className: "tour-nav-recurring" },
-                { to: "/shopping-list", icon: ShoppingCart, label: t("common.shopping_list"), onClick: handleNavClick, className: "tour-nav-shopping" }
-              ]
+                {
+                  to: "/budgets",
+                  icon: PiggyBank,
+                  label: t("common.budgets"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-budgets",
+                },
+                {
+                  to: "/goals",
+                  icon: Target,
+                  label: t("common.goals"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-goals",
+                },
+                {
+                  to: "/recurring",
+                  icon: Repeat,
+                  label: t("common.recurring"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-recurring",
+                },
+                {
+                  to: "/shopping-list",
+                  icon: ShoppingCart,
+                  label: t("common.shopping_list"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-shopping",
+                },
+              ],
             },
             {
               section: "management",
               title: "Management",
               items: [
-                { to: "/categories", icon: Tags, label: t("common.categories"), onClick: handleNavClick, className: "tour-nav-categories" },
-                { to: "/export", icon: Download, label: t("common.export"), onClick: handleNavClick, className: "tour-nav-export" }
-              ]
+                {
+                  to: "/categories",
+                  icon: Tags,
+                  label: t("common.categories"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-categories",
+                },
+                {
+                  to: "/export",
+                  icon: Download,
+                  label: t("common.export"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-export",
+                },
+                ...(activeWorkspace.type === "household"
+                  ? [
+                      {
+                        to: "/household-settings",
+                        icon: Home,
+                        label: "Household Settings",
+                        onClick: handleNavClick,
+                        className: undefined,
+                      },
+                    ]
+                  : []),
+              ],
             },
             {
               section: "general",
               title: "General",
               items: [
-                { to: "/settings", icon: Settings, label: t("common.settings"), onClick: handleNavClick, className: undefined },
-                { to: "/account-info", icon: UserCircle, label: t("common.account_info"), onClick: handleNavClick, className: undefined },
-                { to: "/whats-new", icon: Sparkles, label: t("common.whats_new"), onClick: handleNavClick, className: undefined }
-              ]
-            }
+                {
+                  to: "/settings",
+                  icon: Settings,
+                  label: t("common.settings"),
+                  onClick: handleNavClick,
+                  className: undefined,
+                },
+                {
+                  to: "/account-info",
+                  icon: UserCircle,
+                  label: t("common.account_info"),
+                  onClick: handleNavClick,
+                  className: undefined,
+                },
+                {
+                  to: "/whats-new",
+                  icon: Sparkles,
+                  label: t("common.whats_new"),
+                  onClick: handleNavClick,
+                  className: undefined,
+                },
+              ],
+            },
           ];
 
           if (user?.email === "jainshr21@gmail.com") {
@@ -408,35 +544,53 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   icon: Shield,
                   label: t("common.user_feedback"),
                   onClick: handleNavClick,
-                  className: location.pathname === "/admin/feedback" 
-                            ? "shadow-none" 
-                            : "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 font-bold"
-                }
-              ]
+                  className:
+                    location.pathname === "/admin/feedback"
+                      ? "shadow-none"
+                      : "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 font-bold",
+                },
+              ],
             });
           }
 
-          const filteredNavItems = navItems.map(section => ({
-            ...section,
-            items: section.items.filter(item => 
-              !searchQuery || item.label.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-          })).filter(section => section.items.length > 0);
+          const filteredNavItems = navItems
+            .map((section) => ({
+              ...section,
+              items: section.items.filter(
+                (item) =>
+                  !searchQuery ||
+                  item.label.toLowerCase().includes(searchQuery.toLowerCase()),
+              ),
+            }))
+            .filter((section) => section.items.length > 0);
 
           return (
-            <nav className={cn("flex-1 space-y-1 overflow-y-auto custom-scrollbar", isSidebarCollapsed && !searchQuery ? "px-2" : "px-4")}>
+            <nav
+              className={cn(
+                "flex-1 space-y-1 overflow-y-auto custom-scrollbar",
+                isSidebarCollapsed && !searchQuery ? "px-2" : "px-4",
+              )}
+            >
               {filteredNavItems.length === 0 ? (
                 <div className="text-center py-6 px-4">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">No results found.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    No results found.
+                  </p>
                 </div>
               ) : (
                 filteredNavItems.map(({ title, section, items }) => (
                   <React.Fragment key={section}>
                     <NavHeader title={title} section={section} />
                     <AnimatePresence>
-                      {(isSidebarCollapsed || expandedSections[section] || searchQuery) && (
+                      {(isSidebarCollapsed ||
+                        expandedSections[section] ||
+                        searchQuery) && (
                         <MotionDiv
-                          initial={isSidebarCollapsed ? false : { height: 0, opacity: 0 }}
+                          initial={
+                            isSidebarCollapsed
+                              ? false
+                              : { height: 0, opacity: 0 }
+                          }
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
                           transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -464,49 +618,95 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           );
         })()}
 
-
         {/* Bottom Actions Section */}
-        <div className={cn("p-4 mb-4 mt-2 bg-slate-100 dark:bg-white/5 rounded-2xl flex flex-col gap-2 transition-all duration-300", isSidebarCollapsed ? "mx-2 items-center px-2 py-3" : "mx-4")}>
+        <div
+          className={cn(
+            "p-4 mb-4 mt-2 bg-slate-100 dark:bg-white/5 rounded-2xl flex flex-col gap-2 transition-all duration-300",
+            isSidebarCollapsed ? "mx-2 items-center px-2 py-3" : "mx-4",
+          )}
+        >
           {/* Invite Friends */}
           <div className="w-full">
-            <Tooltip content={isSidebarCollapsed ? "Invite Friends" : ""} side="right" disabled={!isSidebarCollapsed}>
+            <Tooltip
+              content={isSidebarCollapsed ? "Invite Friends" : ""}
+              side="right"
+              disabled={!isSidebarCollapsed}
+            >
               <button
                 onClick={handleInvite}
-                className={cn("w-full flex items-center p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-brand-500 transition-colors group", isSidebarCollapsed ? "justify-center" : "gap-3 px-3")}
+                className={cn(
+                  "w-full flex items-center p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-brand-500 transition-colors group",
+                  isSidebarCollapsed ? "justify-center" : "gap-3 px-3",
+                )}
               >
                 <Share2
                   size={18}
                   className="group-hover:scale-110 transition-transform shrink-0"
                 />
-                {!isSidebarCollapsed && <span className="font-medium text-sm whitespace-nowrap">Invite Friends</span>}
+                {!isSidebarCollapsed && (
+                  <span className="font-medium text-sm whitespace-nowrap">
+                    Invite Friends
+                  </span>
+                )}
               </button>
             </Tooltip>
           </div>
 
           {/* Feedback */}
           <div className="w-full">
-            <Tooltip content={isSidebarCollapsed ? "Send Feedback" : ""} side="right" disabled={!isSidebarCollapsed}>
+            <Tooltip
+              content={isSidebarCollapsed ? "Send Feedback" : ""}
+              side="right"
+              disabled={!isSidebarCollapsed}
+            >
               <button
                 onClick={() => setIsFeedbackModalOpen(true)}
-                className={cn("w-full flex items-center p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-brand-500 transition-colors group", isSidebarCollapsed ? "justify-center" : "gap-3 px-3")}
+                className={cn(
+                  "w-full flex items-center p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-brand-500 transition-colors group",
+                  isSidebarCollapsed ? "justify-center" : "gap-3 px-3",
+                )}
               >
                 <MessageSquare
                   size={18}
                   className="group-hover:scale-110 transition-transform shrink-0"
                 />
-                {!isSidebarCollapsed && <span className="font-medium text-sm whitespace-nowrap">Send Feedback</span>}
+                {!isSidebarCollapsed && (
+                  <span className="font-medium text-sm whitespace-nowrap">
+                    Send Feedback
+                  </span>
+                )}
               </button>
             </Tooltip>
           </div>
 
           {/* Show/Hide Balances */}
           <div className="w-full">
-            <Tooltip content={isSidebarCollapsed ? (hideAmounts ? "Show Balances" : "Hide Balances") : ""} side="right" disabled={!isSidebarCollapsed}>
+            <Tooltip
+              content={
+                isSidebarCollapsed
+                  ? hideAmounts
+                    ? "Show Balances"
+                    : "Hide Balances"
+                  : ""
+              }
+              side="right"
+              disabled={!isSidebarCollapsed}
+            >
               <button
                 onClick={toggleHideAmounts}
-                className={cn("w-full flex items-center p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-slate-200 transition-colors group", isSidebarCollapsed ? "justify-center" : "justify-between px-3")}
+                className={cn(
+                  "w-full flex items-center p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-zinc-800 hover:text-slate-900 dark:hover:text-slate-200 transition-colors group",
+                  isSidebarCollapsed
+                    ? "justify-center"
+                    : "justify-between px-3",
+                )}
               >
-                <div className={cn("flex items-center", isSidebarCollapsed ? "justify-center" : "gap-3")}>
+                <div
+                  className={cn(
+                    "flex items-center",
+                    isSidebarCollapsed ? "justify-center" : "gap-3",
+                  )}
+                >
                   {hideAmounts ? (
                     <EyeOff
                       size={18}
@@ -518,15 +718,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       className="group-hover:scale-110 transition-transform shrink-0"
                     />
                   )}
-                  {!isSidebarCollapsed && <span className="font-medium text-sm whitespace-nowrap">
-                    {hideAmounts ? "Hidden Balances" : "Show Balances"}
-                  </span>}
+                  {!isSidebarCollapsed && (
+                    <span className="font-medium text-sm whitespace-nowrap">
+                      {hideAmounts ? "Hidden Balances" : "Show Balances"}
+                    </span>
+                  )}
                 </div>
                 {!isSidebarCollapsed && (
                   <div
                     className={cn(
                       "w-1.5 h-1.5 rounded-full shrink-0",
-                      hideAmounts ? "bg-brand-500" : "bg-slate-300 dark:bg-slate-600",
+                      hideAmounts
+                        ? "bg-brand-500"
+                        : "bg-slate-300 dark:bg-slate-600",
                     )}
                   />
                 )}
@@ -537,19 +741,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Install App - Only show if valid prompt exists */}
           {deferredPrompt && (
             <div className="w-full">
-              <Tooltip content={isSidebarCollapsed ? "Install App" : ""} side="right" disabled={!isSidebarCollapsed}>
+              <Tooltip
+                content={isSidebarCollapsed ? "Install App" : ""}
+                side="right"
+                disabled={!isSidebarCollapsed}
+              >
                 <button
                   onClick={handleInstallClick}
-                  className={cn("w-full flex items-center p-2 rounded-xl text-white bg-brand-600 hover:bg-brand-500 shadow-lg shadow-brand-500/20 transition-all active:scale-95 group", isSidebarCollapsed ? "justify-center" : "gap-3 px-3")}
+                  className={cn(
+                    "w-full flex items-center p-2 rounded-xl text-white bg-brand-600 hover:bg-brand-500 shadow-lg shadow-brand-500/20 transition-all active:scale-95 group",
+                    isSidebarCollapsed ? "justify-center" : "gap-3 px-3",
+                  )}
                 >
-                  <Download size={18} className="shrink-0 group-hover:scale-110 transition-transform" />
-                  {!isSidebarCollapsed && <span className="font-bold text-sm whitespace-nowrap">Install App</span>}
+                  <Download
+                    size={18}
+                    className="shrink-0 group-hover:scale-110 transition-transform"
+                  />
+                  {!isSidebarCollapsed && (
+                    <span className="font-bold text-sm whitespace-nowrap">
+                      Install App
+                    </span>
+                  )}
                 </button>
               </Tooltip>
             </div>
           )}
         </div>
-
       </aside>
 
       {/* Main Content */}
@@ -983,13 +1200,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <AnimatePresence>
         {isTxModalOpen && (
-          <AddTransactionModal onClose={() => setIsTxModalOpen(false)} />
-        )}
-        {isGoalModalOpen && (
-          <GoalModal isOpen={isGoalModalOpen} onClose={() => setIsGoalModalOpen(false)} />
-        )}
-        {isBudgetModalOpen && (
-          <BudgetModal onClose={() => setIsBudgetModalOpen(false)} />
+          <AddTransactionModal 
+            onClose={() => setIsTxModalOpen(false)} 
+            defaultType={txModalDefaultType}
+          />
         )}
         {isInviteModalOpen && (
           <InviteFriendsModal onClose={() => setIsInviteModalOpen(false)} />
@@ -1037,6 +1251,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           )
         }
         hasCustomPhoto={!!avatarBase64}
+        onViewPhoto={() => setShowFullPhoto(true)}
+      />
+      <FullPhotoViewModal
+        isOpen={showFullPhoto}
+        onClose={() => setShowFullPhoto(false)}
+        photoURL={(avatarBase64 && avatarBase64 !== "removed" ? avatarBase64 : user?.photoURL) || null}
+        name={user?.displayName}
       />
       {cropImageSrc && (
         <AvatarCropModal

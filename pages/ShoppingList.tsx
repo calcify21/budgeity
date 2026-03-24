@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { useData } from "../context/DataContext";
 import { getCategoryIcon, cn } from "../utils";
 import {
@@ -38,9 +39,21 @@ const ShoppingList: React.FC = () => {
   } = useData();
   const { info, success, error } = useToast();
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ShoppingItem | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("add") === "item") {
+      setIsAddModalOpen(true);
+      // Clean up the URL after opening the modal
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
+
   const [buyingItem, setBuyingItem] = useState<ShoppingItem | null>(null);
   const [revertItem, setRevertItem] = useState<ShoppingItem | null>(null);
   const [showPurchased, setShowPurchased] = useState(false);

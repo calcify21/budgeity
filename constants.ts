@@ -119,7 +119,7 @@ export const CURRENCIES = [
   { code: "MMK", symbol: "K", name: "Myanma Kyat" },
   { code: "MNT", symbol: "₮", name: "Mongolian Tugrik" },
   { code: "MOP", symbol: "P", name: "Macanese Pataca" },
-  { code: "MRO", symbol: "UM", name: "Mauritanian Ouguiya" },
+  { code: "MRU", symbol: "UM", name: "Mauritanian Ouguiya" },
   { code: "MUR", symbol: "₨", name: "Mauritian Rupee" },
   { code: "MVR", symbol: "Rf", name: "Maldivian Rufiyaa" },
   { code: "MWK", symbol: "MK", name: "Malawian Kwacha" },
@@ -155,7 +155,7 @@ export const CURRENCIES = [
   { code: "SLL", symbol: "Le", name: "Sierra Leonean Leone" },
   { code: "SOS", symbol: "Sh", name: "Somali Shilling" },
   { code: "SRD", symbol: "$", name: "Surinamese Dollar" },
-  { code: "STD", symbol: "Db", name: "São Tomé and Príncipe Dobra" },
+  { code: "STN", symbol: "Db", name: "São Tomé and Príncipe Dobra" },
   { code: "SVC", symbol: "$", name: "Salvadoran Colón" },
   { code: "SYP", symbol: "£", name: "Syrian Pound" },
   { code: "SZL", symbol: "L", name: "Swazi Lilangeni" },
@@ -172,7 +172,7 @@ export const CURRENCIES = [
   { code: "UGX", symbol: "USh", name: "Ugandan Shilling" },
   { code: "UYU", symbol: "$U", name: "Uruguayan Peso" },
   { code: "UZS", symbol: "лв", name: "Uzbekistan Som" },
-  { code: "VEF", symbol: "Bs", name: "Venezuelan Bolívar Fuerte" },
+  { code: "VES", symbol: "Bs", name: "Venezuelan Bolívar Soberano" },
   { code: "VND", symbol: "₫", name: "Vietnamese Dong" },
   { code: "VUV", symbol: "VT", name: "Vanuatu Vatu" },
   { code: "WST", symbol: "WS$", name: "Samoan Tala" },
@@ -184,6 +184,8 @@ export const CURRENCIES = [
   { code: "ZAR", symbol: "R", name: "South African Rand" },
   { code: "ZMW", symbol: "ZK", name: "Zambian Kwacha" },
   { code: "ZWL", symbol: "$", name: "Zimbabwean Dollar" },
+  { code: "KID", symbol: "$", name: "Kiribati Dollar" },
+  { code: "TVD", symbol: "$", name: "Tuvaluan Dollar" },
 ].sort((a, b) => a.code.localeCompare(b.code));
 
 export const DEFAULT_CATEGORIES: Category[] = [
@@ -477,6 +479,7 @@ export const INITIAL_WALLETS: Wallet[] = [
     type: "cash",
     balance: 0,
     color: "#10b981",
+    icon: "Wallet",
     createdAt: new Date().toISOString(),
   },
 ];

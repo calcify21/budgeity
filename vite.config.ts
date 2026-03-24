@@ -86,46 +86,31 @@ export default defineConfig({
         ],
         shortcuts: [
           {
-            name: "Add Transaction",
-            short_name: "Add",
-            description: "Add a new transaction",
-            url: "/budgeity/#/dashboard?add=true",
-            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }]
+            name: "Add Expense",
+            short_name: "Expense",
+            url: "/budgeity/#/dashboard?add=expense",
+            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
+          },
+          {
+            name: "Add Income",
+            short_name: "Income",
+            url: "/budgeity/#/dashboard?add=income",
+            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
+          },
+          {
+            name: "Add to Shopping List",
+            short_name: "Shop Item",
+            url: "/budgeity/#/shopping-list?add=item",
+            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
           },
           {
             name: "Analytics",
             short_name: "Analytics",
-            description: "View financial analytics",
-            url: "/budgeity/#/analytics-v2",
-            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }]
+            url: "/budgeity/#/analytics",
+            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
           },
-          {
-            name: "Wallets",
-            short_name: "Wallets",
-            description: "Manage your wallets",
-            url: "/budgeity/#/wallets",
-            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }]
-          }
         ],
-        widgets: [
-          {
-            name: "Budgeity Quick View",
-            short_name: "Quick View",
-            description: "Check your financial status at a glance",
-            tag: "budgeity-summary",
-            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
-            screenshots: [{ src: "pwa-512x512.png", sizes: "512x512", label: "Summary View" }]
-          },
-          {
-            name: "Budgeity Balance",
-            short_name: "Balance",
-            description: "Keep track of your total balance",
-            tag: "budgeity-balance",
-            icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
-            screenshots: [{ src: "pwa-512x512.png", sizes: "512x512", label: "Balance View" }]
-          }
-        ]
-      } as any,
+      },
     }),
   ],
   resolve: {

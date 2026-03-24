@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import CustomSelect from "./CustomSelect";
 import { cn } from "../utils";
 import { COLORS } from "../constants";
-import { Banknote, Landmark, Lock, AlertCircle } from "lucide-react";
+import { Wallet as WalletIcon, Landmark, Lock, AlertCircle } from "lucide-react";
 import { useToast } from "../context/ToastContext";
 import IconPicker from "./IconPicker";
 import { useScrollToError } from "../hooks/useScrollToError";
@@ -23,7 +23,7 @@ const WALLET_TYPES: {
   {
     value: "cash",
     label: "Cash",
-    icon: Banknote,
+    icon: WalletIcon,
     desc: "Physical cash. Cannot go negative.",
   },
   {
@@ -58,7 +58,7 @@ const WalletModal: React.FC<Props> = ({
   const [type, setType] = useState<WalletType>("cash");
   const [initialBalance, setInitialBalance] = useState("");
   const [color, setColor] = useState("#10b981");
-  const [selectedIcon, setSelectedIcon] = useState("Banknote");
+  const [selectedIcon, setSelectedIcon] = useState("Wallet");
 
   useEffect(() => {
     if (walletToEdit) {
@@ -66,14 +66,14 @@ const WalletModal: React.FC<Props> = ({
       setType(walletToEdit.type);
       setInitialBalance(walletToEdit.balance.toString());
       setColor(walletToEdit.color);
-      setSelectedIcon(walletToEdit.icon || "Banknote");
+      setSelectedIcon(walletToEdit.icon || "Wallet");
       setMode("create");
     } else {
       setName("");
       setType("cash");
       setInitialBalance("");
       setColor("#10b981");
-      setSelectedIcon("Banknote");
+      setSelectedIcon("Wallet");
       setMode("create");
     }
   }, [walletToEdit]);
@@ -85,7 +85,7 @@ const WalletModal: React.FC<Props> = ({
     if (typeConfig) {
       setSelectedIcon(
         typeConfig.value === "cash"
-          ? "Banknote"
+          ? "Wallet"
           : typeConfig.value === "bank"
             ? "Landmark"
             : "Lock",

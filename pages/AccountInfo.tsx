@@ -13,13 +13,16 @@ import {
   KeyRound,
   AlertTriangle,
   UserX,
+  X,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import EditNameModal from "../components/EditNameModal";
 import { ConfirmModal } from "../components/ConfirmModal";
 import UserAvatar from "../components/ui/UserAvatar";
 import ChangePhotoModal from "../components/ChangePhotoModal";
 import AvatarCropModal from "../components/AvatarCropModal";
+import FullPhotoViewModal from "../components/FullPhotoViewModal";
 
 const providerLabel = (providerId: string): string => {
   switch (providerId) {
@@ -85,6 +88,7 @@ const AccountInfo: React.FC = () => {
   const [showEditName, setShowEditName] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [isChangePhotoOpen, setIsChangePhotoOpen] = useState(false);
+  const [showFullPhoto, setShowFullPhoto] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const { avatarBase64, saveAvatar, removeAvatar, setProviderPhoto } =
     useAvatar();
@@ -296,6 +300,7 @@ const AccountInfo: React.FC = () => {
             error("Failed to remove photo.");
           }
         }}
+        onViewPhoto={() => setShowFullPhoto(true)}
         hasGooglePhoto={
           !!(
             user?.photoURL &&
@@ -304,6 +309,13 @@ const AccountInfo: React.FC = () => {
           )
         }
         hasCustomPhoto={!!avatarBase64}
+      />
+
+      <FullPhotoViewModal
+        isOpen={showFullPhoto}
+        onClose={() => setShowFullPhoto(false)}
+        photoURL={(avatarBase64 && avatarBase64 !== "removed" ? avatarBase64 : user?.photoURL) || null}
+        name={user?.displayName}
       />
       {cropImageSrc && (
         <AvatarCropModal

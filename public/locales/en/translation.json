@@ -107,13 +107,7 @@
     "no_budgets": "No budgets set.",
     "no_goals": "No active goals.",
     "stored": "{{amount}} stored",
-    "of_budget": "{{percent}}% of Budget",
-    "monthly_spending": "Monthly Spending",
-    "quick_actions": "Quick Actions",
-    "total_this_month": "Total This Month",
-    "period_spending": "Period Spending",
-    "total_in_period": "Total in Period",
-    "spending_by_category": "Spending by Category"
+    "of_budget": "{{percent}}% of Budget"
   },
   "transactions": {
     "title": "Transactions",

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -28,11 +28,12 @@ import {
   Check,
   Search,
   GripVertical,
-  Zap
+  Home,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../utils";
 import { useData } from "../../context/DataContext";
+import { useHousehold } from "../../context/HouseholdContext";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useToast } from "../../context/ToastContext";
 import { Reorder, useDragControls } from "framer-motion";
@@ -195,7 +196,6 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
   const location = useLocation();
   const { navPreferences, updateNavPreferences } = useData();
   const { error } = useToast();
-  const navigate = useNavigate();
   const [isCustomizing, setIsCustomizing] = React.useState(false);
   const [localPinnedIds, setLocalPinnedIds] = React.useState<string[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -231,6 +231,15 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
     { to: "/account-info", icon: UserCircle, label: t("common.account_info") },
     { to: "/whats-new", icon: Sparkles, label: t("common.whats_new") },
   ];
+
+  const { activeWorkspace } = useHousehold();
+  if (activeWorkspace.type === "household") {
+    navLinks.push({
+      to: "/household-settings",
+      icon: Home,
+      label: "Household Settings",
+    });
+  }
 
   if (userEmail === "jainshr21@gmail.com") {
     navLinks.push({ to: "/admin/feedback", icon: Shield, label: t("common.user_feedback") });
@@ -463,44 +472,6 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                 className="grid grid-cols-1 gap-2"
               >
                 <div className="space-y-4">
-                  {/* Quick Links Row */}
-                  {!isCustomizing && !searchQuery && (
-                    <motion.div variants={itemVariants} className="px-2 pt-2">
-                       <div className="flex items-center gap-2 mb-3">
-                        <Zap size={14} className="text-brand-500 fill-brand-500" />
-                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500">
-                          Quick Links
-                        </span>
-                      </div>
-                      <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2 -mx-2 px-2">
-                        {[
-                          { label: "Add Tx", icon: Plus, color: "bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400", to: "?add=true", iconSize: 24, stroke: 2.5 },
-                          { label: "Invite", icon: Share2, color: "bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400", onClick: onInviteClick },
-                          { label: "Analytics", icon: BarChart3, color: "bg-brand-500/10 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400", to: "/analytics" },
-                          { label: "Wallets", icon: Wallet, color: "bg-indigo-500/10 text-indigo-600 dark:bg-indigo-500/20 dark:text-indigo-400", to: "/wallets" },
-                          { label: "Settings", icon: Settings, color: "bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300", to: "/settings" }
-                        ].map((link, idx) => (
-                          <button
-                            key={idx}
-                            onClick={() => {
-                              if (link.to) navigate(link.to);
-                              if (link.onClick) link.onClick();
-                              onClose();
-                            }}
-                            className="flex flex-col items-center gap-2 min-w-[64px]"
-                          >
-                            <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm active:scale-95 transition-transform", link.color)}>
-                              <link.icon size={link.iconSize || 22} strokeWidth={link.stroke || 2} />
-                            </div>
-                            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-400 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">
-                              {link.label}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </motion.div>
-                  )}
-
                   {/* Search Bar */}
                   {!isCustomizing && (
                     <div className="mb-2 px-2">

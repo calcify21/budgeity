@@ -12,19 +12,28 @@ export const QuickActionsWidget: React.FC = () => {
       label: t("common.add_transaction", "Add Transaction"),
       icon: <Plus size={20} />,
       color: "bg-emerald-500 text-white",
-      onClick: () => navigate("?add=true"),
+      onClick: () => {
+        // Find existing transaction add button logic or navigate to transactions
+        navigate("/transactions");
+      },
+    },
+    {
+      label: t("common.transfer", "Transfer"),
+      icon: <ArrowRightLeft size={20} />,
+      color: "bg-indigo-500 text-white",
+      onClick: () => navigate("/transactions"),
     },
     {
       label: t("common.new_goal", "New Goal"),
       icon: <Target size={20} />,
       color: "bg-rose-500 text-white",
-      onClick: () => navigate("?add_goal=true"),
+      onClick: () => navigate("/goals"),
     },
     {
       label: t("common.new_budget", "New Budget"),
       icon: <PiggyBank size={20} />,
       color: "bg-amber-500 text-white",
-      onClick: () => navigate("?add_budget=true"),
+      onClick: () => navigate("/budgets"),
     },
   ];
 
