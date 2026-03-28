@@ -140,20 +140,31 @@ const BottomNav: React.FC<BottomNavProps> = ({
               <div className="relative flex items-center justify-center h-14 px-2">
                 <motion.button
                   onClick={onAddClick}
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  className="w-12 h-12 relative group outline-none isolate"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="group relative flex items-center justify-center w-12 h-12 rounded-full shadow-lg shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
                   aria-label="Add Transaction"
                 >
-                  <div className="absolute inset-0 bg-brand-500 rounded-full blur-[15px] opacity-40 group-hover:opacity-60 transition-opacity animate-pulse z-[-1]" />
-                  <div className="relative w-full h-full bg-brand-500 rounded-full flex items-center justify-center shadow-lg shadow-brand-500/40 border border-white/20 overflow-hidden">
-                    <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.3),transparent)] -translate-x-full group-hover:animate-shimmer transition-transform" />
-                    <Plus
-                      size={28}
-                      strokeWidth={3}
-                      className="text-white drop-shadow-md relative z-10"
-                    />
+                  {/* Outer static glow */}
+                  <div className="absolute inset-[-4px] bg-gradient-to-r from-brand-400 via-indigo-500 to-purple-500 rounded-full opacity-50 blur-md group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+                  
+                  {/* Slow pulsing outer rings */}
+                  <div className="absolute inset-0 rounded-full border border-brand-400/50 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] pointer-events-none" />
+                  <div className="absolute inset-0 rounded-full border border-indigo-400/30 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_1s] pointer-events-none" />
+
+                  {/* Core button background */}
+                  <div className="relative w-full h-full bg-gradient-to-br from-brand-500 to-indigo-600 rounded-full overflow-hidden flex items-center justify-center border border-white/20">
+                    {/* Internal diagonal shimmer */}
+                    <div className="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-no-repeat [background-position:-100%_0,0_0] group-hover:[transition:background-position_2s_ease_infinite] group-hover:animate-[shimmer_2s_infinite]" />
+                    
+                    <motion.div 
+                      className="relative z-10 text-white drop-shadow-md"
+                      initial={{ rotate: 0 }}
+                      whileHover={{ rotate: 180 }}
+                      transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                    >
+                      <Plus size={26} strokeWidth={3} />
+                    </motion.div>
                   </div>
                 </motion.button>
               </div>

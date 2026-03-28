@@ -13,6 +13,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils";
 import { useScrollToError } from "../hooks/useScrollToError";
+import { useTranslation } from "react-i18next";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -23,6 +24,7 @@ interface Props {
 
 const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
   const { updateUserPassword, logout, user } = useAuth();
+  const { t } = useTranslation();
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -46,13 +48,13 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!strongPasswordRegex.test(newPassword)) {
       setError(
-        "Password must be at least 8 chars, include uppercase, lowercase, number, and special char.",
+        t("changePasswordModal.errWeak")
       );
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(t("changePasswordModal.errMismatch"));
       return;
     }
 
@@ -65,7 +67,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
         onClose();
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "Failed to update password.");
+      setError(err.message || t("changePasswordModal.errUpdate"));
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +92,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <Lock className="text-brand-500" size={24} /> Change Password
+              <Lock className="text-brand-500" size={24} /> {t("changePasswordModal.changePassword")}
             </h2>
             <button
               onClick={onClose}
@@ -106,10 +108,10 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
                 <CheckCircle size={32} />
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Password Updated!
+                {t("changePasswordModal.passwordUpdated")}
               </h3>
               <p className="text-slate-500 mt-2">
-                Logging you out for security...
+                {t("changePasswordModal.loggingOut")}
               </p>
             </div>
           ) : (
@@ -142,7 +144,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  New Password
+                  {t("changePasswordModal.newPassword")}
                 </label>
                 <div className="relative">
                   <input
@@ -151,7 +153,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
                     autoComplete="new-password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Min. 8 characters"
+                    placeholder={t("changePasswordModal.minChars")}
                     className="w-full pl-4 pr-12 py-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
                   />
                   <button
@@ -164,7 +166,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
                 </div>
                 <div className="mt-2 text-xs flex flex-col gap-1 text-slate-400">
                   <p>
-                    Must contain 1 upper, 1 lower, 1 number, 1 special char.
+                    {t("changePasswordModal.requirements")}
                   </p>
                   <a
                     href="https://calc.aurabyte.in/pwd"
@@ -172,7 +174,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
                     rel="noopener noreferrer"
                     className="text-brand-600 hover:underline flex items-center gap-1"
                   >
-                    Can't decide? Check out this password generator{" "}
+                    {t("changePasswordModal.pwdGenerator")}{" "}
                     <ExternalLink size={10} />
                   </a>
                 </div>
@@ -180,7 +182,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Confirm Password
+                  {t("changePasswordModal.confirmPassword")}
                 </label>
                 <div className="relative">
                   <input
@@ -189,7 +191,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
                     autoComplete="new-password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Re-enter password"
+                    placeholder={t("changePasswordModal.reEnter")}
                     className="w-full pl-4 pr-12 py-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
                   />
                   <button
@@ -215,7 +217,7 @@ const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
                   {isLoading ? (
                     <Loader2 size={20} className="animate-spin" />
                   ) : (
-                    "Update Password"
+                    t("changePasswordModal.updatePassword")
                   )}
                 </button>
               </div>

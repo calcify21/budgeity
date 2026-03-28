@@ -10,34 +10,20 @@ import { useToast } from "../context/ToastContext";
 import IconPicker from "./IconPicker";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 // Cast motion component to avoid type issues
 const MotionDiv = motion.div as any;
 
 const WALLET_TYPES: {
   value: WalletType;
-  label: string;
+  labelKey: string;
   icon: any;
-  desc: string;
+  descKey: string;
 }[] = [
-  {
-    value: "cash",
-    label: "Cash",
-    icon: WalletIcon,
-    desc: "Physical cash. Cannot go negative.",
-  },
-  {
-    value: "bank",
-    label: "Bank",
-    icon: Landmark,
-    desc: "Regular bank account.",
-  },
-  {
-    value: "savings",
-    label: "Savings",
-    icon: Lock,
-    desc: "Set aside. Excluded from budgets.",
-  },
+  { value: "cash", icon: WalletIcon, labelKey: "walletModal.cash", descKey: "walletModal.cashDesc" },
+  { value: "bank", icon: Landmark, labelKey: "walletModal.bank", descKey: "walletModal.bankDesc" },
+  { value: "savings", icon: Lock, labelKey: "walletModal.savings", descKey: "walletModal.savingsDesc" },
 ];
 
 interface Props {
@@ -52,6 +38,7 @@ const WalletModal: React.FC<Props> = ({
   onImportRequested,
 }) => {
   const { addWallet, updateWallet } = useData();
+  const { t } = useTranslation();
 
   const [mode, setMode] = useState<"create" | "import">("create");
   const [name, setName] = useState("");
@@ -105,12 +92,12 @@ const WalletModal: React.FC<Props> = ({
     setError("");
 
     if (!name.trim()) {
-      setError("Please enter a wallet name.");
+      setError(t("walletModal.errNoName"));
       return;
     }
 
     if (type === "cash" && parseFloat(initialBalance) < 0) {
-      setError("Cash wallets cannot have a negative balance.");
+      setError(t("walletModal.errNegativeCash"));
       return;
     }
 
@@ -124,7 +111,7 @@ const WalletModal: React.FC<Props> = ({
           balance: parseFloat(initialBalance) || 0,
           icon: selectedIcon,
         });
-        success("Wallet updated successfully.");
+        success(t("walletModal.walletUpdated"));
         onClose();
       } else {
         const newId = addWallet({
@@ -139,12 +126,12 @@ const WalletModal: React.FC<Props> = ({
           onImportRequested(newId);
           onClose();
         } else {
-          success("Wallet created successfully.");
+          success(t("walletModal.walletCreated"));
           onClose();
         }
       }
     } catch (err: any) {
-      toastError(err.message || "Failed to save wallet.");
+      toastError(err.message || t("walletModal.errSave"));
     }
   };
 
@@ -164,7 +151,7 @@ const WalletModal: React.FC<Props> = ({
           className="p-8 overflow-y-auto custom-scrollbar flex-1"
         >
           <h2 className="text-2xl font-bold mb-6">
-            {walletToEdit ? "Edit Wallet" : "Add New Wallet"}
+            {walletToEdit ? t("walletModal.editWallet") : t("walletModal.addNewWallet")}
           </h2>
 
           {!walletToEdit && (
@@ -179,7 +166,7 @@ const WalletModal: React.FC<Props> = ({
                     : "text-slate-500",
                 )}
               >
-                Manual Setup
+                {t("walletModal.manualSetup")}
               </button>
               <button
                 type="button"
@@ -191,7 +178,7 @@ const WalletModal: React.FC<Props> = ({
                     : "text-slate-500",
                 )}
               >
-                Import Data
+                {t("walletModal.importData")}
               </button>
             </div>
           )}
@@ -205,7 +192,7 @@ const WalletModal: React.FC<Props> = ({
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                Name
+                {t("walletModal.nameLabel")}
               </label>
               <input
                 value={name}
@@ -219,29 +206,29 @@ const WalletModal: React.FC<Props> = ({
                     ? "border-rose-300 dark:border-rose-900 focus:ring-rose-500"
                     : "border-slate-200 dark:border-zinc-800",
                 )}
-                placeholder="e.g. Main Stash"
+                placeholder={t("walletModal.namePlaceholder")}
                 autoFocus
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="tour-wallet-type">
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Type
+                  {t("walletModal.typeLabel")}
                 </label>
                 <CustomSelect
                   value={type}
                   onChange={(v) => handleTypeChange(v as WalletType)}
-                  options={WALLET_TYPES.map((t) => ({
-                    value: t.value,
-                    label: t.label,
-                    icon: t.icon,
-                    subLabel: t.desc,
+                  options={WALLET_TYPES.map((wt) => ({
+                    value: wt.value,
+                    label: t(wt.labelKey),
+                    icon: wt.icon,
+                    subLabel: t(wt.descKey),
                   }))}
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  {walletToEdit ? "Balance" : "Initial"}
+                  {walletToEdit ? t("walletModal.balanceLabel") : t("walletModal.initialLabel")}
                 </label>
                 <input
                   type="number"
@@ -255,7 +242,7 @@ const WalletModal: React.FC<Props> = ({
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-                Color
+                {t("walletModal.colorLabel")}
               </label>
               <div className="flex gap-3 flex-wrap">
                 {COLORS.map((c) => (
@@ -276,7 +263,7 @@ const WalletModal: React.FC<Props> = ({
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-                Icon
+                {t("walletModal.iconLabel")}
               </label>
               <IconPicker
                 selectedIcon={selectedIcon}
@@ -288,10 +275,10 @@ const WalletModal: React.FC<Props> = ({
               className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-black rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl tour-wallet-save"
             >
               {mode === "import"
-                ? "Create & Import Data"
+                ? t("walletModal.createAndImport")
                 : walletToEdit
-                  ? "Save Changes"
-                  : "Create Wallet"}
+                  ? t("walletModal.saveChanges")
+                  : t("walletModal.createWallet")}
             </button>
           </form>
         </div>

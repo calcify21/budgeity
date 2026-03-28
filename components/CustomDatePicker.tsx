@@ -16,9 +16,10 @@ interface Props {
   className?: string;
   maxDate?: string;
   minDate?: string;
+  mode?: "date" | "month" | "year";
 }
 
-const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+const DAYS = ["S", "M", "T", "W", "T", "F", "S"];
 const MONTHS = [
   "January",
   "February",
@@ -41,6 +42,7 @@ const CustomDatePicker: React.FC<Props> = ({
   className,
   maxDate,
   minDate,
+  mode = "date",
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"days" | "months" | "years">("days");
@@ -56,10 +58,12 @@ const CustomDatePicker: React.FC<Props> = ({
   useEffect(() => {
     if (isOpen) {
       setViewDate(value ? new Date(value) : new Date());
-      setViewMode("days");
+      setViewMode(
+        mode === "year" ? "years" : mode === "month" ? "months" : "days",
+      );
       updatePosition();
     }
-  }, [isOpen, value]);
+  }, [isOpen, value, mode]);
 
   const updatePosition = () => {
     if (containerRef.current) {
@@ -154,20 +158,45 @@ const CustomDatePicker: React.FC<Props> = ({
     const newDate = new Date(viewDate);
     newDate.setMonth(monthIdx);
     setViewDate(newDate);
-    setViewMode("days");
+
+    if (mode === "month") {
+      newDate.setDate(1); // Set to 1st to prevent rollover
+      const offset = newDate.getTimezoneOffset();
+      const adjustedDate = new Date(newDate.getTime() - offset * 60 * 1000);
+      onChange(adjustedDate.toISOString().split("T")[0]);
+      setIsOpen(false);
+    } else {
+      setViewMode("days");
+    }
   };
 
   const handleYearClick = (year: number) => {
     const newDate = new Date(viewDate);
     newDate.setFullYear(year);
     setViewDate(newDate);
-    setViewMode("months");
+
+    if (mode === "year") {
+      newDate.setMonth(0);
+      newDate.setDate(1);
+      const offset = newDate.getTimezoneOffset();
+      const adjustedDate = new Date(newDate.getTime() - offset * 60 * 1000);
+      onChange(adjustedDate.toISOString().split("T")[0]);
+      setIsOpen(false);
+    } else {
+      setViewMode(mode === "month" ? "months" : "months");
+    }
   };
 
   const handleTodayClick = () => {
     const today = new Date();
     if (maxDate && today > new Date(maxDate)) return;
     if (minDate && today < new Date(minDate)) return;
+
+    if (mode === "month") today.setDate(1);
+    if (mode === "year") {
+      today.setMonth(0);
+      today.setDate(1);
+    }
 
     const offset = today.getTimezoneOffset();
     const adjustedDate = new Date(today.getTime() - offset * 60 * 1000);
@@ -178,6 +207,15 @@ const CustomDatePicker: React.FC<Props> = ({
   const formatDateDisplay = (isoDate: string) => {
     if (!isoDate) return "Select Date";
     const date = new Date(isoDate);
+
+    if (mode === "year") return date.getFullYear().toString();
+    if (mode === "month") {
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
+    }
+
     return date.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -208,16 +246,18 @@ const CustomDatePicker: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative" ref={containerRef}>
-      <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-        <CalendarIcon size={12} /> {label}
-      </label>
+    <div className="relative w-full" ref={containerRef}>
+      {label && mode === "date" && (
+        <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+          <CalendarIcon size={12} /> {label}
+        </label>
+      )}
 
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full p-4 bg-slate-50 dark:bg-black border rounded-2xl font-medium text-left transition-all flex items-center justify-between",
+          "w-full px-4 py-2.5 bg-slate-50 dark:bg-black border rounded-xl font-bold text-sm text-center transition-all flex items-center justify-between",
           isOpen
             ? "border-brand-500 ring-2 ring-brand-500/20"
             : "border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-900",
@@ -226,13 +266,15 @@ const CustomDatePicker: React.FC<Props> = ({
       >
         <span
           className={cn(
-            "text-lg",
-            value ? "text-slate-900 dark:text-white" : "text-slate-400",
+            mode === "date" ? "text-lg" : "text-sm",
+            value
+              ? "text-slate-900 dark:text-white"
+              : "text-slate-400 font-medium",
+            "mx-auto",
           )}
         >
           {formatDateDisplay(value)}
         </span>
-        <CalendarIcon size={20} className="text-slate-400" />
       </button>
 
       {portalRoot &&
@@ -263,19 +305,35 @@ const CustomDatePicker: React.FC<Props> = ({
                     <ChevronLeft size={20} />
                   </button>
                   <div className="flex items-center gap-1 font-bold text-slate-900 dark:text-white text-lg">
+                    {mode !== "year" && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setViewMode(
+                            viewMode === "months"
+                              ? mode === "month"
+                                ? "months"
+                                : "days"
+                              : "months",
+                          )
+                        }
+                        className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                      >
+                        {MONTHS[viewDate.getMonth()]}
+                      </button>
+                    )}
                     <button
                       type="button"
                       onClick={() =>
-                        setViewMode(viewMode === "months" ? "days" : "months")
-                      }
-                      className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
-                    >
-                      {MONTHS[viewDate.getMonth()]}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setViewMode(viewMode === "years" ? "days" : "years")
+                        setViewMode(
+                          viewMode === "years"
+                            ? mode === "month"
+                              ? "months"
+                              : mode === "year"
+                                ? "years"
+                                : "days"
+                            : "years",
+                        )
                       }
                       className="px-2 py-1 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                     >
@@ -416,7 +474,11 @@ const CustomDatePicker: React.FC<Props> = ({
                     onClick={handleTodayClick}
                     className="text-sm font-bold text-brand-600 dark:text-brand-400 hover:underline"
                   >
-                    Today
+                    {mode === "month"
+                      ? "This Month"
+                      : mode === "year"
+                        ? "This Year"
+                        : "Today"}
                   </button>
                 </div>
               </motion.div>

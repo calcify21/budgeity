@@ -24,6 +24,7 @@ import CustomDatePicker from "./CustomDatePicker";
 import CustomNumberPad from "./CustomNumberPad";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   onClose: () => void;
@@ -54,6 +55,7 @@ const AddTransactionModal: React.FC<Props> = ({
     formatAmount,
   } = useData();
   const { success } = useToast();
+  const { t } = useTranslation();
 
   // Navigation State
   const [step, setStep] = useState(1);
@@ -172,28 +174,28 @@ const AddTransactionModal: React.FC<Props> = ({
     }
 
     if (!expr) {
-      setError("Please enter an amount");
+      setError(t("transactionModal.errNoAmount"));
       return;
     }
     const val = evaluateExpression(expr);
     setAmountValue(val);
 
     if (val <= 0) {
-      setError("Please enter a valid positive amount");
+      setError(t("transactionModal.errInvalidAmount"));
       return;
     }
 
     if (type !== "income" && !fromWallet) {
-      setError("Please select a source wallet");
+      setError(t("transactionModal.errNoSourceWallet"));
       return;
     }
     if (type === "transfer") {
       if (!toWallet) {
-        setError("Please select a destination wallet");
+        setError(t("transactionModal.errNoDestWallet"));
         return;
       }
       if (fromWallet === toWallet) {
-        setError("Source and destination cannot be same");
+        setError(t("transactionModal.errSameWallet"));
         return;
       }
     }
@@ -225,7 +227,7 @@ const AddTransactionModal: React.FC<Props> = ({
     // Step 2 Validation (Category)
     if (step === 2) {
       if (!categoryId) {
-        setError("Please select a category");
+        setError(t("transactionModal.errNoCategory"));
         return;
       }
     }
@@ -249,7 +251,7 @@ const AddTransactionModal: React.FC<Props> = ({
     today.setHours(23, 59, 59, 999); // Allow until end of today
 
     if (selectedDate > today) {
-      setError("Future transactions are not allowed.");
+      setError(t("transactionModal.errFutureDate"));
       return;
     }
 
@@ -285,10 +287,10 @@ const AddTransactionModal: React.FC<Props> = ({
     try {
       if (transactionToEdit) {
         updateTransaction({ ...txData, id: transactionToEdit.id });
-        success("Transaction updated successfully");
+        success(t("transactionModal.txUpdated"));
       } else {
         addTransaction(txData);
-        success("Transaction added successfully");
+        success(t("transactionModal.txAdded"));
       }
       onClose();
     } catch (err: any) {
@@ -320,7 +322,7 @@ const AddTransactionModal: React.FC<Props> = ({
     if (activeWallets.length > 0) {
       options.push({
         value: "header_wallets",
-        label: "Wallets",
+        label: t("common.wallets"),
         isHeader: true,
       });
       activeWallets.forEach((w) => {
@@ -345,7 +347,7 @@ const AddTransactionModal: React.FC<Props> = ({
     if (activeGoals.length > 0) {
       options.push({
         value: "header_goals",
-        label: "Savings Goals",
+        label: t("common.goals"),
         isHeader: true,
       });
       activeGoals.forEach((g) => {
@@ -397,7 +399,7 @@ const AddTransactionModal: React.FC<Props> = ({
             {/* Calculator Amount Input */}
             <div className="text-center py-6 tour-trans-amount">
               <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center justify-center gap-2">
-                <Calculator size={14} /> Amount
+                <Calculator size={14} /> {t("transactionModal.amountLabel")}
               </label>
               <div className="flex-1 flex flex-col items-center justify-center min-h-[400px]">
                 <div className="w-full max-w-xs space-y-6">
@@ -448,7 +450,7 @@ const AddTransactionModal: React.FC<Props> = ({
             <div className="space-y-4">
               {type !== "income" && (
                 <CustomSelect
-                  label="From Wallet"
+                  label={t("transactionModal.fromWallet")}
                   value={fromWallet}
                   onChange={setFromWallet}
                   options={walletOptions}
@@ -471,7 +473,7 @@ const AddTransactionModal: React.FC<Props> = ({
 
               {type !== "expense" && (
                 <CustomSelect
-                  label={type === "transfer" ? "To Wallet" : "Deposit To"}
+                  label={type === "transfer" ? t("transactionModal.toWallet") : t("transactionModal.depositTo")}
                   value={type === "income" ? fromWallet : toWallet}
                   onChange={type === "income" ? setFromWallet : setToWallet}
                   options={walletOptions}
@@ -487,7 +489,7 @@ const AddTransactionModal: React.FC<Props> = ({
           <div className="space-y-6 h-full flex flex-col">
             <div className="flex-1 overflow-y-auto custom-scrollbar -mx-2 px-2 pb-2">
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 sticky top-0 bg-white dark:bg-zinc-900 z-10 py-2">
-                Select Category
+                {t("transactionModal.selectCategory")}
               </label>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 tour-trans-category">
                 {filteredCategories.map((cat) => {
@@ -533,7 +535,7 @@ const AddTransactionModal: React.FC<Props> = ({
                   <div className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-zinc-800">
                     <FileText size={18} />
                   </div>
-                  <span className="text-[11px] font-bold">New</span>
+                  <span className="text-[11px] font-bold">{t("transactionModal.newCategory")}</span>
                 </button>
               </div>
             </div>
@@ -547,17 +549,17 @@ const AddTransactionModal: React.FC<Props> = ({
                   className="border-t border-slate-100 dark:border-zinc-800 pt-4"
                 >
                   <CustomSelect
-                    label="Sub-Category (Optional)"
+                    label={t("transactionModal.subCategoryOptional")}
                     value={subCategoryId}
                     onChange={setSubCategoryId}
                     options={[
-                      { value: "", label: "None" },
+                      { value: "", label: t("transactionModal.none") },
                       ...subCategories.map((sc) => ({
                         value: sc.id,
                         label: sc.name,
                       })),
                     ]}
-                    placeholder="Select detail..."
+                    placeholder={t("transactionModal.selectDetail")}
                   />
                 </MotionDiv>
               )}
@@ -599,19 +601,19 @@ const AddTransactionModal: React.FC<Props> = ({
                 <CustomDatePicker
                   value={date}
                   onChange={setDate}
-                  label="Date"
+                  label={t("transactionModal.dateLabel")}
                   maxDate={new Date().toISOString().split("T")[0]}
                 />
               </div>
               <div>
                 <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  <FileText size={12} /> Note
+                  <FileText size={12} /> {t("transactionModal.noteLabel")}
                 </label>
                 <textarea
                   rows={3}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="What was this for?"
+                  placeholder={t("transactionModal.notePlaceholder")}
                   className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl font-medium focus:ring-2 focus:ring-brand-500 outline-none resize-none"
                 />
               </div>
@@ -621,27 +623,27 @@ const AddTransactionModal: React.FC<Props> = ({
             {type === "expense" && (
               <div className="mt-4">
                 <label className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Spending Type
+                  {t("transactionModal.spendingType")}
                 </label>
                 <div className="flex gap-2">
                   {[
                     {
                       key: "must" as SpendingNature,
-                      label: "Must",
+                      label: t("transactionModal.must"),
                       color: "bg-rose-500",
-                      desc: "Critical",
+                      desc: t("transactionModal.critical"),
                     },
                     {
                       key: "need" as SpendingNature,
-                      label: "Need",
+                      label: t("transactionModal.need"),
                       color: "bg-amber-500",
-                      desc: "Important",
+                      desc: t("transactionModal.important"),
                     },
                     {
                       key: "want" as SpendingNature,
-                      label: "Want",
+                      label: t("transactionModal.want"),
                       color: "bg-violet-500",
-                      desc: "Discretionary",
+                      desc: t("transactionModal.discretionary"),
                     },
                   ].map((opt) => (
                     <button
@@ -702,22 +704,45 @@ const AddTransactionModal: React.FC<Props> = ({
               </button>
               <div>
                 <h2 className="text-xl font-bold">
-                  {transactionToEdit ? "Edit Transaction" : "New Transaction"}
+                  {transactionToEdit ? t("transactionModal.editTransaction") : t("transactionModal.newTransaction")}
                 </h2>
-                <div className="flex gap-1 mt-1">
-                  {STEPS.map((_, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        "h-1 rounded-full transition-all duration-300",
-                        step > i + 1
-                          ? "w-4 bg-brand-500"
-                          : step === i + 1
-                            ? "w-8 bg-brand-500"
-                            : "w-4 bg-slate-200 dark:bg-zinc-800",
-                      )}
-                    />
-                  ))}
+                <div className="flex gap-1.5 mt-2">
+                  {[t("transactionModal.stepAmount"), t("transactionModal.stepCategory"), t("transactionModal.stepDetails")].map((_, i) => {
+                    const targetStep = i + 1;
+                    const isTransferStep = type === "transfer" && targetStep === 2;
+                    
+                    if (isTransferStep) return null; // Hide category step for transfers visually
+                    
+                    const isNextAvailable = targetStep === step + 1 || (type === "transfer" && step === 1 && targetStep === 3);
+
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        disabled={targetStep === step || (!isNextAvailable && targetStep > step)}
+                        onClick={() => {
+                          if (targetStep < step) {
+                            setError("");
+                            setDirection(-1);
+                            setStep(targetStep);
+                          } else if (isNextAvailable) {
+                            handleNext();
+                          }
+                        }}
+                        className={cn(
+                          "h-1.5 rounded-full transition-all duration-300",
+                          step > targetStep
+                            ? "w-5 bg-brand-500 hover:bg-brand-600 cursor-pointer"
+                            : step === targetStep
+                              ? "w-8 bg-brand-500"
+                              : isNextAvailable
+                                ? "w-5 bg-slate-200 dark:bg-zinc-800 hover:bg-slate-300 dark:hover:bg-zinc-700 cursor-pointer"
+                                : "w-5 bg-slate-200 dark:bg-zinc-800 opacity-40 hover:opacity-40 cursor-not-allowed"
+                        )}
+                        aria-label={`Go to Step ${targetStep}`}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -768,7 +793,7 @@ const AddTransactionModal: React.FC<Props> = ({
                 onClick={handleNext}
                 className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-brand-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 tour-trans-next"
               >
-                Next <ArrowRight size={20} />
+                {t("transactionModal.next")} <ArrowRight size={20} />
               </button>
             ) : (
               <button
@@ -776,7 +801,7 @@ const AddTransactionModal: React.FC<Props> = ({
                 className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 tour-trans-save"
               >
                 <Check size={20} />{" "}
-                {transactionToEdit ? "Save Changes" : "Confirm Transaction"}
+                {transactionToEdit ? t("transactionModal.saveChanges") : t("transactionModal.confirmTransaction")}
               </button>
             )}
           </div>
@@ -788,9 +813,9 @@ const AddTransactionModal: React.FC<Props> = ({
         isOpen={confirmDelete}
         onClose={() => setConfirmDelete(false)}
         onConfirm={handleDelete}
-        title="Delete Transaction?"
-        message="This action cannot be undone."
-        confirmText="Delete"
+        title={t("transactionModal.deleteTitle")}
+        message={t("transactionModal.deleteMessage")}
+        confirmText={t("transactionModal.delete")}
         isDestructive
       />
       <ConfirmModal

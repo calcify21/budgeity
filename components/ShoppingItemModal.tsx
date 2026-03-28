@@ -4,6 +4,7 @@ import { ShoppingItem, Category, Wallet } from "../types";
 import CustomSelect from "./CustomSelect";
 import { cn } from "../utils";
 import { useScrollToError } from "../hooks/useScrollToError";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   isOpen: boolean;
@@ -30,6 +31,7 @@ const ShoppingItemModal: React.FC<Props> = ({
   defaultWalletId,
 }) => {
   const [name, setName] = useState("");
+  const { t } = useTranslation();
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [subCategoryId, setSubCategoryId] = useState("");
@@ -75,7 +77,7 @@ const ShoppingItemModal: React.FC<Props> = ({
         finalName = "Tour Demo Item";
         setName(finalName);
       } else {
-        setError("Item name is required");
+        setError(t("shoppingModal.errNameRequired"));
         return;
       }
     }
@@ -101,7 +103,7 @@ const ShoppingItemModal: React.FC<Props> = ({
         {/* Header */}
         <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center">
           <h2 className="text-xl font-bold">
-            {initialItem ? "Edit Item" : "Add Shopping Item"}
+            {initialItem ? t("shoppingModal.editItem") : t("shoppingModal.addShoppingItem")}
           </h2>
           <button
             onClick={onClose}
@@ -121,13 +123,13 @@ const ShoppingItemModal: React.FC<Props> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-              Item Name
+              {t("shoppingModal.itemName")}
             </label>
             <input
               value={name}
               autoFocus
               onChange={(e) => setName(e.target.value)}
-              placeholder="What do you need?"
+              placeholder={t("shoppingModal.itemNamePlaceholder")}
               className="w-full p-4 text-lg font-medium bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 tour-shop-input-name"
             />
           </div>
@@ -135,7 +137,7 @@ const ShoppingItemModal: React.FC<Props> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                Est. Cost
+                {t("shoppingModal.estCost")}
               </label>
               <input
                 type="number"
@@ -147,7 +149,7 @@ const ShoppingItemModal: React.FC<Props> = ({
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                Quantity
+                {t("shoppingModal.quantity")}
               </label>
               <input
                 type="number"
@@ -161,31 +163,31 @@ const ShoppingItemModal: React.FC<Props> = ({
 
           <div className="grid grid-cols-2 gap-4">
             <CustomSelect
-              label="Priority"
+              label={t("shoppingModal.priority")}
               value={priority}
               onChange={(v) => setPriority(v as any)}
               options={[
-                { value: "low", label: "Low", color: "#22c55e" },
-                { value: "medium", label: "Medium", color: "#f59e0b" },
-                { value: "high", label: "High", color: "#ef4444" },
+                { value: "low", label: t("shoppingModal.low"), color: "#22c55e" },
+                { value: "medium", label: t("shoppingModal.medium"), color: "#f59e0b" },
+                { value: "high", label: t("shoppingModal.high"), color: "#ef4444" },
               ]}
-              placeholder="Priority"
+              placeholder={t("shoppingModal.priority")}
             />
             <CustomSelect
-              label="Wallet (Preferred)"
+              label={t("shoppingModal.walletPreferred")}
               value={walletId}
               onChange={setWalletId}
               options={[
-                { value: "", label: "Default" },
+                { value: "", label: t("shoppingModal.default") },
                 ...wallets.map((w) => ({ value: w.id, label: w.name })),
               ]}
-              placeholder="Select Wallet"
+              placeholder={t("shoppingModal.selectWallet")}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <CustomSelect
-              label="Category"
+              label={t("shoppingModal.category")}
               value={categoryId}
               onChange={(v) => {
                 setCategoryId(v);
@@ -194,17 +196,17 @@ const ShoppingItemModal: React.FC<Props> = ({
               options={categories
                 .filter((c) => c.type === "expense")
                 .map((c) => ({ value: c.id, label: c.name, color: c.color }))}
-              placeholder="Select Category"
+              placeholder={t("shoppingModal.selectCategory")}
             />
             <CustomSelect
-              label="Sub-Category"
+              label={t("shoppingModal.subCategory")}
               value={subCategoryId}
               onChange={setSubCategoryId}
               options={[
-                { value: "", label: "None" },
+                { value: "", label: t("shoppingModal.none") },
                 ...subCategories.map((s) => ({ value: s.id, label: s.name })),
               ]}
-              placeholder="None"
+              placeholder={t("shoppingModal.none")}
             />
           </div>
         </div>
@@ -216,13 +218,13 @@ const ShoppingItemModal: React.FC<Props> = ({
             onClick={onClose}
             className="flex-1 py-3 px-4 rounded-xl font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
           >
-            Cancel
+            {t("shoppingModal.cancel")}
           </button>
           <button
             onClick={handleSubmit}
             className="flex-1 py-3 px-4 rounded-xl font-bold bg-brand-600 text-white hover:bg-brand-700 transition-colors shadow-lg shadow-brand-500/20 tour-shop-save-btn"
           >
-            {initialItem ? "Save Changes" : "Add Item"}
+            {initialItem ? t("shoppingModal.saveChanges") : t("shoppingModal.addItem")}
           </button>
         </div>
       </div>

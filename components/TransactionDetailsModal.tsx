@@ -17,6 +17,7 @@ import {
 import { ConfirmModal } from "./ConfirmModal";
 import { useHousehold } from "../context/HouseholdContext";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 const MotionDiv = motion.div as any;
 
@@ -34,6 +35,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
   const { categories, wallets, deleteTransaction, formatAmount } = useData();
   const { activeWorkspace, currentMembers } = useHousehold();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const { t } = useTranslation();
   useEscapeKey(true, onClose);
 
   const category = categories.find((c) => c.id === transaction.categoryId);
@@ -43,7 +45,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
   const Icon = category ? getCategoryIcon(category.icon) : ArrowRightLeft;
 
   const getWalletName = (id: string | null) =>
-    wallets.find((w) => w.id === id)?.name || "Unknown";
+    wallets.find((w) => w.id === id)?.name || t("txDetails.unknown");
 
   const isTransfer = transaction.type === "transfer";
   const isIncome = transaction.type === "income";
@@ -67,7 +69,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
         className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-md relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold">Transaction Details</h2>
+          <h2 className="text-xl font-bold">{t("txDetails.title")}</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
@@ -93,7 +95,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
             {formatAmount(transaction.amount)}
           </div>
           <div className="text-slate-500 font-medium">
-            {isTransfer ? "Transfer" : category?.name}
+            {isTransfer ? t("common.transfer") : category?.name}
           </div>
         </div>
 
@@ -102,7 +104,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
             <div className="flex items-center gap-3 text-slate-500">
               <Calendar size={18} />
               <span className="text-sm font-semibold uppercase tracking-wide">
-                Date
+                {t("txDetails.date")}
               </span>
             </div>
             <div className="font-bold">{formatDate(transaction.date)}</div>
@@ -112,7 +114,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
             <div className="flex items-center gap-3 text-slate-500">
               <Wallet size={18} />
               <span className="text-sm font-semibold uppercase tracking-wide">
-                Wallet
+                {t("txDetails.wallet")}
               </span>
             </div>
             <div className="font-bold text-right">
@@ -139,7 +141,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
               <div className="flex items-center gap-3 text-slate-500">
                 <Icon size={18} />
                 <span className="text-sm font-semibold uppercase tracking-wide">
-                  Sub-Category
+                  {t("txDetails.subCategory")}
                 </span>
               </div>
               <div className="font-bold">{subCategory.name}</div>
@@ -151,7 +153,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
               <div className="flex items-center gap-3 text-slate-500">
                 <FileText size={18} />
                 <span className="text-sm font-semibold uppercase tracking-wide">
-                  Note
+                  {t("txDetails.note")}
                 </span>
               </div>
               <div className="font-medium pl-8 italic text-slate-700 dark:text-slate-300">
@@ -165,14 +167,14 @@ const TransactionDetailsModal: React.FC<Props> = ({
               <div className="flex items-center gap-3 text-slate-500 mb-1">
                 <History size={18} />
                 <span className="text-sm font-semibold uppercase tracking-wide">
-                  History
+                  {t("txDetails.history")}
                 </span>
               </div>
 
               {/* Created By */}
               {transaction.createdBy && (
                 <div className="flex items-center justify-between pl-8">
-                  <span className="text-xs text-slate-500">Created by</span>
+                  <span className="text-xs text-slate-500">{t("txDetails.createdBy")}</span>
                   <div className="flex items-center gap-2">
                     <div className="w-5 h-5 rounded-full bg-brand-600 flex items-center justify-center text-[10px] text-white font-bold overflow-hidden relative">
                       {(currentMembers.find(
@@ -228,7 +230,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
                 transaction.lastModifiedBy !== transaction.createdBy && (
                   <div className="flex items-center justify-between pl-8">
                     <span className="text-xs text-slate-500">
-                      Last edited by
+                      {t("txDetails.lastEditedBy")}
                     </span>
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 rounded-full bg-amber-500 flex items-center justify-center text-[10px] text-white font-bold overflow-hidden relative">
@@ -300,7 +302,7 @@ const TransactionDetailsModal: React.FC<Props> = ({
             }}
             className="flex-1 py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
           >
-            <Pencil size={18} /> Edit
+            <Pencil size={18} /> {t("txDetails.edit")}
           </button>
         </div>
       </MotionDiv>
@@ -309,9 +311,9 @@ const TransactionDetailsModal: React.FC<Props> = ({
         isOpen={showDeleteConfirm}
         onClose={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
-        title="Delete Transaction"
-        message="Are you sure you want to delete this transaction? This action cannot be undone."
-        confirmText="Delete"
+        title={t("txDetails.deleteTitle")}
+        message={t("txDetails.deleteMessage")}
+        confirmText={t("txDetails.delete")}
         isDestructive
       />
     </div>

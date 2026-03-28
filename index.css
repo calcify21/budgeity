@@ -220,6 +220,11 @@
     -moz-appearance: textfield; /* Firefox */
     appearance: textfield;
   }
+
+  /* Make focus rings inset to avoid clipping in overflow containers */
+  input, textarea, select {
+    @apply ring-inset;
+  }
 }
 
 /* -------------------------------------------------------------------------- */

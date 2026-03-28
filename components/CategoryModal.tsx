@@ -8,6 +8,7 @@ import { COLORS } from "../constants";
 import IconPicker from "./IconPicker";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   onClose: () => void;
@@ -21,6 +22,7 @@ const CategoryModal: React.FC<Props> = ({
   initialType = "expense",
 }) => {
   const { addCategory, updateCategory } = useData();
+  const { t } = useTranslation();
 
   const [name, setName] = useState("");
   const [type, setType] = useState<"income" | "expense" | "transfer">(
@@ -53,7 +55,7 @@ const CategoryModal: React.FC<Props> = ({
     setError("");
 
     if (!name.trim()) {
-      setError("Please enter a category name.");
+      setError(t("categoryModal.errNoName"));
       return;
     }
 
@@ -67,7 +69,7 @@ const CategoryModal: React.FC<Props> = ({
           icon: selectedIcon,
           subCategories,
         });
-        success("Category updated successfully.");
+        success(t("categoryModal.categoryUpdated"));
       } else {
         addCategory({
           id: generateId(),
@@ -77,11 +79,11 @@ const CategoryModal: React.FC<Props> = ({
           icon: selectedIcon,
           subCategories,
         });
-        success("Category created successfully.");
+        success(t("categoryModal.categoryCreated"));
       }
       onClose();
     } catch (err: any) {
-      toastError(err.message || "Failed to save category.");
+      toastError(err.message || t("categoryModal.errSave"));
     }
   };
 
@@ -113,7 +115,7 @@ const CategoryModal: React.FC<Props> = ({
         <div className="relative transform rounded-3xl bg-white dark:bg-zinc-900 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md w-full border border-slate-100 dark:border-zinc-800 flex flex-col max-h-[90vh] overflow-hidden">
           <div className="p-5 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between bg-slate-50/80 dark:bg-zinc-800/50 backdrop-blur-sm z-10 shrink-0">
             <h2 className="text-lg font-bold">
-              {categoryToEdit ? "Edit Category" : "New Category"}
+              {categoryToEdit ? t("categoryModal.editCategory") : t("categoryModal.newCategory")}
             </h2>
             <button
               onClick={onClose}
@@ -153,7 +155,7 @@ const CategoryModal: React.FC<Props> = ({
               {/* Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Category Name
+                  {t("categoryModal.categoryName")}
                 </label>
                 <input
                   value={name}
@@ -161,7 +163,7 @@ const CategoryModal: React.FC<Props> = ({
                     setName(e.target.value);
                     setError("");
                   }}
-                  placeholder="e.g. Groceries"
+                  placeholder={t("categoryModal.categoryNamePlaceholder")}
                   className={cn(
                     "w-full p-4 bg-slate-50 dark:bg-zinc-800 border rounded-2xl outline-none font-medium transition-all",
                     error && !name
@@ -176,7 +178,7 @@ const CategoryModal: React.FC<Props> = ({
               {!categoryToEdit && (
                 <div>
                   <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    Type
+                    {t("categoryModal.typeLabel")}
                   </label>
                   <div className="flex bg-slate-100 dark:bg-zinc-800 p-1.5 rounded-2xl">
                     {(["expense", "income"] as const).map((t) => (
@@ -201,14 +203,14 @@ const CategoryModal: React.FC<Props> = ({
               {/* Sub Categories */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Sub-Categories
+                  {t("categoryModal.subCategories")}
                 </label>
                 <div className="bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-800 rounded-2xl p-4 space-y-3">
                   <div className="flex gap-2">
                     <input
                       value={newSubCatName}
                       onChange={(e) => setNewSubCatName(e.target.value)}
-                      placeholder="Add sub-category..."
+                      placeholder={t("categoryModal.addSubPlaceholder")}
                       className="flex-1 px-3 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 rounded-xl text-sm focus:ring-2 focus:ring-brand-500 outline-none"
                       onKeyDown={(e) => {
                         if (e.key === "Enter") {
@@ -251,7 +253,7 @@ const CategoryModal: React.FC<Props> = ({
               {/* Colors */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Color
+                  {t("categoryModal.colorLabel")}
                 </label>
                 <div className="grid grid-cols-6 gap-3">
                   {COLORS.map((c) => (
@@ -274,7 +276,7 @@ const CategoryModal: React.FC<Props> = ({
               {/* Icons */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Icon
+                  {t("categoryModal.iconLabel")}
                 </label>
                 <IconPicker
                   selectedIcon={selectedIcon}
@@ -290,7 +292,7 @@ const CategoryModal: React.FC<Props> = ({
               type="submit"
               className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-lg shadow-brand-500/30 transition-all active:scale-[0.98]"
             >
-              {categoryToEdit ? "Save Changes" : "Create Category"}
+              {categoryToEdit ? t("categoryModal.saveChanges") : t("categoryModal.createCategory")}
             </button>
           </div>
         </div>

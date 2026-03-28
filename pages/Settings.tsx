@@ -175,6 +175,7 @@ const Settings: React.FC = () => {
 
   const languageOptions = [
     { value: "en", label: "English", subLabel: "English" },
+    { value: "fr", label: "Français", subLabel: "French" },
     { value: "hi", label: "हिन्दी", subLabel: "Hindi" },
   ];
 

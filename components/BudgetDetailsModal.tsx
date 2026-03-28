@@ -4,6 +4,7 @@ import { Budget } from "../types";
 import { cn, isDateInPeriod, getCategoryIcon, formatDate } from "../utils";
 import { X, Pencil, Trash2, ArrowRightLeft, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -22,6 +23,7 @@ const BudgetDetailsModal: React.FC<Props> = ({
   onDelete,
 }) => {
   const { transactions, categories, formatAmount, wallets } = useData();
+  const { t } = useTranslation();
 
   const category = categories.find((c) => c.id === budget.categoryId);
   const Icon = category ? getCategoryIcon(category.icon) : HelpCircle;
@@ -29,14 +31,14 @@ const BudgetDetailsModal: React.FC<Props> = ({
 
   // Filter transactions for this budget
   const budgetTransactions = useMemo(() => {
-    return transactions.filter((t) => {
-      if (t.type !== "expense") return false;
-      if (t.categoryId !== budget.categoryId) return false;
-      if (budget.subCategoryId && t.subCategoryId !== budget.subCategoryId)
+    return transactions.filter((tx) => {
+      if (tx.type !== "expense") return false;
+      if (tx.categoryId !== budget.categoryId) return false;
+      if (budget.subCategoryId && tx.subCategoryId !== budget.subCategoryId)
         return false;
-      if (budget.walletId && t.fromWalletId !== budget.walletId) return false;
+      if (budget.walletId && tx.fromWalletId !== budget.walletId) return false;
       return isDateInPeriod(
-        t.date,
+        tx.date,
         budget.period,
         budget.customStartDate,
         budget.customEndDate,
@@ -44,7 +46,7 @@ const BudgetDetailsModal: React.FC<Props> = ({
     });
   }, [transactions, budget]);
 
-  const spent = budgetTransactions.reduce((acc, t) => acc + t.amount, 0);
+  const spent = budgetTransactions.reduce((acc, tx) => acc + tx.amount, 0);
   const percentage = Math.min((spent / budget.amount) * 100, 100);
   const remaining = budget.amount - spent;
 
@@ -80,7 +82,7 @@ const BudgetDetailsModal: React.FC<Props> = ({
             <div className="text-xs font-medium text-slate-500 bg-slate-100 dark:bg-zinc-800 px-2 py-0.5 rounded-lg ml-10">
               {category?.subCategories?.find(
                 (s) => s.id === budget.subCategoryId,
-              )?.name || "Unknown Sub-category"}
+              )?.name || t("budgetDetails.unknownSubCategory")}
             </div>
           )}
           <button
@@ -94,13 +96,13 @@ const BudgetDetailsModal: React.FC<Props> = ({
         {/* Big Status Section */}
         <div className="mb-8 text-center">
           <div className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-1">
-            Spent So Far
+            {t("budgetDetails.spentSoFar")}
           </div>
           <div className="text-4xl font-bold text-slate-900 dark:text-white mb-2">
             {formatAmount(spent)}
           </div>
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-zinc-800 rounded-full text-xs font-medium text-slate-500">
-            <span>of {formatAmount(budget.amount)}</span>
+            <span>{t("budgetDetails.of", { amount: formatAmount(budget.amount) })}</span>
           </div>
         </div>
 
@@ -112,12 +114,12 @@ const BudgetDetailsModal: React.FC<Props> = ({
                 percentage >= 100 ? "text-rose-500" : "text-emerald-500",
               )}
             >
-              {Math.floor((spent / budget.amount) * 100)}% Used
+              {t("budgetDetails.used", { percent: Math.floor((spent / budget.amount) * 100) })}
             </span>
             <span className="text-slate-400">
               {remaining < 0
-                ? `${formatAmount(Math.abs(remaining))} Over`
-                : `${formatAmount(remaining)} Remaining`}
+                ? t("budgetDetails.over", { amount: formatAmount(Math.abs(remaining)) })
+                : t("budgetDetails.remaining", { amount: formatAmount(remaining) })}
             </span>
           </div>
           <div className="h-4 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -140,17 +142,17 @@ const BudgetDetailsModal: React.FC<Props> = ({
         {/* Top Spenders */}
         <div className="mb-8">
           <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
-            Top Spenders
+            {t("budgetDetails.topSpenders")}
           </h3>
           {topTransactions.length === 0 ? (
             <div className="text-center py-6 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl border border-dashed border-slate-200 dark:border-zinc-800 text-slate-400 text-sm">
-              No transactions yet.
+              {t("budgetDetails.noTransactionsYet")}
             </div>
           ) : (
             <div className="space-y-3">
-              {topTransactions.map((t) => (
+              {topTransactions.map((tx) => (
                 <div
-                  key={t.id}
+                  key={tx.id}
                   className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-zinc-800/50 border border-slate-100 dark:border-white/5"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
@@ -159,15 +161,15 @@ const BudgetDetailsModal: React.FC<Props> = ({
                     </div>
                     <div className="min-w-0">
                       <div className="font-bold text-sm text-slate-900 dark:text-white truncate">
-                        {t.note || "Expense"}
+                        {tx.note || t("budgetDetails.expense")}
                       </div>
                       <div className="text-[10px] text-slate-500">
-                        {formatDate(t.date)}
+                        {formatDate(tx.date)}
                       </div>
                     </div>
                   </div>
                   <div className="font-bold text-slate-900 dark:text-white">
-                    -{formatAmount(t.amount)}
+                    -{formatAmount(tx.amount)}
                   </div>
                 </div>
               ))}
@@ -192,7 +194,7 @@ const BudgetDetailsModal: React.FC<Props> = ({
             }}
             className="flex-1 py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg hover:bg-brand-700 transition-colors flex items-center justify-center gap-2"
           >
-            <Pencil size={18} /> Edit Budget
+            <Pencil size={18} /> {t("budgetDetails.editBudget")}
           </button>
         </div>
       </MotionDiv>

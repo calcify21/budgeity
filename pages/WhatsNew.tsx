@@ -106,6 +106,26 @@ const WhatsNew: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChangeItem
+          icon={BarChart3}
+          title="Comprehensive Reports Dashboard"
+          description="Deep-dive into your financial DNA. Our new dedicated Reports page provides professional-grade analysis of your income, expenses, and trends with beautiful, high-fidelity visualizations."
+        />
+        <ChangeItem
+          icon={Maximize2}
+          title="Inset Focus Rings"
+          description="Pixel-perfect input states! All input fields now use inset focus rings, preventing clipping in tight overflow containers and ensuring a cleaner, more cohesive UI throughout the app."
+        />
+        <ChangeItem
+          icon={Compass}
+          title="Complete Translation Refactor"
+          description="A multi-language audit and refactor! We've overhauled our entire localization engine to ensure 100% consistent and accurate translations across English, French, and Hindi."
+        />
+        <ChangeItem
+          icon={CalendarDays}
+          title="High-Speed Date Jumping"
+          description="Navigate across time instantly! Our custom date picker now includes integrated Month and Year selectors, allowing you to jump across years in a single click for ultra-fast logging."
+        />
+        <ChangeItem
           icon={LayoutDashboard}
           title="Premium Household Banners"
           description="Instant clarity for your shared spaces! A beautiful glassmorphic banner now appears at the top of your dashboard whenever you enter a shared Household workspace."

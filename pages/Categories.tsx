@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { useData } from "../context/DataContext";
 import { getCategoryIcon, cn } from "../utils";
 import {
@@ -30,6 +31,7 @@ const Categories: React.FC = () => {
   const { categories, deleteCategory, reorderCategories, resetCategories } =
     useData();
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | undefined>(
     undefined,
@@ -40,6 +42,16 @@ const Categories: React.FC = () => {
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set(),
   );
+
+  useEffect(() => {
+    if (searchParams.get("add") === "true") {
+      setEditingCategory(undefined);
+      setIsModalOpen(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Filter out transfers and sort by current order
   const displayCategories = categories.filter(

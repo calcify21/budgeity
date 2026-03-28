@@ -22,6 +22,7 @@ service-account.json
 
 # Build / Cache
 .firebase/
+emulator-data
 .eslintcache
 .parcel-cache
 .turbo

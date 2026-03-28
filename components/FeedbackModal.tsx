@@ -15,6 +15,7 @@ import { db } from "../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   onClose: () => void;
@@ -26,6 +27,7 @@ const MotionDiv = motion.div as any;
 const FeedbackModal: React.FC<Props> = ({ onClose }) => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
+  const { t } = useTranslation();
 
   const [type, setType] = useState<"general" | "bug" | "feature">("general");
   const [message, setMessage] = useState("");
@@ -41,11 +43,11 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
     e.preventDefault();
     setError("");
     if (!message.trim()) {
-      setError("Please enter a message.");
+      setError(t("feedbackModal.errNoMessage"));
       return;
     }
     if (rating === 0) {
-      setError("Please select a rating.");
+      setError(t("feedbackModal.errNoRating"));
       return;
     }
 
@@ -62,12 +64,12 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
         userAgent: navigator.userAgent,
       });
 
-      success("Thank you for your feedback!");
+      success(t("feedbackModal.thankYou"));
       onClose();
     } catch (err: any) {
       console.error("Error submitting feedback:", err);
       const errMsg =
-        err.message || "Failed to submit feedback. Please try again.";
+        err.message || t("feedbackModal.errSubmit");
       setError(errMsg);
       toastError(errMsg);
     } finally {
@@ -106,7 +108,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <MessageSquare className="text-brand-500" />
-            Send Feedback
+            {t("feedbackModal.sendFeedback")}
           </h2>
           <button
             onClick={onClose}
@@ -123,19 +125,19 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
         >
           {/* Type Selection */}
           <div className="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl">
-            {(["general", "bug", "feature"] as const).map((t) => (
+            {(["general", "bug", "feature"] as const).map((ft) => (
               <button
-                key={t}
+                key={ft}
                 type="button"
-                onClick={() => setType(t)}
+                onClick={() => setType(ft)}
                 className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-bold transition-all ${
-                  type === t
+                  type === ft
                     ? "bg-white dark:bg-black text-brand-600 shadow-sm"
                     : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                 }`}
               >
-                {getIcon(t)}
-                <span className="capitalize">{t}</span>
+                {getIcon(ft)}
+                <span className="capitalize">{t(`feedbackModal.${ft}`)}</span>
               </button>
             ))}
           </div>
@@ -143,17 +145,17 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
           {/* Message Input */}
           <div className="space-y-2">
             <label className="text-sm font-bold text-slate-500 ml-1">
-              Your Feedback
+              {t("feedbackModal.yourFeedback")}
             </label>
             <textarea
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={
                 type === "bug"
-                  ? "Describe what happened..."
+                  ? t("feedbackModal.bugPlaceholder")
                   : type === "feature"
-                    ? "What would you like to see?"
-                    : "Tell us what you think..."
+                    ? t("feedbackModal.featurePlaceholder")
+                    : t("feedbackModal.generalPlaceholder")
               }
               rows={4}
               className="w-full p-4 bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none resize-none transition-all placeholder:text-slate-400"
@@ -164,7 +166,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
           {/* Star Rating */}
           <div className="flex flex-col items-center gap-2">
             <label className="text-sm font-bold text-slate-500">
-              Rate your experience
+              {t("feedbackModal.rateExperience")}
             </label>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
@@ -194,7 +196,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
               onClick={onClose}
               className="flex-1 py-3 text-slate-500 font-medium hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-xl transition-colors"
             >
-              Cancel
+              {t("feedbackModal.cancel")}
             </button>
             <button
               type="submit"
@@ -206,7 +208,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
               ) : (
                 <>
                   <Send size={18} />
-                  Send Feedback
+                  {t("feedbackModal.send")}
                 </>
               )}
             </button>

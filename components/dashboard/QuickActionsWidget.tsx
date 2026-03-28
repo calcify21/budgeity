@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Plus, ArrowRightLeft, Target, PiggyBank, Zap } from "lucide-react";
+import { Plus, Minus, ArrowRightLeft, Target, PiggyBank, Zap, ShoppingCart, Tags, Repeat } from "lucide-react";
 
 export const QuickActionsWidget: React.FC = () => {
   const { t } = useTranslation();
@@ -9,31 +9,52 @@ export const QuickActionsWidget: React.FC = () => {
 
   const actions = [
     {
-      label: t("common.add_transaction", "Add Transaction"),
-      icon: <Plus size={20} />,
-      color: "bg-emerald-500 text-white",
-      onClick: () => {
-        // Find existing transaction add button logic or navigate to transactions
-        navigate("/transactions");
-      },
+      label: t("common.add_expense", "Add Expense"),
+      icon: <Minus size={20} />,
+      color: "bg-rose-500 text-white",
+      onClick: () => navigate("?add=expense"),
     },
     {
-      label: t("common.transfer", "Transfer"),
+      label: t("common.add_income", "Add Income"),
+      icon: <Plus size={20} />,
+      color: "bg-emerald-500 text-white",
+      onClick: () => navigate("?add=income"),
+    },
+    {
+      label: t("common.add_transfer", "Add Transfer"),
       icon: <ArrowRightLeft size={20} />,
       color: "bg-indigo-500 text-white",
-      onClick: () => navigate("/transactions"),
+      onClick: () => navigate("?add=transfer"),
     },
     {
       label: t("common.new_goal", "New Goal"),
       icon: <Target size={20} />,
-      color: "bg-rose-500 text-white",
-      onClick: () => navigate("/goals"),
+      color: "bg-amber-500 text-white",
+      onClick: () => navigate("/goals?add=true"),
     },
     {
       label: t("common.new_budget", "New Budget"),
       icon: <PiggyBank size={20} />,
-      color: "bg-amber-500 text-white",
-      onClick: () => navigate("/budgets"),
+      color: "bg-sky-500 text-white",
+      onClick: () => navigate("/budgets?add=true"),
+    },
+    {
+      label: t("common.shopping_list", "Shopping List"),
+      icon: <ShoppingCart size={20} />,
+      color: "bg-teal-500 text-white",
+      onClick: () => navigate("/shopping-list?add=item"),
+    },
+    {
+      label: t("categories.addCategory", "New Category"),
+      icon: <Tags size={20} />,
+      color: "bg-fuchsia-500 text-white",
+      onClick: () => navigate("/categories?add=true"),
+    },
+    {
+      label: t("recurring.addRule", "Recurring Rule"),
+      icon: <Repeat size={20} />,
+      color: "bg-blue-500 text-white",
+      onClick: () => navigate("/recurring?add=true"),
     },
   ];
 
@@ -43,7 +64,7 @@ export const QuickActionsWidget: React.FC = () => {
         <Zap className="text-brand-500" size={18} />{" "}
         {t("dashboard.quick_actions", "Quick Actions")}
       </h3>
-      <div className="grid grid-cols-2 gap-4 flex-1">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
         {actions.map((action, idx) => (
           <button
             key={idx}

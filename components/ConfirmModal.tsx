@@ -2,6 +2,7 @@ import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CustomCheckbox from "./CustomCheckbox";
+import { useTranslation } from "react-i18next";
 
 const MotionDiv = motion.div as any;
 
@@ -30,6 +31,7 @@ export const ConfirmModal: React.FC<Props> = ({
   checkboxLabel,
   verificationText,
 }) => {
+  const { t } = useTranslation();
   const [isChecked, setIsChecked] = React.useState(false);
   const [verificationInput, setVerificationInput] = React.useState("");
 
@@ -92,14 +94,14 @@ export const ConfirmModal: React.FC<Props> = ({
                 {verificationText && (
                   <div className="text-left space-y-2">
                     <label className="text-xs font-semibold text-slate-500 uppercase">
-                      Type "{verificationText}" to confirm
+                      {t("confirmModal.typeToConfirm", { text: verificationText })}
                     </label>
                     <input
                       type="text"
                       value={verificationInput}
                       onChange={(e) => setVerificationInput(e.target.value)}
                       className="w-full px-3 py-2 border border-slate-200 dark:border-zinc-700 rounded-xl bg-slate-50 dark:bg-zinc-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition-all"
-                      placeholder={`Type ${verificationText}`}
+                      placeholder={t("confirmModal.typePlaceholder", { text: verificationText })}
                     />
                   </div>
                 )}
@@ -110,7 +112,7 @@ export const ConfirmModal: React.FC<Props> = ({
                       id="confirm-checkbox"
                       checked={isChecked}
                       onChange={setIsChecked}
-                      label={checkboxLabel || "I understand the consequences."}
+                      label={checkboxLabel || t("confirmModal.checkboxDefault")}
                       className="mt-0.5"
                     />
                   </div>
@@ -122,7 +124,7 @@ export const ConfirmModal: React.FC<Props> = ({
                   onClick={onClose}
                   className="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
                 >
-                  Cancel
+                  {t("confirmModal.cancel")}
                 </button>
                 <button
                   disabled={!isValid}

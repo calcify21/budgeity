@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "../context/ToastContext";
+import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 interface InviteFriendsModalProps {
   onClose: () => void;
@@ -46,7 +48,8 @@ const XIcon = ({ size = 20 }: { size?: number }) => (
 );
 
 const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ onClose }) => {
-  const { success, error } = useToast();
+  const { success: toastSuccess, error: toastError } = useToast();
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   // Construct the full URL including possible sub-paths (ignoring the hash for HashRouter)
@@ -61,10 +64,10 @@ const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ onClose }) => {
     try {
       await navigator.clipboard.writeText(shareUrl);
       setCopied(true);
-      success("Link copied to clipboard!");
+      toastSuccess(t("inviteModal.linkCopied"));
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      error("Failed to copy link");
+      toastError(t("inviteModal.errCopy"));
     }
   };
 
@@ -147,18 +150,17 @@ const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ onClose }) => {
               <Share2 size={32} />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-              Invite Friends
+              {t("inviteModal.title")}
             </h2>
-            <p className="text-slate-500 dark:text-slate-400">
-              Share Budgeity with your friends and help them take control of
-              their finances!
+            <p className="text-sm text-slate-500 dark:text-zinc-400 text-center">
+              {t("inviteModal.subtitle")}
             </p>
           </div>
 
           {/* Copy Link Section */}
           <div className="mb-8">
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 ml-1">
-              Share this link
+              {t("inviteModal.shareLink")}
             </label>
             <div className="flex gap-2">
               <div className="flex-1 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-slate-600 dark:text-slate-300 truncate font-mono">
@@ -208,7 +210,7 @@ const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ onClose }) => {
             className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:opacity-90 active:scale-[0.98]"
           >
             <Share2 size={20} />
-            Other Ways to Share
+            {t("inviteModal.otherWays")}
           </button>
         </div>
       </MotionDiv>

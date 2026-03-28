@@ -10,6 +10,7 @@ import { ShoppingItem, Wallet } from "../types";
 import CustomSelect from "./CustomSelect";
 import CustomDatePicker from "./CustomDatePicker";
 import { cn } from "../utils";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   isOpen: boolean;
@@ -38,6 +39,7 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
   formatAmount,
   currency,
 }) => {
+  const { t } = useTranslation();
   const [finalAmount, setFinalAmount] = useState(
     item.estimatedAmount.toString(),
   );
@@ -54,7 +56,7 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!walletId && !document.querySelector(".driver-active")) {
-      alert("Please select a wallet");
+      alert(t("purchaseModal.errNoWallet"));
       return;
     }
 
@@ -89,16 +91,16 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
 
         <div className="p-6 space-y-4">
           <div className="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
-            <div className="text-sm text-slate-500 mb-1">Item</div>
+            <div className="text-sm text-slate-500 mb-1">{t("purchaseModal.item")}</div>
             <div className="font-bold text-lg">{item.name}</div>
             <div className="text-sm text-slate-400">
-              Est: {formatAmount(item.estimatedAmount)}
+              {t("purchaseModal.estimated", { amount: formatAmount(item.estimatedAmount) })}
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-              Final Amount Spent
+              {t("purchaseModal.finalAmountSpent")}
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">
@@ -117,7 +119,7 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                Quantity Bought
+                {t("purchaseModal.quantityBought")}
               </label>
               <input
                 type="number"
@@ -128,12 +130,12 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
                 className="w-full p-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
               />
               <div className="text-xs text-slate-400 mt-1">
-                Max: {maxQty} {isPartial && "(Partial Buy)"}
+                {t("purchaseModal.maxQty", { qty: maxQty })} {isPartial && t("purchaseModal.partialBuy")}
               </div>
             </div>
             <div>
               <CustomDatePicker
-                label="Date"
+                label={t("purchaseModal.date")}
                 value={date}
                 onChange={setDate}
                 maxDate={new Date().toISOString().split("T")[0]}
@@ -142,11 +144,11 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
           </div>
 
           <CustomSelect
-            label="Paid From Wallet"
+            label={t("purchaseModal.paidFromWallet")}
             value={walletId}
             onChange={setWalletId}
             options={wallets.map((w) => ({ value: w.id, label: w.name }))}
-            placeholder="Select Wallet"
+            placeholder={t("purchaseModal.selectWallet")}
           />
         </div>
 
@@ -155,13 +157,13 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
             onClick={onClose}
             className="flex-1 py-3 px-4 rounded-xl font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
           >
-            Cancel
+            {t("purchaseModal.cancel")}
           </button>
           <button
             onClick={handleSubmit}
             className="flex-1 py-3 px-4 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20 tour-shop-confirm-btn"
           >
-            Confirm Purchase
+            {t("purchaseModal.confirmPurchase")}
           </button>
         </div>
       </div>

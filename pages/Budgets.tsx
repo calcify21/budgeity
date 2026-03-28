@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { useData } from "../context/DataContext";
 import { Budget } from "../types";
 import { cn, isDateInPeriod, getCategoryIcon } from "../utils";
@@ -33,12 +34,24 @@ const Budgets: React.FC = () => {
     deleteBudget,
     formatAmount,
   } = useData();
+  const [searchParams, setSearchParams] = useSearchParams();
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBudget, setEditingBudget] = useState<Budget | undefined>(
     undefined,
   );
   const [budgetToDelete, setBudgetToDelete] = useState<string | null>(null);
   const [selectedBudget, setSelectedBudget] = useState<Budget | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("add") === "true") {
+      setEditingBudget(undefined);
+      setIsModalOpen(true);
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   const getBudgetStatus = (budget: Budget) => {
     const spent = transactions

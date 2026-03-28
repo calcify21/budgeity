@@ -285,7 +285,7 @@ const Transactions: React.FC = () => {
   );
 
   const categoryOptions = [
-    { value: "all", label: "All Categories" },
+    { value: "all", label: t("transactions.allCategories") || "All Categories" },
     ...filteredCategories.map((c) => ({
       value: c.id,
       label: c.name,
@@ -541,25 +541,13 @@ const Transactions: React.FC = () => {
                   {t("transactions.spendingVelocity")}
                 </h3>
               </div>
-              <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
-                {spendingAcceleration > 0 ? (
-                  <>
-                    Spending increased by{" "}
-                    <strong className="text-rose-500">
-                      {spendingAcceleration}%
-                    </strong>{" "}
-                    in the second half of the selected period.
-                  </>
-                ) : (
-                  <>
-                    Spending decreased by{" "}
-                    <strong className="text-emerald-500">
-                      {Math.abs(spendingAcceleration)}%
-                    </strong>{" "}
-                    in the second half of the selected period.
-                  </>
-                )}
-              </p>
+              <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium"
+                 dangerouslySetInnerHTML={{
+                   __html: spendingAcceleration > 0
+                     ? t("transactions.spendingIncreased", { percent: spendingAcceleration })
+                     : t("transactions.spendingDecreased", { percent: Math.abs(spendingAcceleration) })
+                 }}
+              />
             </div>
           </div>
 
@@ -575,17 +563,14 @@ const Transactions: React.FC = () => {
                 </h3>
               </div>
               {highestDay ? (
-                <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium">
-                  You spend the most on{" "}
-                  <strong className="text-indigo-600 dark:text-indigo-400">
-                    {highestDay.dayName}
-                  </strong>
-                  , totaling{" "}
-                  <strong className="text-slate-900 dark:text-white">
-                    {formatAmount(highestDay.amount)}
-                  </strong>
-                  .
-                </p>
+                <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-medium"
+                   dangerouslySetInnerHTML={{
+                     __html: t("transactions.highestSpendDayDesc", {
+                       day: highestDay.dayName,
+                       amount: formatAmount(highestDay.amount),
+                     })
+                   }}
+                />
               ) : (
                 <p className="text-sm text-slate-400 italic">
                   {t("transactions.notEnoughData")}
@@ -607,9 +592,7 @@ const Transactions: React.FC = () => {
                 {t("transactions.noTransactionsFound")}
               </p>
               <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                Your transaction history is empty. Tap the{" "}
-                <span className="font-bold text-brand-600">+</span> button to
-                record your first income or expense.
+                {t("transactions.emptyTransactions")}
               </p>
             </div>
           </div>
@@ -943,7 +926,7 @@ const Transactions: React.FC = () => {
                   onClick={selectAllFiltered}
                   className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-brand-500 rounded-full transition-colors"
                 >
-                  All
+                  {t("transactions.selectAll")}
                 </button>
                 <div className="h-4 w-px bg-slate-200 dark:bg-white/10" />
                 <button

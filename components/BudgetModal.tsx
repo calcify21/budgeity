@@ -11,6 +11,7 @@ import WalletModal from "./WalletModal";
 import CategoryModal from "./CategoryModal";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -24,6 +25,7 @@ import { COLORS } from "../constants";
 
 const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
   const { addBudget, updateBudget, categories, wallets, currency } = useData();
+  const { t } = useTranslation();
 
   const [name, setName] = useState("");
   const [amount, setAmount] = useState("");
@@ -70,19 +72,19 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
     setError("");
 
     if (!name.trim()) {
-      setError("Please enter a budget name.");
+      setError(t("budgetModal.errNoName"));
       return;
     }
     if (!amount || parseFloat(amount) <= 0) {
-      setError("Please enter a valid amount.");
+      setError(t("budgetModal.errInvalidAmount"));
       return;
     }
     if (!categoryId) {
-      setError("Please select a category.");
+      setError(t("budgetModal.errNoCategory"));
       return;
     }
     if (period === "custom" && (!customStartDate || !customEndDate)) {
-      setError("Please select start and end dates.");
+      setError(t("budgetModal.errNoDates"));
       return;
     }
 
@@ -105,21 +107,21 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
           id: budgetToEdit.id,
           createdAt: budgetToEdit.createdAt,
         });
-        success("Budget updated successfully.");
+        success(t("budgetModal.budgetUpdated"));
       } else {
         addBudget(budgetData);
-        success("Budget created successfully.");
+        success(t("budgetModal.budgetCreated"));
       }
       onClose();
     } catch (err: any) {
-      toastError(err.message || "Failed to save budget.");
+      toastError(err.message || t("budgetModal.errSave"));
     }
   };
 
   const periodOptions = [
-    { value: "weekly", label: "Weekly" },
-    { value: "monthly", label: "Monthly" },
-    { value: "custom", label: "Custom Range" },
+    { value: "weekly", label: t("budgetModal.weekly") },
+    { value: "monthly", label: t("budgetModal.monthly") },
+    { value: "custom", label: t("budgetModal.customRange") },
   ];
 
   const categoryOptions = categories
@@ -128,7 +130,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
 
   const selectedCategory = categories.find((c) => c.id === categoryId);
   const subCategoryOptions = [
-    { value: "", label: "All Sub-categories" },
+    { value: "", label: t("budgetModal.allSubCategories") },
     ...(selectedCategory?.subCategories?.map((s) => ({
       value: s.id,
       label: s.name,
@@ -139,7 +141,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
   // But prompt says "Category (linked to expense categories)". Assuming single category per budget for now.
 
   const walletOptions = [
-    { value: "all", label: "All Wallets" },
+    { value: "all", label: t("budgetModal.allWallets") },
     ...wallets
       .filter((w) => !w.archived && w.type !== "savings")
       .map((w) => ({ value: w.id, label: w.name, color: w.color })),
@@ -160,7 +162,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
         >
           <div className="flex justify-between items-center p-8 pb-4 shrink-0">
             <h2 className="text-xl font-bold">
-              {budgetToEdit ? "Edit Budget" : "New Budget"}
+              {budgetToEdit ? t("budgetModal.editBudget") : t("budgetModal.newBudget")}
             </h2>
             <button
               onClick={onClose}
@@ -191,7 +193,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
                     setName(e.target.value);
                     setError("");
                   }}
-                  placeholder="e.g. Monthly Groceries"
+                  placeholder={t("budgetModal.budgetNamePlaceholder")}
                   className={cn(
                     "w-full p-4 bg-slate-50 dark:bg-black border rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 font-medium",
                     error && !name
@@ -205,7 +207,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Limit Amount
+                  {t("budgetModal.limitAmount")}
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
@@ -233,13 +235,13 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <CustomSelect
-                  label="Period"
+                  label={t("budgetModal.period")}
                   value={period}
                   onChange={(v) => setPeriod(v as any)}
                   options={periodOptions}
                 />
                 <CustomSelect
-                  label="Wallet"
+                  label={t("budgetModal.wallet")}
                   value={walletId || "all"}
                   onChange={(v) => setWalletId(v === "all" ? null : v)}
                   options={walletOptions}
@@ -251,7 +253,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
                 <div className="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
                   <div>
                     <CustomDatePicker
-                      label="Start Date"
+                      label={t("budgetModal.startDate")}
                       value={customStartDate}
                       onChange={setCustomStartDate}
                       className="bg-white dark:bg-black border-slate-200 dark:border-zinc-700 h-[42px] py-2"
@@ -259,7 +261,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
                   </div>
                   <div>
                     <CustomDatePicker
-                      label="End Date"
+                      label={t("budgetModal.endDate")}
                       value={customEndDate}
                       onChange={setCustomEndDate}
                       className="bg-white dark:bg-black border-slate-200 dark:border-zinc-700 h-[42px] py-2"
@@ -270,7 +272,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <CustomSelect
-                  label="Category"
+                  label={t("budgetModal.category")}
                   value={categoryId}
                   onChange={(v) => {
                     setCategoryId(v);
@@ -281,17 +283,17 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
                   onAddNew={() => setShowAddCategory(true)}
                 />
                 <CustomSelect
-                  label="Sub-Category"
+                  label={t("budgetModal.subCategory")}
                   value={subCategoryId}
                   onChange={setSubCategoryId}
                   options={subCategoryOptions}
-                  placeholder="Optional"
+                  placeholder={t("budgetModal.optional")}
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-                  Color Tag
+                  {t("budgetModal.colorTag")}
                 </label>
                 <div className="flex gap-3 flex-wrap">
                   {COLORS.map((c) => (
@@ -315,7 +317,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
                 type="submit"
                 className="w-full py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-xl hover:bg-brand-700 transition-all active:scale-[0.98] tour-budget-save"
               >
-                {budgetToEdit ? "Save Changes" : "Create Budget"}
+                {budgetToEdit ? t("budgetModal.saveChanges") : t("budgetModal.createBudget")}
               </button>
             </form>
           </div>

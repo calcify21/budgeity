@@ -471,8 +471,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       window.localStorage.setItem("emailForSignIn", email);
     } catch (err: any) {
       console.error("Error sending passwordless link", err);
-      setError(err.message || "Failed to send login link.");
-      throw err;
+      let msg = "Failed to send login link.";
+      if (err.code === "auth/invalid-email") {
+        msg = "Please enter a valid email address.";
+      } else if (err.code === "auth/quota-exceeded") {
+        msg = "We've reached our daily limit for sending login emails. Please try again tomorrow or use a different login method.";
+      }
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -487,8 +493,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     } catch (err: any) {
       console.error("Error completing passwordless sign in", err);
-      setError(err.message || "Failed to sign in with link.");
-      throw err;
+      let msg = "Failed to sign in with link.";
+      if (err.code === "auth/invalid-action-code") {
+        msg = "The magic link is invalid or has already been used. Please request a new one.";
+      } else if (err.code === "auth/expired-action-code") {
+        msg = "The magic link has expired. Please request a new one.";
+      } else if (err.code === "auth/invalid-email") {
+        msg = "The email address does not match the link.";
+      } else if (err.code === "auth/quota-exceeded") {
+        msg = "We've reached our limit for today. Please try again tomorrow or use a different login method.";
+      }
+      setError(msg);
+      throw new Error(msg);
     }
   };
 
@@ -510,8 +526,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         );
       }
     } catch (err: any) {
-      setError(err.message || "Failed to send verification email.");
-      throw err;
+      let msg = "Failed to send verification email.";
+      if (err.code === "auth/quota-exceeded") {
+        msg = "Daily email limit reached. Please try again later or use 'Forgot Password'.";
+      }
+      setError(msg || err.message);
+      throw new Error(msg || err.message);
     }
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import CustomDatePicker from "../components/CustomDatePicker";
 import CustomSelect from "../components/CustomSelect";
 import { useData } from "../context/DataContext";
@@ -59,6 +60,7 @@ const Goals: React.FC = () => {
   const { activeWorkspace, currentMembers, currentHousehold } = useHousehold();
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -87,6 +89,15 @@ const Goals: React.FC = () => {
   const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
 
   const [error, setError] = useState("");
+
+  React.useEffect(() => {
+    if (searchParams.get("add") === "true") {
+      openModal();
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Auto-check for achieved goals
   React.useEffect(() => {

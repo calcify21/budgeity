@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import CustomDatePicker from "../components/CustomDatePicker";
 import { useData } from "../context/DataContext";
 import { RecurringTransaction, TransactionType } from "../types";
@@ -35,6 +36,7 @@ const Recurring: React.FC = () => {
     formatAmount,
   } = useData();
   const { t } = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRule, setEditingRule] = useState<RecurringTransaction | null>(
     null,
@@ -45,6 +47,15 @@ const Recurring: React.FC = () => {
     count: number;
     payload: any;
   } | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get("add") === "true") {
+      openModal();
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("add");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Form State
   const [type, setType] = useState<TransactionType>("expense");

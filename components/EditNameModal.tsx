@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { X, User, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollToError } from "../hooks/useScrollToError";
+import { useTranslation } from "react-i18next";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -13,6 +14,7 @@ interface Props {
 
 const EditNameModal: React.FC<Props> = ({ onClose }) => {
   const { user, updateName } = useAuth();
+  const { t } = useTranslation();
 
   const [name, setName] = useState(user?.displayName || "");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +29,7 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
     setError(null);
 
     if (!name.trim()) {
-      setError("Name cannot be empty.");
+      setError(t("editNameModal.errNoName"));
       return;
     }
 
@@ -39,7 +41,7 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
         onClose();
       }, 1500);
     } catch (err: any) {
-      setError(err.message || "Failed to update name.");
+      setError(err.message || t("editNameModal.errUpdate"));
     } finally {
       setIsLoading(false);
     }
@@ -64,7 +66,7 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
         >
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <User className="text-brand-500" size={24} /> Edit Profile
+              <User className="text-brand-500" size={24} /> {t("editNameModal.editProfile")}
             </h2>
             <button
               onClick={onClose}
@@ -80,7 +82,7 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
                 <CheckCircle size={32} />
               </div>
               <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                Profile Updated!
+                {t("editNameModal.profileUpdated")}
               </h3>
             </div>
           ) : (
@@ -103,13 +105,13 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  Display Name
+                  {t("editNameModal.displayName")}
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Your Name"
+                  placeholder={t("editNameModal.namePlaceholder")}
                   className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
                   autoFocus
                 />
@@ -124,7 +126,7 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
                   {isLoading ? (
                     <Loader2 size={20} className="animate-spin" />
                   ) : (
-                    "Save Changes"
+                    t("editNameModal.saveChanges")
                   )}
                 </button>
               </div>

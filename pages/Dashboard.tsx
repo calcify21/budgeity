@@ -373,7 +373,7 @@ const Dashboard: React.FC = () => {
           onReorder={(newEnabled) => {
             setLocalWidgets([...newEnabled, ...disabledWidgets]);
           }}
-          className="space-y-6"
+          className="flex flex-col gap-8"
         >
           {enabledWidgets.map((widget) => {
             const WidgetComponent = widgetComponents[widget.id];
@@ -383,7 +383,7 @@ const Dashboard: React.FC = () => {
               <Reorder.Item
                 key={widget.id}
                 value={widget}
-                className="relative group cursor-grab active:cursor-grabbing touch-none list-none"
+                className="relative group cursor-grab active:cursor-grabbing touch-none list-none w-full"
               >
                 <div className="absolute top-4 right-4 flex flex-col gap-2 z-50">
                   <button
@@ -403,7 +403,9 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Widget Preview wrapper */}
-                <div className="ring-4 ring-brand-500/30 rounded-[2rem] overflow-hidden opacity-60 transition-all grayscale pointer-events-none">
+                <div className="relative rounded-[2rem] transition-all group-hover:ring-4 group-hover:ring-brand-500/30 pointer-events-none shadow-sm group-hover:shadow-xl">
+                  {/* Subtle overlay to indicate edit mode */}
+                  <div className="absolute inset-0 bg-slate-50/5 dark:bg-black/5 rounded-[2rem] z-10" />
                   <WidgetComponent 
                     timeRange={timeRange} 
                     customStartDate={customStartDate}

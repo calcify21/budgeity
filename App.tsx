@@ -21,6 +21,7 @@ const Budgets = React.lazy(() => import("./pages/Budgets"));
 const Goals = React.lazy(() => import("./pages/Goals"));
 const Recurring = React.lazy(() => import("./pages/Recurring"));
 const Export = React.lazy(() => import("./pages/Export"));
+const Reports = React.lazy(() => import("./pages/Reports"));
 const ShoppingList = React.lazy(() => import("./pages/ShoppingList"));
 const Settings = React.lazy(() => import("./pages/Settings"));
 const AccountInfo = React.lazy(() => import("./pages/AccountInfo"));
@@ -229,6 +230,7 @@ const AppContent: React.FC = () => {
               <Route path="/analytics-v2" element={<AnalyticsV2 />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/export" element={<Export />} />
+              <Route path="/reports" element={<Reports />} />
               <Route path="/shopping-list" element={<ShoppingList />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/account-info" element={<AccountInfo />} />

@@ -115,7 +115,7 @@ const Auth: React.FC = () => {
     }
 
     // Password (Login & Signup)
-    if (mode !== "forgot") {
+    if (mode !== "forgot" && !isPasswordless) {
       if (!password) {
         errors.password = "Password is required";
         isValid = false;
@@ -131,7 +131,7 @@ const Auth: React.FC = () => {
     }
 
     // Confirm Password (Signup only)
-    if (mode === "signup") {
+    if (mode === "signup" && !isPasswordless) {
       if (password !== confirmPassword) {
         errors.confirm = "Passwords do not match";
         isValid = false;

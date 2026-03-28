@@ -23,6 +23,7 @@ import {
   Sparkles,
   Share2,
   BarChart3,
+  FileBarChart2,
   Sun,
   Moon,
   MessageSquare,
@@ -173,8 +174,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   useEffect(() => {
     const addParam = searchParams.get("add");
-    if (addParam === "expense" || addParam === "income" || addParam === "true") {
-      setTxModalDefaultType(addParam === "income" ? "income" : "expense");
+    if (addParam === "expense" || addParam === "income" || addParam === "transfer") {
+      setTxModalDefaultType(
+        addParam === "income" ? "income" : 
+        addParam === "transfer" ? "transfer" : "expense"
+      );
       setIsTxModalOpen(true);
       // Clean up the URL after opening the modal
       const newParams = new URLSearchParams(searchParams);
@@ -200,6 +204,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     Record<string, boolean>
   >({
     main: true,
+    insights: true,
     planning: true,
     management: true,
     general: true,
@@ -411,6 +416,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   className: undefined,
                 },
                 {
+                  to: "/transactions",
+                  icon: ArrowRightLeft,
+                  label: t("common.transactions"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-transactions",
+                },
+                {
+                  to: "/wallets",
+                  icon: Wallet,
+                  label: t("common.wallets"),
+                  onClick: handleNavClick,
+                  className: "tour-nav-wallets",
+                },
+              ],
+            },
+            {
+              section: "insights",
+              title: "Insights",
+              items: [
+                {
                   to: "/analytics",
                   icon: BarChart3,
                   label: t("common.analytics"),
@@ -425,18 +450,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   className: undefined,
                 },
                 {
-                  to: "/transactions",
-                  icon: ArrowRightLeft,
-                  label: t("common.transactions"),
+                  to: "/reports",
+                  icon: FileBarChart2,
+                  label: "Reports",
                   onClick: handleNavClick,
-                  className: "tour-nav-transactions",
-                },
-                {
-                  to: "/wallets",
-                  icon: Wallet,
-                  label: t("common.wallets"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-wallets",
+                  className: undefined,
                 },
               ],
             },
@@ -1164,25 +1182,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {/* Desktop Floating FAB - Bottom Right */}
         <div className="fixed bottom-8 right-8 z-[45] hidden lg:block">
           <MotionButton
-            whileHover={{ scale: 1.05, y: -2 }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsTxModalOpen(true)}
-            className="flex items-center gap-3 px-6 py-4 bg-brand-600 text-white rounded-full shadow-xl shadow-brand-500/20 border border-brand-500/30 relative group overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-brand-500/30"
+            className="group relative flex items-center justify-center w-14 h-14 rounded-full shadow-xl shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
           >
-            {/* Shimmer Effect */}
-            <div className="absolute inset-0 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.2),transparent)] -translate-x-[100%] group-hover:animate-shimmer" />
+            {/* Outer static glow */}
+            <div className="absolute inset-[-4px] bg-gradient-to-r from-brand-400 via-indigo-500 to-purple-500 rounded-full opacity-50 blur-md group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+            
+            {/* Slow pulsing outer rings */}
+            <div className="absolute inset-0 rounded-full border-2 border-brand-400/50 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] pointer-events-none" />
+            <div className="absolute inset-0 rounded-full border-2 border-indigo-400/30 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_1s] pointer-events-none" />
 
-            <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors shadow-inner shrink-0 backdrop-blur-sm">
-              <Plus
-                size={20}
-                strokeWidth={3}
-                className="text-white drop-shadow-md"
-              />
+            {/* Core button background */}
+            <div className="relative w-full h-full bg-gradient-to-br from-brand-500 to-indigo-600 rounded-full overflow-hidden flex items-center justify-center border border-white/20">
+              {/* Internal diagonal shimmer */}
+              <div className="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-no-repeat [background-position:-100%_0,0_0] group-hover:[transition:background-position_2s_ease_infinite] group-hover:animate-[shimmer_2s_infinite]" />
+              
+              <MotionDiv 
+                className="relative z-10 text-white drop-shadow-md"
+                initial={{ rotate: 0 }}
+                whileHover={{ rotate: 180 }}
+                transition={{ type: "spring", stiffness: 200, damping: 10 }}
+              >
+                <Plus size={28} strokeWidth={3} />
+              </MotionDiv>
             </div>
-
-            <span className="font-extrabold uppercase tracking-widest text-sm whitespace-nowrap drop-shadow-sm">
-              Add Transaction
-            </span>
           </MotionButton>
         </div>
 
