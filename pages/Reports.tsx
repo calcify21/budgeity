@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { useData } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
 import { cn } from "../utils";
@@ -73,11 +74,11 @@ const MotionDiv = motion.div as any;
 
 type TabId = "performance" | "cashflow" | "budget" | "forecast";
 
-const TABS: { id: TabId; label: string; icon: any; color: string }[] = [
-  { id: "performance", label: "Performance", icon: TrendingUp, color: "from-indigo-500 to-violet-500" },
-  { id: "cashflow", label: "Cash Flow", icon: Activity, color: "from-emerald-500 to-teal-500" },
-  { id: "budget", label: "Budget", icon: PiggyBank, color: "from-amber-500 to-orange-500" },
-  { id: "forecast", label: "Forecast", icon: Target, color: "from-sky-500 to-blue-500" },
+const TABS: { id: TabId; labelKey: string; icon: any; color: string }[] = [
+  { id: "performance", labelKey: "reports.performance", icon: TrendingUp, color: "from-indigo-500 to-violet-500" },
+  { id: "cashflow", labelKey: "reports.cash_flow", icon: Activity, color: "from-emerald-500 to-teal-500" },
+  { id: "budget", labelKey: "reports.budget", icon: PiggyBank, color: "from-amber-500 to-orange-500" },
+  { id: "forecast", labelKey: "reports.forecast", icon: Target, color: "from-sky-500 to-blue-500" },
 ];
 
 // ── Smart Summary Icons ─────────────────────────────────────────────
@@ -263,6 +264,7 @@ const Reports: React.FC = () => {
     currency,
   } = useData();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   // ── State ───────────────────────────────────────────────────────
 
@@ -347,7 +349,7 @@ const Reports: React.FC = () => {
 
   const walletOptions = useMemo(
     () => [
-      { value: "all", label: "All Wallets", icon: Filter },
+      { value: "all", label: t("reports.all_wallets"), icon: Filter },
       ...wallets
         .filter((w) => !w.archived && !w.isGoalWallet)
         .map((w) => ({
@@ -357,7 +359,7 @@ const Reports: React.FC = () => {
           color: w.color,
         })),
     ],
-    [wallets],
+    [wallets, t],
   );
 
   // ── PDF Generation ─────────────────────────────────────────────
@@ -401,10 +403,10 @@ const Reports: React.FC = () => {
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 shadow-lg shadow-black/[0.03] dark:shadow-black/20 px-5 lg:px-6 py-3.5">
           <div className="min-w-0">
             <h2 className="text-2xl font-bold tracking-tight">
-              Financial Reports
+              {t("reports.title")}
             </h2>
             <p className="text-slate-500 dark:text-zinc-400 font-medium text-xs mt-0.5">
-              Comprehensive analysis of your finances
+              {t("reports.subtitle")}
             </p>
           </div>
 
@@ -446,7 +448,7 @@ const Reports: React.FC = () => {
                 <FileText size={18} />
               )}
               <span className="hidden sm:inline">
-                {isGeneratingPdf ? "Generating..." : "Generate Report (PDF)"}
+                {isGeneratingPdf ? t("reports.generating") : t("reports.generate_report")}
               </span>
               <span className="sm:hidden">
                 {isGeneratingPdf ? "..." : "PDF"}
@@ -469,10 +471,10 @@ const Reports: React.FC = () => {
                 <div className="w-8 h-8 rounded-xl bg-brand-500/10 text-brand-600 dark:text-brand-400 flex items-center justify-center">
                   <Sparkles size={16} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Smart Summary</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t("reports.smart_summary")}</h3>
               </div>
               <p className="text-sm text-slate-500 dark:text-zinc-400 font-medium">
-                Here are the key insights for {range.label}.
+                {t("reports.smart_summary_desc", { month: range.label })}
               </p>
             </div>
             
@@ -538,7 +540,7 @@ const Reports: React.FC = () => {
               )}
               <span className="relative z-10 flex items-center gap-2">
                 <Icon size={16} />
-                {tab.label}
+                {t(tab.labelKey)}
               </span>
             </button>
           );
@@ -587,8 +589,9 @@ const PerformanceTab: React.FC<{
   formatAmount: (n: number) => string;
   range: any;
 }> = ({ data, formatAmount, range }) => {
+  const { t } = useTranslation();
   if (data.currentTotals.income === 0 && data.currentTotals.expense === 0 && data.previousTotals.income === 0 && data.previousTotals.expense === 0) {
-    return <EmptyState message="No transactions found for this period. Add income and expenses to see performance analysis." icon={BarChart3} />;
+    return <EmptyState message={t("reports.performance_empty")} icon={BarChart3} />;
   }
 
   return (
@@ -638,7 +641,7 @@ const PerformanceTab: React.FC<{
       )}
 
       {/* Category Comparison Table */}
-      <ReportCard title="Category Comparison" subtitle={`${range.label} vs ${range.prevLabel}`}>
+      <ReportCard title={t("reports.category_comparison")} subtitle={t("reports.comparison_subtitle", { current: range.label, previous: range.prevLabel })}>
         {data.categoryComparisons.length === 0 ? (
           <EmptyState message="No expense categories to compare." />
         ) : (
@@ -646,10 +649,10 @@ const PerformanceTab: React.FC<{
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-100 dark:border-zinc-800">
-                  <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Category</th>
-                  <th className="text-right py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Current</th>
-                  <th className="text-right py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Previous</th>
-                  <th className="text-right py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Change</th>
+                  <th className="text-left py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">{t("reports.category")}</th>
+                  <th className="text-right py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">{t("reports.current")}</th>
+                  <th className="text-right py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">{t("reports.previous")}</th>
+                  <th className="text-right py-3 px-2 text-xs font-bold text-slate-400 uppercase tracking-wider">{t("reports.change")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -697,16 +700,16 @@ const PerformanceTab: React.FC<{
       {/* Savings Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Savings Change */}
-        <ReportCard title="Savings Comparison">
+        <ReportCard title={t("reports.savings_comparison")}>
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Current</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{t("reports.current")}</p>
               <p className={cn("text-xl font-bold", data.currentTotals.savings >= 0 ? "text-emerald-600" : "text-rose-600")}>
                 {formatAmount(data.currentTotals.savings)}
               </p>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Previous</p>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">{t("reports.previous")}</p>
               <p className="text-xl font-bold text-slate-500 dark:text-zinc-400">
                 {formatAmount(data.previousTotals.savings)}
               </p>
@@ -726,7 +729,7 @@ const PerformanceTab: React.FC<{
         </ReportCard>
 
         {/* Efficiency Score */}
-        <ReportCard title="Savings Efficiency Score" subtitle="(Savings ÷ Income) × 100">
+        <ReportCard title={t("reports.efficiency_score")} subtitle={t("reports.efficiency_subtitle")}>
           <div className="flex flex-col items-center py-4">
             <CircularProgress
               value={data.efficiencyScore}
@@ -739,16 +742,16 @@ const PerformanceTab: React.FC<{
                     ? "#f59e0b"
                     : "#f43f5e"
               }
-              label="Saved"
+              label={t("reports.efficiency_saved")}
             />
             <p className="mt-4 text-sm text-slate-500 dark:text-zinc-400 text-center max-w-xs">
               {data.efficiencyScore >= 30
-                ? "Excellent! You're saving a significant portion of your income."
+                ? t("reports.efficiency_excellent")
                 : data.efficiencyScore >= 15
-                  ? "Good savings rate. Try to push towards 30% for long-term growth."
+                  ? t("reports.efficiency_good")
                   : data.efficiencyScore >= 0
-                    ? "Your savings rate needs improvement. Look for areas to cut spending."
-                    : "Your expenses exceed income. Urgent attention needed."}
+                    ? t("reports.efficiency_fair")
+                    : t("reports.efficiency_poor")}
             </p>
           </div>
         </ReportCard>
@@ -765,8 +768,9 @@ const CashFlowTab: React.FC<{
   data: CashFlowData;
   formatAmount: (n: number) => string;
 }> = ({ data, formatAmount }) => {
+  const { t } = useTranslation();
   if (data.totalInflow === 0 && data.totalOutflow === 0) {
-    return <EmptyState message="No cash flow data for this period." icon={Activity} />;
+    return <EmptyState message={t("reports.cash_flow_empty")} icon={Activity} />;
   }
 
   const waterfallDisplay = data.waterfall.map((step) => ({
@@ -781,9 +785,9 @@ const CashFlowTab: React.FC<{
       {/* Net Flow Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Total Inflow", value: data.totalInflow, color: "emerald" },
-          { label: "Total Outflow", value: data.totalOutflow, color: "rose" },
-          { label: "Net Flow", value: data.netFlow, color: data.netFlow >= 0 ? "indigo" : "rose" },
+          { label: t("reports.total_inflow"), value: data.totalInflow, color: "emerald" },
+          { label: t("reports.total_outflow"), value: data.totalOutflow, color: "rose" },
+          { label: t("reports.net_flow"), value: data.netFlow, color: data.netFlow >= 0 ? "indigo" : "rose" },
         ].map((item) => (
           <MotionDiv
             key={item.label}
@@ -806,7 +810,7 @@ const CashFlowTab: React.FC<{
       </div>
 
       {/* Waterfall Chart */}
-      <ReportCard title="Money Flow" subtitle="How money moves through your system">
+      <ReportCard title={t("reports.money_flow")} subtitle={t("reports.money_flow_desc")}>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={waterfallDisplay} margin={{ top: 20, right: 10, left: 10, bottom: 5 }}>
@@ -827,7 +831,7 @@ const CashFlowTab: React.FC<{
       {/* Income & Expense Breakdown */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Income Breakdown */}
-        <ReportCard title="Income Sources">
+        <ReportCard title={t("reports.income_sources")}>
           {data.incomeSources.length === 0 ? (
             <EmptyState message="No income recorded this period." />
           ) : (
@@ -835,7 +839,7 @@ const CashFlowTab: React.FC<{
               <div className="h-[220px] w-full relative shrink-0">
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 mt-1">
-                    Total Income
+                    {t("reports.total_income")}
                   </p>
                   <h4 className="text-xl font-bold text-slate-900 dark:text-white leading-none">
                     {formatAmount(data.totalInflow)}
@@ -877,7 +881,7 @@ const CashFlowTab: React.FC<{
         </ReportCard>
 
         {/* Expense Breakdown */}
-        <ReportCard title="Expense Distribution" className="flex flex-col">
+        <ReportCard title={t("reports.expense_distribution")} className="flex flex-col">
           {data.expenseFlows.length === 0 ? (
             <EmptyState message="No expenses recorded this period." />
           ) : (
@@ -913,8 +917,9 @@ const BudgetTab: React.FC<{
   formatAmount: (n: number) => string;
   range: any;
 }> = ({ data, formatAmount, range }) => {
+  const { t } = useTranslation();
   if (data.budgetVsActual.length === 0 && data.heatmap.length === 0) {
-    return <EmptyState message="No budgets configured. Create budgets on the Budgets page to see discipline analysis." icon={PiggyBank} />;
+    return <EmptyState message={t("reports.budget_empty")} icon={PiggyBank} />;
   }
 
   return (
@@ -922,7 +927,7 @@ const BudgetTab: React.FC<{
       {/* Discipline Score */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <ReportCard className="lg:col-span-1 flex flex-col items-center justify-center">
-          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Budget Discipline</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">{t("reports.budget_discipline")}</h3>
           {data.disciplineScore === -1 ? (
             <div className="w-[150px] h-[150px] rounded-full border-8 border-slate-100 dark:border-white/5 flex flex-col items-center justify-center text-center">
               <span className="text-2xl font-bold text-slate-300 dark:text-zinc-600">N/A</span>
@@ -945,13 +950,13 @@ const BudgetTab: React.FC<{
           )}
           <div className="mt-5 grid grid-cols-2 gap-4 text-center w-full">
             <div className="p-3 bg-slate-50 dark:bg-zinc-800/50 rounded-xl">
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Budget</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("reports.budget")}</p>
               <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">
                 {data.categoriesWithinBudget}/{data.totalCategories}
               </p>
             </div>
             <div className="p-3 bg-slate-50 dark:bg-zinc-800/50 rounded-xl">
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Safe Days</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">{t("reports.safe_days")}</p>
               <p className="text-sm font-bold text-slate-900 dark:text-white mt-1">
                 {data.daysUnderSafeSpend}/{data.totalDays}
               </p>
@@ -960,7 +965,7 @@ const BudgetTab: React.FC<{
         </ReportCard>
 
         {/* Budget vs Actual Chart */}
-        <ReportCard title="Budget vs Actual" className="lg:col-span-2">
+        <ReportCard title={t("reports.budget_vs_actual")} className="lg:col-span-2">
           {data.budgetVsActual.length === 0 ? (
             <EmptyState message="No budgets to compare." />
           ) : (
@@ -986,7 +991,7 @@ const BudgetTab: React.FC<{
       </div>
 
       {/* Category Status */}
-      <ReportCard title="Category Budget Status">
+      <ReportCard title={t("reports.category_budget_status")}>
         <div className="space-y-3">
           {data.budgetVsActual.map((b) => (
             <div key={b.budgetId} className="flex items-center gap-4">
@@ -1032,7 +1037,7 @@ const BudgetTab: React.FC<{
                     ? "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400"
                     : "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
               )}>
-                {b.status === "over" ? "Over" : b.status === "near" ? "Near" : "Under"}
+                {b.status === "over" ? t("reports.status_over") : b.status === "near" ? t("reports.status_near") : t("reports.status_under")}
               </span>
             </div>
           ))}
@@ -1040,7 +1045,7 @@ const BudgetTab: React.FC<{
       </ReportCard>
 
       {/* Overspending Heatmap */}
-      <ReportCard title="Spending Heatmap" subtitle="Daily spending intensity — darker = higher spending">
+      <ReportCard title={t("reports.spending_heatmap")} subtitle={t("reports.heatmap_subtitle")}>
         <div className="mt-2">
           {/* Day labels */}
           <div className="flex gap-1 mb-1 ml-8">
@@ -1120,11 +1125,11 @@ const BudgetTab: React.FC<{
 
           {/* Legend */}
           <div className="flex items-center gap-4 mt-4 justify-center">
-            <span className="text-[10px] font-bold text-slate-400">Less</span>
+            <span className="text-[10px] font-bold text-slate-400">{t("reports.less")}</span>
             {["bg-slate-50 dark:bg-zinc-800/50", "bg-emerald-100 dark:bg-emerald-900/30", "bg-amber-100 dark:bg-amber-900/30", "bg-orange-200 dark:bg-orange-900/40", "bg-rose-300 dark:bg-rose-900/50"].map((cls, i) => (
               <div key={i} className={cn("w-5 h-5 rounded", cls)} />
             ))}
-            <span className="text-[10px] font-bold text-slate-400">More</span>
+            <span className="text-[10px] font-bold text-slate-400">{t("reports.more")}</span>
           </div>
         </div>
       </ReportCard>
@@ -1140,10 +1145,11 @@ const ForecastTab: React.FC<{
   data: ForecastData;
   formatAmount: (n: number) => string;
 }> = ({ data, formatAmount }) => {
+  const { t } = useTranslation();
   if (!data.hasEnoughData) {
     return (
       <EmptyState
-        message="Need at least 2 months of transaction data to generate forecasts. Keep tracking your finances!"
+        message={t("reports.forecast_empty")}
         icon={Target}
       />
     );
@@ -1154,9 +1160,9 @@ const ForecastTab: React.FC<{
       {/* Monthly Averages */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Avg Monthly Income", value: data.monthlyAvgIncome, color: "#10b981" },
-          { label: "Avg Monthly Expense", value: data.monthlyAvgExpense, color: "#f43f5e" },
-          { label: "Avg Monthly Savings", value: data.monthlyAvgSavings, color: data.monthlyAvgSavings >= 0 ? "#6366f1" : "#f43f5e" },
+          { label: t("reports.avg_monthly_income"), value: data.monthlyAvgIncome, color: "#10b981" },
+          { label: t("reports.avg_monthly_expense"), value: data.monthlyAvgExpense, color: "#f43f5e" },
+          { label: t("reports.avg_monthly_savings"), value: data.monthlyAvgSavings, color: data.monthlyAvgSavings >= 0 ? "#6366f1" : "#f43f5e" },
         ].map((item) => (
           <MotionDiv
             key={item.label}
@@ -1173,7 +1179,7 @@ const ForecastTab: React.FC<{
       </div>
 
       {/* Net Worth Projection */}
-      <ReportCard title="Net Worth Projection" subtitle="Historical + 6-month forecast">
+      <ReportCard title={t("reports.net_worth_projection")} subtitle={t("reports.net_worth_subtitle")}>
         <div className="h-[300px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data.netWorthProjection} margin={{ top: 30, right: 10, left: 10, bottom: 5 }}>
@@ -1208,7 +1214,7 @@ const ForecastTab: React.FC<{
 
       {/* Expense & Savings Projections */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ReportCard title="Expense Projection">
+        <ReportCard title={t("reports.expense_projection")}>
           <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.expenseProjection} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
@@ -1229,7 +1235,7 @@ const ForecastTab: React.FC<{
           </div>
         </ReportCard>
 
-        <ReportCard title="Savings Projection">
+        <ReportCard title={t("reports.savings_projection")}>
           <div className="h-[250px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data.savingsProjection} margin={{ top: 10, right: 10, left: 10, bottom: 5 }}>
@@ -1264,7 +1270,7 @@ const ForecastTab: React.FC<{
             <Zap size={22} className="text-sky-600 dark:text-sky-400" />
           </div>
           <div>
-            <h4 className="font-bold text-slate-900 dark:text-white mb-2">Forecast Summary</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-2">{t("reports.forecast_summary")}</h4>
             <p className="text-sm text-slate-600 dark:text-zinc-300 leading-relaxed">
               {data.forecastSummary}
             </p>

@@ -31,6 +31,6 @@ export const db = getFirestore(app);
 // Connect to emulators if enabled
 if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === "true") {
   connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
-  connectFirestoreEmulator(db, "localhost", 8080);
+  connectFirestoreEmulator(db, "localhost", 8085);
 }
 
