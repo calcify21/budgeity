@@ -5,6 +5,8 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
+import { Capacitor } from "@capacitor/core";
+import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 import {
   User,
   onAuthStateChanged,
@@ -382,14 +384,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await setPersistence(auth, browserLocalPersistence);
 
-      // TEMPORARY: Force popup for mobile debugging due to local IP issues with redirect
-      // if (isMobile()) {
-      //   // Use redirect for mobile devices to avoid popup blocking issues
-      //   await signInWithRedirect(auth, provider);
-      //   // The flow effectively ends here as the page redirects.
-      //   // The result is handled in the useEffect above.
-      //   return;
-      // }
+      if (Capacitor.isNativePlatform()) {
+        if (provider.providerId === "google.com") {
+          await FirebaseAuthentication.signInWithGoogle();
+        } else if (provider.providerId === "github.com") {
+          await FirebaseAuthentication.signInWithGithub();
+        } else if (provider.providerId === "facebook.com") {
+          await FirebaseAuthentication.signInWithFacebook();
+        } else {
+          throw new Error("Unsupported native provider");
+        }
+        
+        // Wait for auth state to update globally and refresh it
+        await auth.currentUser?.reload();
+        if (auth.currentUser) {
+          setUser({ ...auth.currentUser });
+        }
+        return;
+      }
 
       const result = await signInWithPopup(auth, provider);
 
