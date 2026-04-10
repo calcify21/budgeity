@@ -6,49 +6,27 @@
   "main": "main.cjs",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "preview": "vite preview",
-    "deploy:rules": "npx firebase-tools deploy --only firestore:rules",
-    "emulators": "firebase emulators:start --import=./emulator-data --export-on-exit",
     "dev:emulators": "concurrently \"npm run emulators\" \"npm run dev\"",
-    "cap:build": "cross-env VITE_BASE_URL=./ npm run build",
-    "cap:sync": "npx cap sync android",
-    "cap:run": "npm run cap:build && npm run cap:sync && npx cap open android",
-    "exe:dev": "npm run cap:build && electron .",
-    "exe:build": "npm run cap:build && electron-builder"
-  },
-  "build": {
-    "appId": "com.budgeity.app",
-    "productName": "Budgeity",
-    "directories": {
-      "output": "dist-exe"
-    },
-    "files": [
-      "dist/**/*",
-      "main.cjs",
-      "preload.cjs"
-    ],
-    "win": {
-      "target": "portable",
-      "icon": "public/favicon.ico"
-    }
+    "emulators": "firebase emulators:start --import=./emulator-data --export-on-exit",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
+    "build": "tsc && vite build",
+    "build:firebase": "tsc && vite build --mode firebase",
+    "build:hostinger": "tsc && vite build --mode hostinger",
+    "deploy:firebase": "npm run build:firebase && firebase deploy",
+    "deploy:rules": "npx firebase-tools deploy --only firestore:rules"
   },
   "dependencies": {
-    "@capacitor-firebase/authentication": "^8.2.0",
-    "@capacitor/android": "^8.3.0",
-    "@capacitor/cli": "^8.3.0",
-    "@capacitor/core": "^8.3.0",
     "@tanstack/react-virtual": "^3.13.19",
     "clsx": "^2.1.0",
     "driver.js": "^1.4.0",
-    "firebase": "^10.8.0",
+    "firebase": "^12.12.0",
     "framer-motion": "^11.0.8",
     "html2canvas": "^1.4.1",
     "i18next": "^25.8.11",
     "i18next-browser-languagedetector": "^8.2.1",
     "i18next-http-backend": "^3.0.2",
-    "jspdf": "^2.5.1",
+    "jspdf": "^4.2.1",
     "jspdf-autotable": "^3.8.2",
     "lucide-react": "^0.563.0",
     "react": "^18.2.0",
@@ -69,18 +47,15 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "concurrently": "^9.2.1",
-    "cross-env": "^10.1.0",
-    "electron": "^41.2.0",
-    "electron-builder": "^26.8.1",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
-    "firebase-admin": "^13.6.1",
+    "firebase-admin": "^13.8.0",
     "globals": "^15.15.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3",
     "typescript-eslint": "^8.38.0",
-    "vite": "^5.1.4"
+    "vite": "^6.4.2"
   }
 }

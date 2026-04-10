@@ -5,8 +5,6 @@ import React, {
   useEffect,
   useCallback,
 } from "react";
-import { Capacitor } from "@capacitor/core";
-import { FirebaseAuthentication } from "@capacitor-firebase/authentication";
 import {
   User,
   onAuthStateChanged,
@@ -384,25 +382,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await setPersistence(auth, browserLocalPersistence);
 
-      if (Capacitor.isNativePlatform()) {
-        if (provider.providerId === "google.com") {
-          await FirebaseAuthentication.signInWithGoogle();
-        } else if (provider.providerId === "github.com") {
-          await FirebaseAuthentication.signInWithGithub();
-        } else if (provider.providerId === "facebook.com") {
-          await FirebaseAuthentication.signInWithFacebook();
-        } else {
-          throw new Error("Unsupported native provider");
-        }
-        
-        // Wait for auth state to update globally and refresh it
-        await auth.currentUser?.reload();
-        if (auth.currentUser) {
-          setUser({ ...auth.currentUser });
-        }
-        return;
-      }
-
       const result = await signInWithPopup(auth, provider);
 
       console.log(
@@ -473,7 +452,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const actionCodeSettings = {
         // URL you want to redirect back to. The domain (www.example.com) for this
         // URL must be in the authorized domains list in the Firebase Console.
-        url: `${window.location.origin}/budgeity/#/auth/action?mode=signInWithEmailLink`,
+        url: `${window.location.origin}${import.meta.env.VITE_BASE_URL || "/budgeity/"}#/auth/action?mode=signInWithEmailLink`,
         // This must be true.
         handleCodeInApp: true,
       };

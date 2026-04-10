@@ -3,7 +3,7 @@ import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode }): any => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
     base: env.VITE_BASE_URL || "/budgeity/",
@@ -80,7 +80,7 @@ export default defineConfig(({ mode }) => {
               purpose: "any",
             },
             {
-              src: "maskable-icon-512x512.png",
+              src: "pwa-512x512.png",
               sizes: "512x512",
               type: "image/png",
               purpose: "maskable",
@@ -90,25 +90,25 @@ export default defineConfig(({ mode }) => {
             {
               name: "Add Expense",
               short_name: "Expense",
-              url: "/budgeity/#/dashboard?add=expense",
+              url: `${env.VITE_BASE_URL || "/budgeity/"}#/dashboard?add=expense`,
               icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
             },
             {
               name: "Add Income",
               short_name: "Income",
-              url: "/budgeity/#/dashboard?add=income",
+              url: `${env.VITE_BASE_URL || "/budgeity/"}#/dashboard?add=income`,
               icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
             },
             {
               name: "Add to Shopping List",
               short_name: "Shop Item",
-              url: "/budgeity/#/shopping-list?add=item",
+              url: `${env.VITE_BASE_URL || "/budgeity/"}#/shopping-list?add=item`,
               icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
             },
             {
               name: "Analytics",
               short_name: "Analytics",
-              url: "/budgeity/#/analytics",
+              url: `${env.VITE_BASE_URL || "/budgeity/"}#/analytics`,
               icons: [{ src: "pwa-192x192.png", sizes: "192x192" }],
             },
           ],

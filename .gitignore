@@ -12,11 +12,15 @@ yarn-error.log*
 firebase-debug.log*
 firestore-debug.log*
 
-# Environment Variables (Security)
+# Environment Variables (Secrets)
 .env
 .env.local
 .env.*.local
 service-account.json
+
+# Deployment Modes (Not Secrets - safe to track)
+# .env.firebase
+# .env.hostinger
 
 # Editor / OS
 .vscode/
@@ -46,6 +50,3 @@ skills-lock.json
 # Vite
 *.tsbuildinfo
 
-# Capacitor / Android
-android/
-ios/

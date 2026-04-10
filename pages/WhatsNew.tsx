@@ -181,11 +181,6 @@ const WhatsNew: React.FC = () => {
           description="Budgeity has a fresh new look! Experience our stunning new high-resolution logo, refined brand colors, and a completely overhauled visual system designed for a premium fintech feel."
         />
         <ChangeItem
-          icon={Smartphone}
-          title="Advanced PWA Integration"
-          description="Take Budgeity anywhere. Our new Progressive Web App (PWA) engine features high-definition icons and full support for Android 'Maskable' icons, ensuring we look native on every home screen."
-        />
-        <ChangeItem
           icon={Globe}
           title="Cross-Device Branding"
           description="Consistency matters. From your browser tab's favicon to your mobile splash screen, our identity is now perfectly standardized across all platforms and devices."

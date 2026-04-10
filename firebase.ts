@@ -28,12 +28,9 @@ export const githubProvider = new GithubAuthProvider();
 export const facebookProvider = new FacebookAuthProvider();
 export const db = getFirestore(app);
 
-import { Capacitor } from '@capacitor/core';
-
 // Connect to emulators if enabled
 if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === "true") {
-  const isAndroid = Capacitor.getPlatform() === 'android';
-  const emulatorHost = isAndroid ? "10.0.2.2" : "localhost";
+  const emulatorHost = "localhost";
   
   connectAuthEmulator(auth, `http://${emulatorHost}:9099`, { disableWarnings: true });
   connectFirestoreEmulator(db, emulatorHost, 8085);
