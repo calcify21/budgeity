@@ -1,0 +1,99 @@
+.multi-range-slider-container {
+  height: 40px;
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+/* The actual inputs */
+.thumb-input {
+  position: absolute;
+  width: 100%;
+  top: 50%; /* Center the input line */
+  pointer-events: none;
+  outline: none;
+  z-index: 3;
+  -webkit-appearance: none;
+  background: transparent;
+  margin: 0;
+}
+
+/* The Thumbs themselves */
+.thumb-input::-webkit-slider-thumb {
+  pointer-events: auto;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  /* Center vertically: Input is a line at 50%. Thumb is 18px.
+     Move up by half height (9px).
+     No transform ensures simpler browser behavior. */
+  margin-top: -9px; 
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid #ffffff; /* White border */
+  box-shadow: 0 0 0 1px #cbd5e1, 0 2px 4px rgba(0,0,0,0.1); /* Ring + Shadow */
+  cursor: grab;
+  position: relative;
+  z-index: 50;
+}
+
+.dark .thumb-input::-webkit-slider-thumb {
+  background-color: #18181b;
+  border-color: #18181b;
+  box-shadow: 0 0 0 1px #52525b, 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.thumb-input::-webkit-slider-thumb::after {
+  display: none;
+}
+
+/* Firefox Support */
+.thumb-input::-moz-range-thumb {
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  /* Firefox usually centers thumb on track if height matches?
+     Or we use transform. Let's try transform for Firefox only or align with webkit. */
+  transform: translateY(-50%); 
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 0 1px #cbd5e1, 0 2px 4px rgba(0,0,0,0.1);
+  cursor: grab;
+  z-index: 50;
+  margin-top: 0;
+}
+.dark .thumb-input::-moz-range-thumb {
+  background-color: #18181b;
+  border-color: #18181b;
+  box-shadow: 0 0 0 1px #52525b, 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Track Background */
+.slider__track {
+  position: absolute;
+  top: 50%;
+  /* Height 4px. Center means move up 2px. */
+  margin-top: -2px;
+  border-radius: 3px;
+  height: 4px;
+  background-color: #e2e8f0;
+  width: 100%;
+  z-index: 1;
+}
+
+.dark .slider__track {
+  background-color: #27272a;
+}
+
+/* Selected Range */
+.slider__range {
+  position: absolute;
+  top: 50%;
+  margin-top: -2px;
+  border-radius: 3px;
+  height: 4px;
+  background-color: #10b981;
+  z-index: 2;
+}

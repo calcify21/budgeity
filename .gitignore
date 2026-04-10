@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+firebase-debug.log*
+firestore-debug.log*
+
+# Environment Variables (Secrets)
+.env
+.env.local
+.env.*.local
+service-account.json
+
+# Deployment Modes (Not Secrets - safe to track)
+# .env.firebase
+# .env.hostinger
+
+# Editor / OS
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.sw?
+*.swo
+*.swp
+
+# Build / Cache
+.firebase/
+.eslintcache
+.parcel-cache
+.turbo
+.next
+.cache/
+
+# Firebase Emulators
+emulator-data/
+firebase-export-*/
+
+# Agent settings
+.agents/
+skills-lock.json
+
+# Vite
+*.tsbuildinfo

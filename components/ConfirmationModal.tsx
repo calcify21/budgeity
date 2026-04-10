@@ -1,0 +1,77 @@
+import React from "react";
+import { X, AlertTriangle } from "lucide-react";
+import { cn } from "../utils";
+
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  variant?: "danger" | "neutral" | "success";
+}
+
+const ConfirmationModal: React.FC<Props> = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  variant = "neutral",
+}) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+        <div className="p-6 text-center">
+          <div
+            className={cn(
+              "w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4",
+              variant === "danger"
+                ? "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400"
+                : "bg-slate-100 text-slate-600 dark:bg-zinc-800 dark:text-slate-400",
+            )}
+          >
+            <AlertTriangle size={24} />
+          </div>
+          <h2 className="text-xl font-bold mb-2 text-slate-900 dark:text-white">
+            {title}
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 leading-relaxed">
+            {message}
+          </p>
+        </div>
+
+        <div className="p-6 border-t border-slate-100 dark:border-zinc-800 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 px-4 rounded-xl font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
+          >
+            {cancelText}
+          </button>
+          <button
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className={cn(
+              "flex-1 py-3 px-4 rounded-xl font-bold text-white transition-colors shadow-lg",
+              variant === "danger"
+                ? "bg-rose-600 hover:bg-rose-700 shadow-rose-500/20"
+                : "bg-brand-600 hover:bg-brand-700 shadow-brand-500/20",
+            )}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ConfirmationModal;
