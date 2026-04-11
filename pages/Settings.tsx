@@ -19,6 +19,8 @@ import { ConfirmModal } from "../components/ConfirmModal";
 import WalletModal from "../components/WalletModal";
 import { useTour } from "../context/TourContext";
 import { useTranslation } from "react-i18next";
+import AppLockSettings from "../components/applock/AppLockSettings";
+import { useLocation } from "react-router-dom";
 
 const Settings: React.FC = () => {
   const {
@@ -43,6 +45,23 @@ const Settings: React.FC = () => {
   const [confirmResetData, setConfirmResetData] = useState(false);
   const [showAddWallet, setShowAddWallet] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+
+  const location = useLocation();
+
+  // Handle anchor scrolling (e.g., #security)
+  React.useEffect(() => {
+    if (location.hash) {
+      // Small delay to ensure the component is fully rendered
+      const timer = setTimeout(() => {
+        const id = location.hash.replace("#", "");
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 300); // Slightly longer delay for stability with lazy loading
+      return () => clearTimeout(timer);
+    }
+  }, [location.hash]);
 
   const handleResetData = async () => {
     try {
@@ -383,6 +402,9 @@ const Settings: React.FC = () => {
           />
         </div>
       </section>
+
+      {/* Security — App Lock Settings */}
+      <AppLockSettings />
 
       {/* Danger Zone */}
       <section className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-6">

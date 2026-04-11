@@ -11,8 +11,9 @@ import {
   ChevronDown,
   Home,
   Users,
+  ShieldCheck,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import CustomDatePicker from "../components/CustomDatePicker";
 import { useTranslation } from "react-i18next";
 import { useHousehold } from "../context/HouseholdContext";
@@ -87,6 +88,18 @@ const Dashboard: React.FC = () => {
   } = useData();
   const { activeWorkspace, currentHousehold, currentMembers } = useHousehold();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const [showLockResetAlert, setShowLockResetAlert] = useState(
+    location.state?.appLockReset || false
+  );
+
+  // Clear state so it doesn't persist on reload
+  useEffect(() => {
+    if (location.state?.appLockReset) {
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [localWidgets, setLocalWidgets] = useState<DashboardWidgetConfig[]>([]);
@@ -272,6 +285,45 @@ const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {showLockResetAlert && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -20, height: 0 }}
+            className="overflow-hidden mb-4"
+          >
+            <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 rounded-[2rem] p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-sm relative">
+              <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                <ShieldCheck size={24} className="text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-base font-bold text-emerald-800 dark:text-emerald-300">
+                  App Lock Securely Reset
+                </h3>
+                <p className="text-sm text-emerald-600 dark:text-emerald-400/80 mt-1">
+                  Your previous App Lock settings were successfully cleared. You can set up a new PIN or pattern in your security settings to protect your device again.
+                </p>
+              </div>
+              <div className="flex items-center justify-end gap-3 mt-4 sm:mt-0 shrink-0 w-full sm:w-auto">
+                <button
+                  onClick={() => navigate("/settings#security")}
+                  className="px-5 py-2.5 flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm text-center"
+                >
+                  Set Up App Lock
+                </button>
+                <button
+                  onClick={() => setShowLockResetAlert(false)}
+                  className="p-2.5 text-emerald-600/60 hover:text-emerald-800 dark:hover:text-emerald-300 bg-emerald-100/50 hover:bg-emerald-100 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/40 rounded-xl transition-colors shrink-0"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Household Header/Banner */}
       {activeWorkspace.type === "household" && currentHousehold && !isEditing && (

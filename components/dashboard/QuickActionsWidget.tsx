@@ -1,11 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Plus, Minus, ArrowRightLeft, Target, PiggyBank, Zap, ShoppingCart, Tags, Repeat } from "lucide-react";
+import { Plus, Minus, ArrowRightLeft, Target, PiggyBank, Zap, ShoppingCart, Tags, Repeat, LockKeyhole } from "lucide-react";
+import { useAppLock } from "../../context/AppLockContext";
 
 export const QuickActionsWidget: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { isLockEnabled, isUnlocked, lockApp } = useAppLock();
 
   const actions = [
     {
@@ -56,6 +58,17 @@ export const QuickActionsWidget: React.FC = () => {
       color: "bg-blue-500 text-white",
       onClick: () => navigate("/recurring?add=true"),
     },
+    // Lock App action (only shown when lock is enabled)
+    ...(isLockEnabled && isUnlocked
+      ? [
+          {
+            label: t("appLock.lockNow", "Lock App"),
+            icon: <LockKeyhole size={20} />,
+            color: "bg-slate-800 dark:bg-zinc-200 text-white dark:text-black",
+            onClick: () => lockApp(),
+          },
+        ]
+      : []),
   ];
 
   return (

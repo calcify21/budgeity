@@ -106,6 +106,32 @@ const WhatsNew: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChangeItem
+          icon={ShieldCheck}
+          title="Multi-Method App Lock System"
+          description="Secure your financial data with an extra layer of protection. Choose between a 4-6 digit PIN, a custom 3x3 Pattern, or native Biometrics (Fingerprint/Face ID) to lock your app instantly."
+        />
+        <ChangeItem
+          icon={Send}
+          title="Secure Magic Link Recovery"
+          description="Never get locked out. If you forget your App Lock credentials, you can now trigger a secure Magic Link to your email to verify your identity before resetting your security settings."
+        />
+        <ChangeItem
+          icon={Lock}
+          title="Real-Time Security Sync"
+          description="Stay secure on all screens! Your App Lock status now syncs instantly across every open browser tab using a dedicated Security Broadcast Channel."
+        />
+        <ChangeItem
+          icon={Zap}
+          title="Intuitive Recovery Alerts"
+          description="Total clarity after recovery. When you return to Budgeity after a security reset, an elegant new banner confirms your data is safe and offers a one-click shortcut to set up a new lock."
+        />
+        <ChangeItem
+          icon={Compass}
+          title="Smart Anchor Scrolling"
+          description="Navigate settings with speed. Tapping security alerts or recovery buttons now takes you directly to the relevant section with smooth, intelligent anchor scrolling."
+        />
+
+        <ChangeItem
           icon={BarChart3}
           title="Comprehensive Reports Dashboard"
           description="Deep-dive into your financial DNA. Our new dedicated Reports page provides professional-grade analysis of your income, expenses, and trends with beautiful, high-fidelity visualizations."

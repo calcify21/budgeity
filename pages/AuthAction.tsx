@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useData } from "../context/DataContext";
+import { auth } from "../firebase";
+import { clearAllAppLockData } from "../utils/appLockStorage";
 import {
   Lock,
   ArrowRight,
@@ -96,10 +98,33 @@ const AuthAction: React.FC = () => {
         } else if (mode === "signInWithEmailLink") {
           const savedEmail = window.localStorage.getItem("emailForSignIn");
           if (savedEmail) {
-            await completePasswordlessSignIn(savedEmail, window.location.href);
-            setSuccessMsg("Signed in successfully! Redirecting...");
+            console.log("[AuthAction/Init] Processing Magic Link with saved email...");
+            const uid = await completePasswordlessSignIn(savedEmail, window.location.href);
+            console.log("[AuthAction/Init] SignIn Complete. Returned UID:", uid);
+
+            // App Lock Wiping Protocol - Ensure it specifically triggered via Magic Link
+            const pending = window.localStorage.getItem("budgeity_lock_reset_pending");
+            console.log("[AuthAction/Init] Lock reset pending flag:", pending);
+            let wasReset = false;
+            if (pending === "true") {
+              const targetUid = uid || auth.currentUser?.uid;
+              console.log("[AuthAction/Init] Wiping lock data for UID:", targetUid);
+              if (targetUid) {
+                await clearAllAppLockData(targetUid);
+                console.log("[AuthAction/Init] clearAllAppLockData finished.");
+              } else {
+                console.error("[AuthAction/Init] No UID available to wipe lock data!");
+              }
+              window.localStorage.removeItem("budgeity_lock_reset_pending");
+              window.dispatchEvent(new Event("budgeity_applock_force_refresh"));
+              setSuccessMsg("App Lock securely reset. Welcome back! Redirecting...");
+              wasReset = true;
+            } else {
+              setSuccessMsg("Signed in successfully! Redirecting...");
+            }
+
             setActionComplete(true);
-            setTimeout(() => navigate("/dashboard"), 2000);
+            setTimeout(() => navigate("/dashboard", { state: { appLockReset: wasReset } }), 2000);
           } else {
             // Must ask for email
             setIsVerifying(false); // Stop loader to show email prompt
@@ -185,10 +210,33 @@ const AuthAction: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      await completePasswordlessSignIn(passwordlessEmail, window.location.href);
-      setSuccessMsg("Signed in successfully! Redirecting...");
+      console.log("[AuthAction/Submit] Processing Magic Link with entered email...");
+      const uid = await completePasswordlessSignIn(passwordlessEmail, window.location.href);
+      console.log("[AuthAction/Submit] SignIn Complete. Returned UID:", uid);
+
+      // App Lock Wiping Protocol - Ensure it specifically triggered via Magic Link
+      const pending = window.localStorage.getItem("budgeity_lock_reset_pending");
+      console.log("[AuthAction/Submit] Lock reset pending flag:", pending);
+      let wasReset = false;
+      if (pending === "true") {
+        const targetUid = uid || auth.currentUser?.uid;
+        console.log("[AuthAction/Submit] Wiping lock data for UID:", targetUid);
+        if (targetUid) {
+          await clearAllAppLockData(targetUid);
+          console.log("[AuthAction/Submit] clearAllAppLockData finished.");
+        } else {
+          console.error("[AuthAction/Submit] No UID available to wipe lock data!");
+        }
+        window.localStorage.removeItem("budgeity_lock_reset_pending");
+        window.dispatchEvent(new Event("budgeity_applock_force_refresh"));
+        setSuccessMsg("App Lock securely reset. Welcome back! Redirecting...");
+        wasReset = true;
+      } else {
+        setSuccessMsg("Signed in successfully! Redirecting...");
+      }
+
       setActionComplete(true);
-      setTimeout(() => navigate("/dashboard"), 2000);
+      setTimeout(() => navigate("/dashboard", { state: { appLockReset: wasReset } }), 2000);
     } catch (err: any) {
       setError(err.message);
     } finally {

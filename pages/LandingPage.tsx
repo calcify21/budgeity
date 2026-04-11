@@ -47,7 +47,7 @@ const HeroSection = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
                 </span>
-                v2.0 is now live
+                v3.0 is now live
               </div>
               <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight">
                 Take control of <br />
@@ -577,37 +577,36 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black overflow-x-hidden selection:bg-brand-500/30 transition-colors duration-300">
-      <nav className="fixed top-0 left-0 w-full z-50 bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-slate-200/50 dark:border-white/5">
-        <div className="container mx-auto px-4 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="Budgeity" className="w-8 h-8" />
-            <span className="font-bold text-xl text-slate-900 dark:text-white">
+      <nav className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-6xl z-50 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border border-white/40 dark:border-zinc-800/60 shadow-md sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-3xl transition-all duration-300">
+        <div className="px-3 sm:px-6 h-14 sm:h-20 flex items-center justify-between gap-1.5 overflow-hidden">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            <img src={logo} alt="Budgeity" className="w-6 h-6 sm:w-9 sm:h-9" />
+            <span className="font-bold text-base sm:text-lg lg:text-xl text-slate-900 dark:text-white tracking-tight hidden min-[380px]:block">
               Budgeity
             </span>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 mr-2">
-              <button
-                onClick={toggleTheme}
-                className="p-2.5 bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-slate-400 rounded-xl hover:text-brand-600 dark:hover:text-brand-400 transition-colors border border-slate-200 dark:border-zinc-700"
-                title={
-                  theme === "dark"
-                    ? "Switch to Light Mode"
-                    : "Switch to Dark Mode"
-                }
-              >
-                {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
-              </button>
-            </div>
+          <div className="flex items-center gap-1 sm:gap-4 shrink-0">
+            <button
+              onClick={toggleTheme}
+              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-slate-100/80 dark:bg-zinc-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:text-brand-600 dark:hover:text-brand-400 transition-all duration-300 shrink-0"
+              title={
+                theme === "dark"
+                  ? "Switch to Light Mode"
+                  : "Switch to Dark Mode"
+              }
+            >
+              {theme === "dark" ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+            </button>
+            <div className="h-4 sm:h-5 w-[1px] bg-slate-200 dark:bg-zinc-800 hidden sm:block"></div>
             <button
               onClick={() => navigate("/login")}
-              className="text-slate-600 dark:text-slate-300 font-medium hover:text-brand-600 dark:hover:text-brand-400 transition-colors"
+              className="text-xs sm:text-base text-slate-600 dark:text-slate-300 font-medium hover:text-brand-600 dark:hover:text-brand-400 transition-colors whitespace-nowrap shrink-0 px-2"
             >
               Login
             </button>
             <button
               onClick={() => navigate("/login?mode=signup")}
-              className="px-5 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/20"
+              className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/20 whitespace-nowrap text-xs sm:text-base shrink-0"
             >
               Sign Up
             </button>

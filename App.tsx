@@ -5,11 +5,14 @@ import { AuthProvider, useAuth } from "./context/AuthContext";
 import { HouseholdProvider, useHousehold } from "./context/HouseholdContext";
 import { ToastProvider } from "./context/ToastContext";
 import { TourProvider } from "./context/TourContext";
+import { AppLockProvider, useAppLock } from "./context/AppLockContext";
 import Layout from "./components/Layout";
 import OnboardingModal from "./components/OnboardingModal";
 import { Loader2, Wallet, Activity, Database, Repeat } from "lucide-react";
 import { processRecurringTransactions } from "./services/recurringEngine";
 import { motion, AnimatePresence } from "framer-motion";
+
+const SecurityOverlay = React.lazy(() => import("./components/applock/SecurityOverlay"));
 
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const Wallets = React.lazy(() => import("./pages/Wallets"));
@@ -52,6 +55,21 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
   // If no user, redirect to login
   if (!user) {
     return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+/** Gate component: shows SecurityOverlay when locked, otherwise renders children */
+const AppLockGate: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isLockEnabled, isUnlocked } = useAppLock();
+
+  if (isLockEnabled && !isUnlocked) {
+    return (
+      <React.Suspense fallback={<div className="min-h-screen bg-black" />}>
+        <SecurityOverlay />
+      </React.Suspense>
+    );
   }
 
   return <>{children}</>;
@@ -314,7 +332,11 @@ const App: React.FC = () => {
                   path="/*"
                   element={
                     <ProtectedRoute>
-                      <AppContent />
+                      <AppLockProvider>
+                        <AppLockGate>
+                          <AppContent />
+                        </AppLockGate>
+                      </AppLockProvider>
                     </ProtectedRoute>
                   }
                 />

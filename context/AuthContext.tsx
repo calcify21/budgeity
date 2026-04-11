@@ -59,7 +59,7 @@ interface AuthContextType {
   signInWithGithub: () => Promise<void>;
   signInWithFacebook: () => Promise<void>;
   sendPasswordlessLink: (email: string) => Promise<void>;
-  completePasswordlessSignIn: (email: string, link: string) => Promise<void>;
+  completePasswordlessSignIn: (email: string, link: string) => Promise<string | undefined>;
   resendVerification: (email: string) => Promise<void>;
   error: string | null;
   clearError: () => void;
@@ -220,7 +220,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const logout = async () => {
     setError(null);
     try {
+      // Preserve critical persistent keys from being wiped on logout
+      const preserveKeys = [
+        "emailForSignIn",
+        "budgeity_lock_reset_pending",
+        "theme",
+        "budgeity_sidebar_collapsed",
+        "i18nextLng"
+      ];
+      const preserved: Record<string, string> = {};
+      preserveKeys.forEach(k => {
+        const val = localStorage.getItem(k);
+        if (val) preserved[k] = val;
+      });
+
       localStorage.clear(); // Clear local state on logout
+
+      // Restore critical settings
+      Object.entries(preserved).forEach(([k, v]) => localStorage.setItem(k, v));
+
       await signOut(auth);
     } catch (err) {
       console.error("Logout failed", err);
@@ -473,15 +491,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const completePasswordlessSignIn = async (email: string, link: string) => {
+  const completePasswordlessSignIn = async (email: string, link: string): Promise<string | undefined> => {
     setError(null);
     try {
       if (isSignInWithEmailLink(auth, link)) {
         await setPersistence(auth, browserLocalPersistence);
         const result = await signInWithEmailLink(auth, email, link);
         window.localStorage.removeItem("emailForSignIn");
-        console.log("Passwordless sign in successful:", result.user);
+        console.log("[AuthContext] Passwordless sign in successful for:", result.user.uid);
+        return result.user.uid;
       }
+      return undefined;
     } catch (err: any) {
       console.error("Error completing passwordless sign in", err);
       let msg = "Failed to sign in with link.";

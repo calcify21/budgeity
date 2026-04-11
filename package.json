@@ -6,15 +6,15 @@
   "main": "main.cjs",
   "scripts": {
     "dev": "vite",
-    "dev:emulators": "concurrently \"npm run emulators\" \"npm run dev\"",
-    "emulators": "firebase emulators:start --import=./emulator-data --export-on-exit",
+    "dev:emu": "concurrently \"npm run emu\" \"npm run dev\" --kill-others",
+    "emu": "powershell -Command \"Get-NetTCPConnection -LocalPort 8085 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; firebase emulators:start --import=./emulator-data --export-on-exit\"",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "build": "tsc && vite build",
-    "build:firebase": "tsc && vite build --mode firebase",
-    "build:hostinger": "tsc && vite build --mode hostinger",
-    "deploy:firebase": "npm run build:firebase && firebase deploy",
-    "deploy:rules": "npx firebase-tools deploy --only firestore:rules"
+    "build:f": "tsc && vite build --mode firebase",
+    "build:h": "tsc && vite build --mode hostinger",
+    "deploy:f": "npm run build:f && firebase deploy",
+    "deploy:r": "npx firebase-tools deploy --only firestore:rules"
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.13.19",
