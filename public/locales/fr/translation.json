@@ -81,7 +81,8 @@
     "today": "Aujourd'hui",
     "soon": "Bientôt",
     "personal": "Personnel",
-    "members": "membres"
+    "members": "membres",
+    "unknown": "Inconnu"
   },
   "dashboard": {
     "title": "Tableau de Bord",

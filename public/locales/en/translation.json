@@ -81,7 +81,8 @@
     "today": "Today",
     "soon": "Soon",
     "personal": "Personal",
-    "members": "members"
+    "members": "members",
+    "unknown": "Unknown"
   },
   "dashboard": {
     "title": "Dashboard",
