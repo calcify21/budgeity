@@ -8,13 +8,13 @@ export const WalletOverviewWidget: React.FC = () => {
   if (wallets.length === 0) return null;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full h-full tour-dash-wallet-flow">
       {wallets.map((wallet, index) => (
         <div
           key={wallet.id}
           className={cn(
             "glass-card rounded-2xl p-5 cursor-default transition-transform duration-200 hover:-translate-y-1 hover:scale-[1.02]",
-            index === 0 && "tour-dash-wallet-flow",
+            index === 0,
           )}
         >
           <div className="flex justify-between items-start mb-2">

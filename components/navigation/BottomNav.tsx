@@ -123,21 +123,20 @@ const BottomNav: React.FC<BottomNavProps> = ({
           >
             <div
               className={cn(
-                "bottom-nav-floating backdrop-blur-3xl border border-white/20 dark:border-white/10 flex items-center justify-between pb-[env(safe-area-inset-bottom,4px)] transition-all duration-300 w-full rounded-[2.5rem] p-2 pointer-events-auto",
-                isTablet
-                  ? "max-w-[700px] gap-2 px-6"
-                  : "max-w-[500px] gap-1 px-4",
+                "bottom-nav-floating backdrop-blur-3xl border border-white/20 dark:border-white/10 flex items-center justify-evenly pb-[env(safe-area-inset-bottom,4px)] transition-all duration-300 w-full rounded-[2.5rem] p-2 pointer-events-auto",
+                isTablet ? "max-w-[700px] px-6" : "max-w-[500px] px-2",
               )}
             >
-              {/* Left Side Items */}
-              <div className="flex-1 flex items-center justify-around h-14">
-                {leftItems.map((item) => (
-                  <NavItem key={item.to} item={item} isActive={location.pathname === item.to} />
-                ))}
-              </div>
+              {leftItems.map((item) => (
+                <NavItem
+                  key={item.to}
+                  item={item}
+                  isActive={location.pathname === item.to}
+                />
+              ))}
 
               {/* Center Add Button */}
-              <div className="relative flex items-center justify-center h-14 px-2">
+              <div className="relative flex items-center justify-center shrink-0">
                 <motion.button
                   onClick={onAddClick}
                   whileHover={{ scale: 1.05 }}
@@ -145,23 +144,20 @@ const BottomNav: React.FC<BottomNavProps> = ({
                   className="group relative flex items-center justify-center w-12 h-12 rounded-full shadow-lg shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
                   aria-label="Add Transaction"
                 >
-                  {/* Outer static glow */}
                   <div className="absolute inset-[-4px] bg-gradient-to-r from-brand-400 via-indigo-500 to-purple-500 rounded-full opacity-50 blur-md group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-                  
-                  {/* Slow pulsing outer rings */}
                   <div className="absolute inset-0 rounded-full border border-brand-400/50 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] pointer-events-none" />
                   <div className="absolute inset-0 rounded-full border border-indigo-400/30 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_1s] pointer-events-none" />
-
-                  {/* Core button background */}
                   <div className="relative w-full h-full bg-gradient-to-br from-brand-500 to-indigo-600 rounded-full overflow-hidden flex items-center justify-center border border-white/20">
-                    {/* Internal diagonal shimmer */}
                     <div className="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-no-repeat [background-position:-100%_0,0_0] group-hover:[transition:background-position_2s_ease_infinite] group-hover:animate-[shimmer_2s_infinite]" />
-                    
-                    <motion.div 
+                    <motion.div
                       className="relative z-10 text-white drop-shadow-md"
                       initial={{ rotate: 0 }}
                       whileHover={{ rotate: 180 }}
-                      transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 10,
+                      }}
                     >
                       <Plus size={26} strokeWidth={3} />
                     </motion.div>
@@ -169,20 +165,22 @@ const BottomNav: React.FC<BottomNavProps> = ({
                 </motion.button>
               </div>
 
-              {/* Right Side Items + More */}
-              <div className="flex-1 flex items-center justify-around h-14">
-                {rightItems.map((item) => (
-                  <NavItem key={item.to} item={item} isActive={location.pathname === item.to} />
-                ))}
-                
-                {/* More Button - Standardized height */}
-                <button
-                  onClick={() => setIsMoreOpen(true)}
-                  className="flex items-center justify-center w-[64px] h-14 rounded-2xl text-slate-400 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
-                >
+              {rightItems.map((item) => (
+                <NavItem
+                  key={item.to}
+                  item={item}
+                  isActive={location.pathname === item.to}
+                />
+              ))}
+
+              <button
+                onClick={() => setIsMoreOpen(true)}
+                className="flex flex-col items-center justify-center min-w-[64px] h-14 rounded-2xl text-slate-400 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors shrink-0"
+              >
+                <div className="h-6 flex items-center justify-center">
                   <Menu size={24} strokeWidth={1.5} />
-                </button>
-              </div>
+                </div>
+              </button>
             </div>
           </motion.div>
         )}
@@ -203,15 +201,20 @@ const BottomNav: React.FC<BottomNavProps> = ({
   );
 };
 
-const NavItem: React.FC<{ item: any; isActive: boolean }> = ({ item, isActive }) => {
+const NavItem: React.FC<{ item: any; isActive: boolean }> = ({
+  item,
+  isActive,
+}) => {
   const Icon = item.icon;
-  
+
   return (
     <Link
       to={item.to}
       className={cn(
         "flex flex-col items-center justify-center min-w-[64px] h-14 relative group outline-none select-none isolate",
-        isActive ? "text-brand-600 dark:text-brand-400" : "text-slate-400 dark:text-zinc-500"
+        isActive
+          ? "text-brand-600 dark:text-brand-400"
+          : "text-slate-400 dark:text-zinc-500",
       )}
     >
       <AnimatePresence>
@@ -234,17 +237,17 @@ const NavItem: React.FC<{ item: any; isActive: boolean }> = ({ item, isActive })
             animate={isActive ? { scale: 1.15, y: -2 } : { scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 400, damping: 25 }}
           >
-            <Icon 
-              size={24} 
-              strokeWidth={1.5} 
+            <Icon
+              size={24}
+              strokeWidth={1.5}
               className={cn(
                 "transition-all duration-300",
-                isActive ? "drop-shadow-[0_0_8px_rgba(99,102,241,0.3)]" : ""
+                isActive ? "drop-shadow-[0_0_8px_rgba(99,102,241,0.3)]" : "",
               )}
             />
           </motion.div>
         </div>
-        
+
         {/* Label container - absolute to not push the icon */}
         <div className="absolute bottom-1 flex items-center justify-center w-full">
           <AnimatePresence initial={false}>

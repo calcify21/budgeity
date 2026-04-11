@@ -155,13 +155,13 @@ const AccountInfo: React.FC = () => {
           </div>
 
           {/* Email */}
-          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-black/40 rounded-2xl border border-slate-100 dark:border-zinc-800">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-zinc-700 flex items-center justify-center text-slate-500">
+          <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-black/40 rounded-2xl border border-slate-100 dark:border-zinc-800 overflow-hidden">
+            <div className="flex items-center gap-4 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-zinc-700 flex items-center justify-center text-slate-500 shrink-0">
                 <Mail size={20} />
               </div>
-              <div>
-                <div className="font-bold text-slate-900 dark:text-white">
+              <div className="min-w-0">
+                <div className="font-bold text-slate-900 dark:text-white truncate">
                   {user?.email}
                 </div>
                 <div className="text-xs text-slate-500">

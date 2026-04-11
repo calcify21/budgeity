@@ -7,7 +7,7 @@ import { ToastProvider } from "./context/ToastContext";
 import { TourProvider } from "./context/TourContext";
 import { AppLockProvider, useAppLock } from "./context/AppLockContext";
 import Layout from "./components/Layout";
-import OnboardingModal from "./components/OnboardingModal";
+import OnboardingWizard from "./components/OnboardingWizard";
 import { Loader2, Wallet, Activity, Database, Repeat } from "lucide-react";
 import { processRecurringTransactions } from "./services/recurringEngine";
 import { motion, AnimatePresence } from "framer-motion";
@@ -201,9 +201,13 @@ const AppContent: React.FC = () => {
     );
   }
 
+  // Full-screen wizard takes over when onboarding
+  if (isOnboarding) {
+    return <OnboardingWizard />;
+  }
+
   return (
     <>
-      {isOnboarding && <OnboardingModal />}
       <AnimatePresence>
         {isProcessingRecurring && (
           <motion.div

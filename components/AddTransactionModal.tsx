@@ -371,7 +371,7 @@ const AddTransactionModal: React.FC<Props> = ({
         return (
           <div className="space-y-6">
             {/* Type Switcher */}
-            <div className="bg-slate-100 dark:bg-zinc-800 p-1.5 rounded-2xl flex">
+            <div className="tour-trans-type bg-slate-100 dark:bg-zinc-800 p-1.5 rounded-2xl flex">
               {(["expense", "income", "transfer"] as const).map((t) => (
                 <button
                   key={t}

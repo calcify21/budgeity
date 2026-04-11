@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import logo from "../assets/logo-927x1024.png";
 import {
   LayoutDashboard,
@@ -15,6 +20,7 @@ import {
   ShoppingCart,
   Download,
   LogOut,
+  LockKeyhole,
   User,
   UserCircle,
   PiggyBank,
@@ -42,6 +48,7 @@ import { useAuth } from "../context/AuthContext";
 import { useHousehold } from "../context/HouseholdContext";
 import { useToast } from "../context/ToastContext";
 import { cn, ICON_MAP } from "../utils";
+import { useAppLock } from "../context/AppLockContext";
 import AddTransactionModal from "./AddTransactionModal";
 import InviteFriendsModal from "./InviteFriendsModal";
 import FeedbackModal from "./FeedbackModal";
@@ -170,14 +177,23 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isMobileNavSheetOpen, setIsMobileNavSheetOpen] = useState(false);
   const [isTxModalOpen, setIsTxModalOpen] = useState(false);
-  const [txModalDefaultType, setTxModalDefaultType] = useState<"expense" | "income" | "transfer">("expense");
+  const [txModalDefaultType, setTxModalDefaultType] = useState<
+    "expense" | "income" | "transfer"
+  >("expense");
 
   useEffect(() => {
     const addParam = searchParams.get("add");
-    if (addParam === "expense" || addParam === "income" || addParam === "transfer") {
+    if (
+      addParam === "expense" ||
+      addParam === "income" ||
+      addParam === "transfer"
+    ) {
       setTxModalDefaultType(
-        addParam === "income" ? "income" : 
-        addParam === "transfer" ? "transfer" : "expense"
+        addParam === "income"
+          ? "income"
+          : addParam === "transfer"
+            ? "transfer"
+            : "expense",
       );
       setIsTxModalOpen(true);
       // Clean up the URL after opening the modal
@@ -229,6 +245,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [showInviteBanner, setShowInviteBanner] = useState(true);
   const { hideAmounts, toggleHideAmounts, theme, toggleTheme } = useData();
   const { user, logout } = useAuth();
+  const { isLockEnabled, lockApp } = useAppLock();
   const {
     activeWorkspace,
     switchWorkspace,
@@ -413,7 +430,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   icon: LayoutDashboard,
                   label: t("common.dashboard"),
                   onClick: handleNavClick,
-                  className: undefined,
+                  className: "tour-nav-dashboard",
                 },
                 {
                   to: "/transactions",
@@ -447,14 +464,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   icon: BarChart3,
                   label: t("common.analytics_v2"),
                   onClick: handleNavClick,
-                  className: undefined,
+                  className: "tour-nav-analytics-v2",
                 },
                 {
                   to: "/reports",
                   icon: FileBarChart2,
                   label: "Reports",
                   onClick: handleNavClick,
-                  className: undefined,
+                  className: "tour-nav-reports",
                 },
               ],
             },
@@ -532,21 +549,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   icon: Settings,
                   label: t("common.settings"),
                   onClick: handleNavClick,
-                  className: undefined,
+                  className: "tour-nav-settings",
                 },
                 {
                   to: "/account-info",
                   icon: UserCircle,
                   label: t("common.account_info"),
                   onClick: handleNavClick,
-                  className: undefined,
+                  className: "tour-nav-account",
                 },
                 {
                   to: "/whats-new",
                   icon: Sparkles,
                   label: t("common.whats_new"),
                   onClick: handleNavClick,
-                  className: undefined,
+                  className: "tour-nav-whats-new",
                 },
               ],
             },
@@ -1029,6 +1046,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex items-center gap-1 sm:gap-2 md:gap-4 shrink-0">
             <SystemStatus />
 
+            {/* Lock App Button */}
+            {isLockEnabled && (
+              <button
+                onClick={lockApp}
+                className="tour-nav-lock flex items-center gap-2 px-3 py-1.5 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-lg transition-all text-[11px] font-black uppercase tracking-wider border border-amber-200/50 dark:border-amber-500/20 shadow-sm"
+              >
+                <LockKeyhole size={16} strokeWidth={2.5} />
+                <span className="hidden sm:inline">Lock App</span>
+              </button>
+            )}
+
             {/* Theme Toggle */}
             <Tooltip
               content={theme === "dark" ? "Light Mode" : "Dark Mode"}
@@ -1036,7 +1064,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             >
               <button
                 onClick={toggleTheme}
-                className="p-2 text-slate-400 hover:text-brand-500 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-full transition-all"
+                className="tour-nav-theme p-2 text-slate-400 hover:text-brand-500 hover:bg-slate-50 dark:hover:bg-zinc-800 rounded-full transition-all"
               >
                 {theme === "dark" ? <Sun size={20} /> : <Moon size={20} />}
               </button>
@@ -1046,7 +1074,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="relative">
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                className="tour-nav-profile flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
               >
                 <UserAvatar
                   name={user?.displayName}
@@ -1185,11 +1213,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsTxModalOpen(true)}
-            className="group relative flex items-center justify-center w-14 h-14 rounded-full shadow-xl shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
+            className="tour-fab-add group relative flex items-center justify-center w-14 h-14 rounded-full shadow-xl shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
           >
             {/* Outer static glow */}
             <div className="absolute inset-[-4px] bg-gradient-to-r from-brand-400 via-indigo-500 to-purple-500 rounded-full opacity-50 blur-md group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
-            
+
             {/* Slow pulsing outer rings */}
             <div className="absolute inset-0 rounded-full border-2 border-brand-400/50 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite] pointer-events-none" />
             <div className="absolute inset-0 rounded-full border-2 border-indigo-400/30 animate-[ping_3s_cubic-bezier(0,0,0.2,1)_infinite_1s] pointer-events-none" />
@@ -1198,8 +1226,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             <div className="relative w-full h-full bg-gradient-to-br from-brand-500 to-indigo-600 rounded-full overflow-hidden flex items-center justify-center border border-white/20">
               {/* Internal diagonal shimmer */}
               <div className="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-no-repeat [background-position:-100%_0,0_0] group-hover:[transition:background-position_2s_ease_infinite] group-hover:animate-[shimmer_2s_infinite]" />
-              
-              <MotionDiv 
+
+              <MotionDiv
                 className="relative z-10 text-white drop-shadow-md"
                 initial={{ rotate: 0 }}
                 whileHover={{ rotate: 180 }}
@@ -1225,8 +1253,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       <AnimatePresence>
         {isTxModalOpen && (
-          <AddTransactionModal 
-            onClose={() => setIsTxModalOpen(false)} 
+          <AddTransactionModal
+            onClose={() => setIsTxModalOpen(false)}
             defaultType={txModalDefaultType}
           />
         )}
@@ -1281,7 +1309,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <FullPhotoViewModal
         isOpen={showFullPhoto}
         onClose={() => setShowFullPhoto(false)}
-        photoURL={(avatarBase64 && avatarBase64 !== "removed" ? avatarBase64 : user?.photoURL) || null}
+        photoURL={
+          (avatarBase64 && avatarBase64 !== "removed"
+            ? avatarBase64
+            : user?.photoURL) || null
+        }
         name={user?.displayName}
       />
       {cropImageSrc && (

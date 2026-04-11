@@ -141,7 +141,7 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
               <Icon
                 size={22}
                 strokeWidth={isActive ? 2.5 : 1.5}
-                fill={isActive ? "currentColor" : "none"}
+                fill="none"
               />
             </div>
             <span className={cn("text-[16px] tracking-tight", isActive ? "font-bold text-brand-700 dark:text-brand-300" : "font-medium group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors")}>
@@ -343,8 +343,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 
   // Regular filtered links
   const visibleLinks = navLinks.filter(
-    (link) => !excludedPaths.includes(link.to) &&
-      (!searchQuery || link.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    (link) => !searchQuery || link.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
   
   const searchResults = searchQuery

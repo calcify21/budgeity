@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { useAuth } from "./AuthContext";
 import { useToast } from "./ToastContext";
+import { useData } from "./DataContext";
 import {
   AppLockPreferences,
   AppLockStoredData,
@@ -88,6 +89,7 @@ export const AppLockProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const { user, logout, sendPasswordlessLink } = useAuth();
   const { info: toastInfo } = useToast();
+  const { isOnboarding } = useData();
 
   // Core state
   const [storedData, setStoredData] = useState<AppLockStoredData>(() => {
@@ -225,7 +227,7 @@ export const AppLockProvider: React.FC<{ children: React.ReactNode }> = ({
   // ── Auto-Lock: Visibility Change (Background) ────────────────────
 
   useEffect(() => {
-    if (!isLockEnabled || !preferences.autoLock.onBackground || !dataLoaded)
+    if (!isLockEnabled || !preferences.autoLock.onBackground || !dataLoaded || isOnboarding)
       return;
 
     const handleVisibilityChange = () => {
@@ -269,7 +271,7 @@ export const AppLockProvider: React.FC<{ children: React.ReactNode }> = ({
   // ── Auto-Lock: Inactivity Timer ───────────────────────────────────
 
   useEffect(() => {
-    if (!isLockEnabled || !isUnlocked || !dataLoaded) return;
+    if (!isLockEnabled || !isUnlocked || !dataLoaded || isOnboarding) return;
 
     const timeoutMs = INACTIVITY_MS[preferences.autoLock.inactivityTimeout];
 

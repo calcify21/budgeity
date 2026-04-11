@@ -6,10 +6,13 @@ import {
   DashboardWidgetConfig,
   AnalyticsWidgetConfig,
   Goal,
+  OnboardingMeta,
+  PrimaryGoal,
   RecurringTransaction,
   ShoppingItem,
   Transaction,
   Wallet,
+  WalletType,
   ActivityActionType,
 } from "../types";
 import {
@@ -34,6 +37,16 @@ import {
 import { adjustEntityBalance } from "../utils/transactionUtils";
 import { logActivity } from "../utils/activityLogger";
 
+export interface OnboardingWizardPayload {
+  currency: string;
+  numberSystem: "IN" | "INTL" | "AUTO";
+  theme: "light" | "dark";
+  hideAmounts: boolean;
+  primaryGoal: PrimaryGoal;
+  wallets: Array<{ name: string; type: WalletType; balance: number; color: string }>;
+  onboardingMeta: OnboardingMeta;
+}
+
 interface DataContextType extends AppState {
   systemStatus: "online" | "syncing" | "offline" | "error";
   retryConnection: () => Promise<void>;
@@ -41,10 +54,7 @@ interface DataContextType extends AppState {
   isOnboarding: boolean;
   tourCompleted?: boolean;
   completeTour: () => void;
-  completeOnboarding: (
-    currency: string,
-    initialBalance: number,
-  ) => Promise<void>;
+  completeOnboarding: (data: OnboardingWizardPayload) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, "id">) => void;
   updateTransaction: (transaction: Transaction) => void;
   updateMultipleTransactions: (transactions: Transaction[]) => void;
@@ -409,24 +419,92 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
-  const completeOnboarding = async (
-    currency: string,
-    initialBalance: number,
-  ) => {
-    const cashWallet: Wallet = {
+  const completeOnboarding = async (data: OnboardingWizardPayload) => {
+    const now = new Date().toISOString();
+    const newWallets: Wallet[] = data.wallets.map((w, i) => ({
       id: generateId(),
-      name: "Cash",
-      type: "cash",
-      balance: initialBalance,
-      color: "#10b981",
-      createdAt: new Date().toISOString(),
+      name: w.name,
+      type: w.type,
+      balance: w.balance,
+      color: w.color,
+      createdAt: now,
       ownerId: user?.uid,
-    };
-    const newState = {
+    }));
+
+    let customDashboardWidgets = INITIAL_STATE.dashboardWidgets;
+
+    if (data.primaryGoal === "debt_free") {
+      customDashboardWidgets = [
+        { id: "goals", enabled: true, order: 1 },
+        { id: "networth", enabled: true, order: 2 },
+        { id: "income_expense", enabled: true, order: 3 },
+        { id: "snapshot", enabled: true, order: 4 },
+        { id: "wallets", enabled: true, order: 5 },
+        { id: "transactions", enabled: true, order: 6 },
+        { id: "trend", enabled: true, order: 7 },
+        { id: "spending", enabled: false, order: 8 },
+        { id: "budgets", enabled: false, order: 9 },
+        { id: "actions", enabled: false, order: 10 },
+        { id: "planned", enabled: false, order: 11 },
+      ];
+    } else if (data.primaryGoal === "build_wealth") {
+      customDashboardWidgets = [
+        { id: "networth", enabled: true, order: 1 },
+        { id: "trend", enabled: true, order: 2 },
+        { id: "wallets", enabled: true, order: 3 },
+        { id: "income_expense", enabled: true, order: 4 },
+        { id: "snapshot", enabled: true, order: 5 },
+        { id: "goals", enabled: true, order: 6 },
+        { id: "transactions", enabled: true, order: 7 },
+        { id: "spending", enabled: false, order: 8 },
+        { id: "budgets", enabled: false, order: 9 },
+        { id: "actions", enabled: false, order: 10 },
+        { id: "planned", enabled: false, order: 11 },
+      ];
+    } else if (data.primaryGoal === "track_spending") {
+      customDashboardWidgets = [
+        { id: "spending", enabled: true, order: 1 },
+        { id: "budgets", enabled: true, order: 2 },
+        { id: "income_expense", enabled: true, order: 3 },
+        { id: "transactions", enabled: true, order: 4 },
+        { id: "trend", enabled: true, order: 5 },
+        { id: "snapshot", enabled: true, order: 6 },
+        { id: "networth", enabled: true, order: 7 },
+        { id: "wallets", enabled: true, order: 8 },
+        { id: "goals", enabled: false, order: 9 },
+        { id: "actions", enabled: false, order: 10 },
+        { id: "planned", enabled: false, order: 11 },
+      ];
+    } else if (data.primaryGoal === "save_goal") {
+      customDashboardWidgets = [
+        { id: "goals", enabled: true, order: 1 },
+        { id: "budgets", enabled: true, order: 2 },
+        { id: "snapshot", enabled: true, order: 3 },
+        { id: "income_expense", enabled: true, order: 4 },
+        { id: "networth", enabled: true, order: 5 },
+        { id: "wallets", enabled: true, order: 6 },
+        { id: "transactions", enabled: true, order: 7 },
+        { id: "trend", enabled: true, order: 8 },
+        { id: "spending", enabled: false, order: 9 },
+        { id: "actions", enabled: false, order: 10 },
+        { id: "planned", enabled: false, order: 11 },
+      ];
+    }
+
+    const newState: AppState = {
       ...INITIAL_STATE,
-      currency,
-      wallets: [cashWallet],
-      defaultWalletId: cashWallet.id,
+      currency: data.currency,
+      numberSystem: data.numberSystem,
+      theme: data.theme,
+      hideAmounts: data.hideAmounts,
+      primaryGoal: data.primaryGoal,
+      onboardingMeta: {
+        ...data.onboardingMeta,
+        completedAt: now,
+      },
+      wallets: newWallets,
+      defaultWalletId: newWallets[0]?.id || null,
+      dashboardWidgets: customDashboardWidgets
     };
     await syncState(newState);
     setIsOnboarding(false);

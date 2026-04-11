@@ -22,7 +22,11 @@ import PatternSetupModal from "./PatternSetupModal";
 import { useTranslation } from "react-i18next";
 import CustomSelect from "../CustomSelect";
 
-const AppLockSettings: React.FC = () => {
+interface AppLockSettingsProps {
+  embeddedMode?: boolean;
+}
+
+const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false }) => {
   const {
     isLockEnabled,
     preferences,
@@ -113,11 +117,13 @@ const AppLockSettings: React.FC = () => {
 
   return (
     <>
-      <section id="security" className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-6">
-        <h3 className="text-xl font-bold flex items-center gap-2">
-          <Shield className="text-brand-500" size={24} />
-          {t("appLock.title", "App Lock")}
-        </h3>
+      <section id="security" className={embeddedMode ? "space-y-6 pt-4" : "bg-white dark:bg-zinc-900 rounded-[2rem] p-8 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-6"}>
+        {!embeddedMode && (
+          <h3 className="text-xl font-bold flex items-center gap-2">
+            <Shield className="text-brand-500" size={24} />
+            {t("appLock.title", "App Lock")}
+          </h3>
+        )}
 
         {/* Master Toggle */}
         <div className="flex items-center justify-between">
@@ -423,7 +429,7 @@ const AppLockSettings: React.FC = () => {
         )}
 
         {/* Lock Now Button */}
-        {isLockEnabled && isUnlocked && (
+        {isLockEnabled && isUnlocked && !embeddedMode && (
           <div className="pt-6 border-t border-slate-100 dark:border-zinc-800">
             <button
               onClick={lockApp}

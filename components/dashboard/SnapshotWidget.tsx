@@ -74,7 +74,7 @@ export const SnapshotWidget: React.FC<SnapshotWidgetProps> = ({
   return (
     <MotionDiv
       whileHover={{ scale: 1.01 }}
-      className="flex-1 rounded-[2rem] bg-indigo-50 dark:bg-zinc-900/50 border border-indigo-100 dark:border-indigo-500/20 p-6 shadow-sm backdrop-blur-xl relative overflow-hidden cursor-default h-full"
+      className="tour-dash-snapshot flex-1 rounded-[2rem] bg-indigo-50 dark:bg-zinc-900/50 border border-indigo-100 dark:border-indigo-500/20 p-6 shadow-sm backdrop-blur-xl relative overflow-hidden cursor-default h-full"
     >
       <div className="absolute right-0 top-0 w-32 h-32 bg-indigo-500/10 blur-[50px] rounded-full -translate-y-1/2 translate-x-1/2" />
       <div className="relative z-10 h-full flex flex-col justify-between">

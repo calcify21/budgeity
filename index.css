@@ -241,7 +241,7 @@
     0 8px 10px -6px rgb(0 0 0 / 0.1) !important; /* shadow-xl */
   border: none !important;
   min-width: 320px !important;
-  max-width: 400px !important;
+  max-width: 440px !important;
 }
 
 .dark .driver-popover {
@@ -267,10 +267,10 @@
 
 .driver-popover-description {
   font-family: "Inter", sans-serif !important;
-  font-size: 1rem !important;
-  line-height: 1.6 !important;
+  font-size: 0.875rem !important;
+  line-height: 1.7 !important;
   color: #64748b !important; /* slate-500 */
-  margin-bottom: 2rem !important;
+  margin-bottom: 1.5rem !important;
   font-weight: 500 !important;
 }
 

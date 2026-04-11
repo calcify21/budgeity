@@ -106,6 +106,26 @@ const WhatsNew: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChangeItem
+          icon={Compass}
+          title="Flawless Floating Navigation"
+          description="The floating bottom bar on mobile and tablet is now mathematically perfect. All icons, menus, and the central Add button share identically spaced flex containers for a flawless, symmetrical layout."
+        />
+        <ChangeItem
+          icon={Sparkles}
+          title="Interactive Add Transaction Tour"
+          description="Our newly rebuilt Guided Tour doesn't just point at buttons—it clicks them! Watch as the tour automatically opens the Add Transaction modal, guides you through the Smart Calculator, and safely closes it."
+        />
+        <ChangeItem
+          icon={BarChart3}
+          title="Analytics V2 inside Tour"
+          description="The comprehensive Guided Tour now spans all 15 screens of Budgeity, fully integrating the new Analytics V2 suite and automatically smooth-scrolling through the sidebar navigation."
+        />
+        <ChangeItem
+          icon={Maximize2}
+          title="Precision Core Polish"
+          description="Minor but mighty layout fixes across the board. From long email addresses elegantly truncating on your Profile card to preventing overlapping elements on various data displays."
+        />
+        <ChangeItem
           icon={ShieldCheck}
           title="Multi-Method App Lock System"
           description="Secure your financial data with an extra layer of protection. Choose between a 4-6 digit PIN, a custom 3x3 Pattern, or native Biometrics (Fingerprint/Face ID) to lock your app instantly."
