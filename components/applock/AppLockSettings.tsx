@@ -20,6 +20,7 @@ import { AutoLockTiming } from "../../types/appLockTypes";
 import PinSetupModal from "./PinSetupModal";
 import PatternSetupModal from "./PatternSetupModal";
 import { useTranslation } from "react-i18next";
+import CustomSelect from "../CustomSelect";
 
 const AppLockSettings: React.FC = () => {
   const {
@@ -395,7 +396,7 @@ const AppLockSettings: React.FC = () => {
             </div>
 
             {/* Inactivity Timeout */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-4">
               <div className="flex items-center gap-4">
                 <div className="p-3 bg-slate-100 dark:bg-zinc-800 rounded-2xl text-slate-600 dark:text-slate-300">
                   <Timer size={20} />
@@ -409,19 +410,14 @@ const AppLockSettings: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <select
+              <CustomSelect
                 value={preferences.autoLock.inactivityTimeout}
-                onChange={(e) =>
-                  setAutoLockTiming(e.target.value as AutoLockTiming)
+                onChange={(val) =>
+                  setAutoLockTiming(val as AutoLockTiming)
                 }
-                className="px-3 py-2 text-sm font-bold bg-slate-100 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl text-slate-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-brand-500"
-              >
-                {timingOptions.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                options={timingOptions}
+                placeholder={t("appLock.selectTimeout", "Select Timeout")}
+              />
             </div>
           </div>
         )}
