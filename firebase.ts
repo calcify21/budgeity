@@ -28,8 +28,8 @@ export const githubProvider = new GithubAuthProvider();
 export const facebookProvider = new FacebookAuthProvider();
 export const db = getFirestore(app);
 
-// Connect to emulators if enabled
-if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === "true") {
+// Connect to emulators if enabled and in development mode
+if (import.meta.env.DEV && import.meta.env.VITE_USE_FIREBASE_EMULATOR === "true") {
   const emulatorHost = "localhost";
   
   connectAuthEmulator(auth, `http://${emulatorHost}:9099`, { disableWarnings: true });
