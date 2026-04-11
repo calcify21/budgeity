@@ -13,7 +13,7 @@
     "build": "tsc && vite build",
     "build:f": "tsc && vite build --mode firebase",
     "build:h": "tsc && vite build --mode hostinger",
-    "deploy:f": "npm run build:f && firebase deploy",
+    "deploy": "npm run build:f && firebase deploy",
     "deploy:r": "npx firebase-tools deploy --only firestore:rules"
   },
   "dependencies": {
