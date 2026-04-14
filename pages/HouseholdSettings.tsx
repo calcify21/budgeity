@@ -10,11 +10,11 @@ import {
   Users,
   Activity,
   Trash2,
-  LogOut,
   Edit3,
   Shield,
   ArrowLeft,
 } from "lucide-react";
+import LogOutIconAnimated from "../components/ui/LogOutIconAnimated";
 import { useNavigate } from "react-router-dom";
 import { ICON_MAP } from "../utils";
 
@@ -267,9 +267,9 @@ const HouseholdSettings: React.FC = () => {
             ) : (
               <button
                 onClick={() => setShowLeaveConfirm(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-rose-100 dark:bg-rose-500/10 text-rose-600 rounded-xl text-sm font-semibold hover:bg-rose-200"
+                className="flex items-center gap-2 px-4 py-2 bg-rose-100 dark:bg-rose-500/10 text-rose-600 rounded-xl text-sm font-semibold hover:bg-rose-200 group"
               >
-                <LogOut size={14} />
+                <LogOutIconAnimated size={14} />
                 Leave
               </button>
             )}

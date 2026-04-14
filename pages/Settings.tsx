@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Moon,
   Sun,
@@ -439,14 +440,16 @@ const Settings: React.FC = () => {
         Budgeity v1.3.0
       </div>
 
-      {showAddWallet && (
-        <WalletModal
-          onClose={() => setShowAddWallet(false)}
-          onImportRequested={() => {
-            setShowAddWallet(false);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {showAddWallet && (
+          <WalletModal
+            onClose={() => setShowAddWallet(false)}
+            onImportRequested={() => {
+              setShowAddWallet(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         isOpen={confirmResetData}

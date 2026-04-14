@@ -5,6 +5,7 @@ import CustomSelect from "./CustomSelect";
 import { cn } from "../utils";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useTranslation } from "react-i18next";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 interface Props {
   isOpen: boolean;
@@ -42,6 +43,7 @@ const ShoppingItemModal: React.FC<Props> = ({
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useScrollToError(error, scrollRef);
+  useEscapeKey(isOpen, onClose);
 
   useEffect(() => {
     if (isOpen) {
@@ -98,8 +100,12 @@ const ShoppingItemModal: React.FC<Props> = ({
   const subCategories = selectedCategory?.subCategories || [];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh] relative z-10">
         {/* Header */}
         <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center">
           <h2 className="text-xl font-bold">

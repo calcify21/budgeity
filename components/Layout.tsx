@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Link,
   useLocation,
@@ -19,7 +19,6 @@ import {
   EyeOff,
   ShoppingCart,
   Download,
-  LogOut,
   LockKeyhole,
   User,
   UserCircle,
@@ -42,7 +41,9 @@ import {
   Home,
   ChevronRight,
   ChevronLeft,
+  Database,
 } from "lucide-react";
+import LogOutIconAnimated from "./ui/LogOutIconAnimated";
 import { useData } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
 import { useHousehold } from "../context/HouseholdContext";
@@ -56,6 +57,8 @@ import HouseholdModal from "./HouseholdModal";
 import { motion, AnimatePresence } from "framer-motion";
 import Tooltip from "./Tooltip";
 import { useTranslation } from "react-i18next";
+import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useClickOutside } from "../hooks/useClickOutside";
 import BottomNav from "./navigation/BottomNav";
 import SystemStatus from "./SystemStatus";
 import UserAvatar from "./ui/UserAvatar";
@@ -254,7 +257,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     acceptInvite,
     declineInvite,
   } = useHousehold();
-  const { success, error } = useToast();
+  const { success, error: toastError } = useToast();
   const { avatarBase64, saveAvatar, removeAvatar, setProviderPhoto } =
     useAvatar();
   const [isChangePhotoOpen, setIsChangePhotoOpen] = useState(false);
@@ -296,6 +299,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleNavClick = () => {
     // setIsMobileNavSheetOpen(false); // Handled explicitly by the sheet via location change
   };
+
+  // Dismissal logic
+  const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const workspaceSwitcherRef = useRef<HTMLDivElement>(null);
+  const profileContainerRef = useRef<HTMLDivElement>(null);
+  const workspaceContainerRef = useRef<HTMLDivElement>(null);
+
+  useEscapeKey(isProfileDropdownOpen, () => setIsProfileDropdownOpen(false));
+  useEscapeKey(isWorkspaceSwitcherOpen, () => setIsWorkspaceSwitcherOpen(false));
+  useEscapeKey(isInviteModalOpen, () => setIsInviteModalOpen(false));
+  useEscapeKey(isFeedbackModalOpen, () => setIsFeedbackModalOpen(false));
+  useEscapeKey(isHouseholdModalOpen, () => setIsHouseholdModalOpen(false));
+  useEscapeKey(isChangePhotoOpen, () => setIsChangePhotoOpen(false));
+  useEscapeKey(showFullPhoto, () => setShowFullPhoto(false));
+  useEscapeKey(isTxModalOpen, () => setIsTxModalOpen(false));
+
+  useClickOutside(
+    profileContainerRef,
+    () => setIsProfileDropdownOpen(false)
+  );
+  useClickOutside(
+    workspaceContainerRef,
+    () => setIsWorkspaceSwitcherOpen(false)
+  );
 
   const mainContentRef = React.useRef<HTMLDivElement>(null);
 
@@ -833,10 +860,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
 
           {/* Workspace Switcher */}
-          <div className="relative">
+          <div className="relative" ref={workspaceContainerRef}>
             <button
               onClick={() =>
-                setIsWorkspaceSwitcherOpen(!isWorkspaceSwitcherOpen)
+                setIsWorkspaceSwitcherOpen(prev => !prev)
               }
               className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl transition-colors tour-nav-workspace"
             >
@@ -866,13 +893,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               )}
             </button>
 
-            {isWorkspaceSwitcherOpen && (
-              <>
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setIsWorkspaceSwitcherOpen(false)}
-                />
-                <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 z-50 overflow-hidden">
+            <AnimatePresence>
+              {isWorkspaceSwitcherOpen && (
+                <MotionDiv
+                  initial={{ opacity: 0, scale: 0.95, y: -10, x: "-50%" }}
+                  animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10, x: "-50%" }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  className="absolute left-1/2 top-full mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 z-50 overflow-hidden sm:left-0 sm:translate-x-0"
+                  style={{ originX: 0.5, originY: 0 }}
+                >
                   {/* Personal */}
                   <button
                     onClick={() => {
@@ -1037,9 +1067,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </button>
                     </div>
                   )}
-                </div>
-              </>
-            )}
+                </MotionDiv>
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Right Side Actions */}
@@ -1053,7 +1083,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="tour-nav-lock flex items-center gap-2 px-3 py-1.5 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-lg transition-all text-[11px] font-black uppercase tracking-wider border border-amber-200/50 dark:border-amber-500/20 shadow-sm"
               >
                 <LockKeyhole size={16} strokeWidth={2.5} />
-                <span className="hidden sm:inline">Lock App</span>
+                <span className="hidden sm:inline">
+                  {t("appLock.lockNow", "Lock App")}
+                </span>
               </button>
             )}
 
@@ -1071,9 +1103,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </Tooltip>
 
             {/* User Profile Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={profileContainerRef}>
               <button
-                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                onClick={() => setIsProfileDropdownOpen(prev => !prev)}
                 className="tour-nav-profile flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
               >
                 <UserAvatar
@@ -1091,13 +1123,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 />
               </button>
 
-              {isProfileDropdownOpen && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setIsProfileDropdownOpen(false)}
-                  />
-                  <div className="absolute right-0 top-full mt-2 w-[360px] max-w-[calc(100vw-2rem)] bg-white dark:bg-[#2d2e30] rounded-[28px] shadow-2xl border border-slate-200 dark:border-white/5 z-50 overflow-hidden text-center p-4">
+              <AnimatePresence>
+                {isProfileDropdownOpen && (
+                  <MotionDiv
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    className="absolute right-0 top-full mt-2 w-[360px] max-w-[calc(100vw-2rem)] bg-white dark:bg-[#2d2e30] rounded-[28px] shadow-2xl border border-slate-200 dark:border-white/5 z-50 overflow-hidden text-center p-4"
+                    style={{ originX: 1, originY: 0 }}
+                  >
                     {/* Header with Exit */}
                     <div className="flex items-center justify-between mb-2 px-2">
                       <div className="flex-1 text-center">
@@ -1165,7 +1200,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         className="flex-1 flex items-center justify-center gap-3 p-4 rounded-3xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors group"
                       >
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:bg-white dark:group-hover:bg-zinc-800 transition-colors">
-                          <LogOut size={20} />
+                          <LogOutIconAnimated size={20} />
                         </div>
                         <span className="font-medium text-sm text-slate-700 dark:text-slate-200">
                           Sign out
@@ -1191,9 +1226,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         Terms of Service
                       </Link>
                     </div>
-                  </div>
-                </>
-              )}
+                  </MotionDiv>
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </header>
@@ -1264,74 +1299,80 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         {isFeedbackModalOpen && (
           <FeedbackModal onClose={() => setIsFeedbackModalOpen(false)} />
         )}
-      </AnimatePresence>
-      <HouseholdModal
-        isOpen={isHouseholdModalOpen}
-        onClose={() => setIsHouseholdModalOpen(false)}
-      />
-      <ChangePhotoModal
-        isOpen={isChangePhotoOpen}
-        onClose={() => setIsChangePhotoOpen(false)}
-        onFileSelected={(file) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            setCropImageSrc(reader.result as string);
-            setIsChangePhotoOpen(false);
-          };
-          reader.readAsDataURL(file);
-        }}
-        onUseGooglePhoto={async () => {
-          try {
-            await setProviderPhoto();
-            success("Using Google profile photo.");
-          } catch {
-            error("Failed to update photo.");
-          }
-        }}
-        onRemovePhoto={async () => {
-          try {
-            await removeAvatar();
-            success("Profile photo removed.");
-          } catch {
-            error("Failed to remove photo.");
-          }
-        }}
-        hasGooglePhoto={
-          !!(
-            user?.photoURL &&
-            user.photoURL !== "undefined" &&
-            user.photoURL !== "null"
-          )
-        }
-        hasCustomPhoto={!!avatarBase64}
-        onViewPhoto={() => setShowFullPhoto(true)}
-      />
-      <FullPhotoViewModal
-        isOpen={showFullPhoto}
-        onClose={() => setShowFullPhoto(false)}
-        photoURL={
-          (avatarBase64 && avatarBase64 !== "removed"
-            ? avatarBase64
-            : user?.photoURL) || null
-        }
-        name={user?.displayName}
-      />
-      {cropImageSrc && (
-        <AvatarCropModal
-          isOpen={!!cropImageSrc}
-          imageSrc={cropImageSrc}
-          onClose={() => setCropImageSrc(null)}
-          onSave={async (base64) => {
-            try {
-              await saveAvatar(base64);
-              success("Profile photo updated!");
-              setCropImageSrc(null);
-            } catch {
-              error("Failed to save photo.");
+        {isHouseholdModalOpen && (
+          <HouseholdModal
+            isOpen={isHouseholdModalOpen}
+            onClose={() => setIsHouseholdModalOpen(false)}
+          />
+        )}
+        {isChangePhotoOpen && (
+          <ChangePhotoModal
+            isOpen={isChangePhotoOpen}
+            onClose={() => setIsChangePhotoOpen(false)}
+            onFileSelected={(file) => {
+              const reader = new FileReader();
+              reader.onload = () => {
+                setCropImageSrc(reader.result as string);
+                setIsChangePhotoOpen(false);
+              };
+              reader.readAsDataURL(file);
+            }}
+            onUseGooglePhoto={async () => {
+              try {
+                await setProviderPhoto();
+                success("Using Google profile photo.");
+              } catch {
+                toastError("Failed to update photo.");
+              }
+            }}
+            onRemovePhoto={async () => {
+              try {
+                await removeAvatar();
+                success("Profile photo removed.");
+              } catch {
+                toastError("Failed to remove photo.");
+              }
+            }}
+            hasGooglePhoto={
+              !!(
+                user?.photoURL &&
+                user.photoURL !== "undefined" &&
+                user.photoURL !== "null"
+              )
             }
-          }}
-        />
-      )}
+            hasCustomPhoto={!!avatarBase64}
+            onViewPhoto={() => setShowFullPhoto(true)}
+          />
+        )}
+        {showFullPhoto && (
+          <FullPhotoViewModal
+            isOpen={showFullPhoto}
+            onClose={() => setShowFullPhoto(false)}
+            photoURL={
+              (avatarBase64 && avatarBase64 !== "removed"
+                ? avatarBase64
+                : user?.photoURL) || null
+            }
+            name={user?.displayName}
+          />
+        )}
+        {cropImageSrc && (
+          <AvatarCropModal
+            isOpen={!!cropImageSrc}
+            imageSrc={cropImageSrc}
+            onClose={() => setCropImageSrc(null)}
+            onSave={async (base64) => {
+              try {
+                await saveAvatar(base64);
+                success("Profile photo updated!");
+                setCropImageSrc(null);
+              } catch {
+                toastError("Failed to save photo.");
+              }
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

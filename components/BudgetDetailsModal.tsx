@@ -5,6 +5,7 @@ import { cn, isDateInPeriod, getCategoryIcon, formatDate } from "../utils";
 import { X, Pencil, Trash2, ArrowRightLeft, HelpCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -24,6 +25,8 @@ const BudgetDetailsModal: React.FC<Props> = ({
 }) => {
   const { transactions, categories, formatAmount, wallets } = useData();
   const { t } = useTranslation();
+
+  useEscapeKey(true, onClose);
 
   const category = categories.find((c) => c.id === budget.categoryId);
   const Icon = category ? getCategoryIcon(category.icon) : HelpCircle;

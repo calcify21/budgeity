@@ -6,9 +6,12 @@ import {
   Lock,
   KeyRound,
   AlertTriangle,
-  LogOut,
 } from "lucide-react";
+import LogOutIconAnimated from "../ui/LogOutIconAnimated";
 import { useAppLock } from "../../context/AppLockContext";
+import { useAuth } from "../../context/AuthContext";
+import { useAvatar } from "../../hooks/useAvatar";
+import UserAvatar from "../ui/UserAvatar";
 import PinInput from "./PinInput";
 import PatternLock from "./PatternLock";
 import { useTranslation } from "react-i18next";
@@ -26,6 +29,8 @@ const SecurityOverlay: React.FC = () => {
     resetLockData,
     isBiometricsAvailable,
   } = useAppLock();
+  const { user, logout } = useAuth();
+  const { avatarBase64 } = useAvatar();
   const { t } = useTranslation();
 
   // Determine which tabs are available
@@ -160,15 +165,52 @@ const SecurityOverlay: React.FC = () => {
         transition={{ delay: 0.1, type: "spring", damping: 25, stiffness: 200 }}
         className="relative z-10 w-full max-w-sm mx-4 flex flex-col items-center"
       >
-        {/* App Icon & Branding */}
-        <div className="mb-8 flex flex-col items-center">
-          <div className="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-brand-500 to-emerald-600 flex items-center justify-center shadow-2xl shadow-brand-500/40 mb-4">
-            <Shield size={36} className="text-white" />
+        {/* App Branding */}
+        <div className="mb-4 flex flex-col items-center">
+          <div className="w-14 h-14 rounded-[1.2rem] bg-gradient-to-br from-brand-500 to-emerald-600 flex items-center justify-center shadow-2xl shadow-brand-500/40 mb-3">
+            <Shield size={24} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-1">Budgeity</h1>
-          <p className="text-sm text-white/50 font-medium">
-            {t("appLock.unlockPrompt", "Unlock to continue")}
+          <h1 className="text-lg font-black text-white tracking-widest uppercase mb-1 drop-shadow-md">
+            Budgeity
+          </h1>
+          <p className="text-[10px] text-white/50 font-bold uppercase tracking-[0.2em]">
+            {t("appLock.unlockPrompt", "Authentication Required")}
           </p>
+        </div>
+
+        {/* Profile Info & Logout */}
+        <div className="w-full mb-6 bg-white/10 dark:bg-white/5 backdrop-blur-xl rounded-[1.5rem] border border-white/10 p-3 flex items-center justify-between shadow-xl">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="relative group">
+              <UserAvatar
+                name={user?.displayName}
+                avatarBase64={avatarBase64}
+                photoURL={user?.photoURL}
+                size={42}
+                className="border-2 border-white/20 shadow-sm"
+              />
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-slate-900 group-hover:scale-110 transition-transform" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-sm font-bold text-white truncate leading-tight">
+                {user?.displayName || "User"}
+              </span>
+              <span className="text-[10px] text-white/40 font-medium truncate tracking-wide">
+                {user?.email}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1">
+            <div className="h-8 w-px bg-white/5 mx-1" />
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-400 transition-all active:scale-95 group font-bold text-[11px] uppercase tracking-wider"
+            >
+              <LogOutIconAnimated size={16} className="transition-transform" />
+              <span>{t("common.logout", "Logout")}</span>
+            </button>
+          </div>
         </div>
 
         {/* Glass Card */}
@@ -311,7 +353,7 @@ const SecurityOverlay: React.FC = () => {
               className="bg-rose-500/20 border border-rose-500/30 rounded-2xl p-4 max-w-xs text-center"
             >
               <div className="flex items-center justify-center gap-2 mb-2">
-                <LogOut size={16} className="text-rose-400" />
+                <LogOutIconAnimated size={16} className="text-rose-400" />
                 <p className="text-sm font-bold text-rose-300">
                   {t("appLock.resetWarningTitle", "Reset App Lock?")}
                 </p>

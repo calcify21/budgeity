@@ -3,6 +3,7 @@ import Cropper from "react-easy-crop";
 import type { Area } from "react-easy-crop";
 import { X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 const MotionDiv = motion.div as any;
 
@@ -74,6 +75,8 @@ const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [saving, setSaving] = useState(false);
 
+  useEscapeKey(isOpen, onClose);
+
   const onCropComplete = useCallback(
     (_croppedArea: Area, croppedAreaPixels: Area) => {
       setCroppedAreaPixels(croppedAreaPixels);
@@ -100,12 +103,13 @@ const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
       {isOpen && (
         <>
           {/* Backdrop */}
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[70]"
-          />
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[70]"
+              onClick={onClose}
+            />
 
           {/* Modal */}
           <MotionDiv

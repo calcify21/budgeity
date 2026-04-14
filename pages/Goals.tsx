@@ -780,7 +780,8 @@ const Goals: React.FC = () => {
       </AnimatePresence>
 
       {/* Goal Form Modal */}
-      {isModalOpen && (
+      <AnimatePresence>
+        {isModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <MotionDiv
             initial={{ opacity: 0 }}
@@ -901,9 +902,11 @@ const Goals: React.FC = () => {
           </MotionDiv>
         </div>
       )}
+      </AnimatePresence>
 
       {/* Contribution Modal */}
-      {isTransferModalOpen && selectedGoal && (
+      <AnimatePresence>
+        {isTransferModalOpen && selectedGoal && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
           <MotionDiv
             initial={{ opacity: 0 }}
@@ -1041,6 +1044,7 @@ const Goals: React.FC = () => {
           </MotionDiv>
         </div>
       )}
+      </AnimatePresence>
 
       {/* Enhanced Delete Modal */}
       <ConfirmModal

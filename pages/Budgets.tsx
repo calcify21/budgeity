@@ -452,21 +452,25 @@ const Budgets: React.FC = () => {
         </div>
       )}
 
-      {isModalOpen && (
-        <BudgetModal
-          onClose={() => setIsModalOpen(false)}
-          budgetToEdit={editingBudget}
-        />
-      )}
+      <AnimatePresence>
+        {isModalOpen && (
+          <BudgetModal
+            onClose={() => setIsModalOpen(false)}
+            budgetToEdit={editingBudget}
+          />
+        )}
+      </AnimatePresence>
 
-      {selectedBudget && (
-        <BudgetDetailsModal
-          budget={selectedBudget}
-          onClose={() => setSelectedBudget(null)}
-          onEdit={handleEditBudget}
-          onDelete={handleDeleteBudget}
-        />
-      )}
+      <AnimatePresence>
+        {selectedBudget && (
+          <BudgetDetailsModal
+            budget={selectedBudget}
+            onClose={() => setSelectedBudget(null)}
+            onEdit={handleEditBudget}
+            onDelete={handleDeleteBudget}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         isOpen={!!budgetToDelete}

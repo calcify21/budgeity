@@ -172,13 +172,15 @@ const Categories: React.FC = () => {
         )}
       </ReorderGroup>
 
-      {isModalOpen && (
-        <CategoryModal
-          onClose={() => setIsModalOpen(false)}
-          categoryToEdit={editingCategory}
-          initialType={activeTab}
-        />
-      )}
+      <AnimatePresence>
+        {isModalOpen && (
+          <CategoryModal
+            onClose={() => setIsModalOpen(false)}
+            categoryToEdit={editingCategory}
+            initialType={activeTab}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmModal
         isOpen={!!categoryToDelete}

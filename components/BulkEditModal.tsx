@@ -6,6 +6,7 @@ import { Transaction } from "../types";
 import { cn, formatCurrency } from "../utils";
 import { motion, AnimatePresence } from "framer-motion";
 import CustomSelect, { SelectOption } from "./CustomSelect";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 // Fix: Cast motion components to any to resolve type errors
 const MotionDiv = motion.div as any;
@@ -28,6 +29,8 @@ const BulkEditModal: React.FC<Props> = ({
     updateMultipleTransactions,
   } = useData();
   const { success, error } = useToast();
+
+  useEscapeKey(true, onClose);
 
   const [categoryId, setCategoryId] = useState<string>("");
   const [walletId, setWalletId] = useState<string>("");

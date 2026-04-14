@@ -310,246 +310,264 @@ const Recurring: React.FC = () => {
         )}
       </div>
 
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
-            onClick={() => setIsModalOpen(false)}
-          />
-          <MotionDiv
-            initial={{ opacity: 0, scale: 0.95, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              damping: 20,
-              stiffness: 220,
-              mass: 0.8,
-            }}
-            className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-md relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10 max-h-[90vh] overflow-y-auto custom-scrollbar"
-          >
-            <h2 className="text-xl font-bold mb-6">
-              {editingRule
-                ? t("recurring.editRule")
-                : t("recurring.newRecurringRule")}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              onClick={() => setIsModalOpen(false)}
+            />
+            <MotionDiv
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{
+                type: "spring",
+                damping: 20,
+                stiffness: 220,
+                mass: 0.8,
+              }}
+              className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-md relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10 max-h-[90vh] overflow-y-auto custom-scrollbar"
+            >
+              <h2 className="text-xl font-bold mb-6">
+                {editingRule
+                  ? t("recurring.editRule")
+                  : t("recurring.newRecurringRule")}
+              </h2>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <CustomSelect
+                    value={type}
+                    onChange={(v) => {
+                      setType(v as any);
+                      setCategoryId(
+                        categories.filter((c) => c.type === v)[0]?.id || "",
+                      );
+                      setSubcategoryId("");
+                    }}
+                    options={[
+                      { value: "income", label: t("common.income") },
+                      { value: "expense", label: t("common.expense") },
+                    ]}
+                  />
+                  <CustomSelect
+                    value={frequency}
+                    onChange={(v) => setFrequency(v as any)}
+                    options={[
+                      { value: "daily", label: t("common.daily") },
+                      { value: "weekly", label: t("common.weekly") },
+                      { value: "monthly", label: t("common.monthly") },
+                      { value: "yearly", label: t("common.yearly") },
+                    ]}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
+                    {t("recurring.nameOptional")}
+                  </label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none"
+                    placeholder="e.g. Netflix Subscription"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
+                    {t("common.amount")}
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    required
+                    className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none"
+                    placeholder="0.00"
+                  />
+                </div>
                 <CustomSelect
-                  value={type}
+                  label={t("common.category")}
+                  value={categoryId}
                   onChange={(v) => {
-                    setType(v as any);
-                    setCategoryId(
-                      categories.filter((c) => c.type === v)[0]?.id || "",
-                    );
+                    setCategoryId(v);
                     setSubcategoryId("");
                   }}
-                  options={[
-                    { value: "income", label: t("common.income") },
-                    { value: "expense", label: t("common.expense") },
-                  ]}
+                  options={categories
+                    .filter((c) => c.type === type)
+                    .map((c) => ({
+                      value: c.id,
+                      label: c.name,
+                      color: c.color,
+                    }))}
+                  searchable
+                  onAddNew={() => setShowAddCategory(true)}
                 />
+
+                {(() => {
+                  const selectedCat = categories.find((c) => c.id === categoryId);
+                  if (
+                    selectedCat?.subCategories &&
+                    selectedCat.subCategories.length > 0
+                  ) {
+                    return (
+                      <CustomSelect
+                        label={t("recurring.subcategoryOptional")}
+                        value={subcategoryId}
+                        onChange={setSubcategoryId}
+                        options={[
+                          { value: "", label: t("recurring.none") },
+                          ...selectedCat.subCategories.map((sc) => ({
+                            value: sc.id,
+                            label: sc.name,
+                          })),
+                        ]}
+                      />
+                    );
+                  }
+                  return null;
+                })()}
+
                 <CustomSelect
-                  value={frequency}
-                  onChange={(v) => setFrequency(v as any)}
-                  options={[
-                    { value: "daily", label: t("common.daily") },
-                    { value: "weekly", label: t("common.weekly") },
-                    { value: "monthly", label: t("common.monthly") },
-                    { value: "yearly", label: t("common.yearly") },
-                  ]}
+                  label={t("common.wallet")}
+                  value={walletId}
+                  onChange={setWalletId}
+                  options={wallets.map((w) => ({ value: w.id, label: w.name }))}
+                  onAddNew={() => setShowAddWallet(true)}
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                  {t("recurring.nameOptional")}
-                </label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none"
-                  placeholder="e.g. Netflix Subscription"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                  {t("common.amount")}
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  required
-                  className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none"
-                  placeholder="0.00"
-                />
-              </div>
-              <CustomSelect
-                label={t("common.category")}
-                value={categoryId}
-                onChange={(v) => {
-                  setCategoryId(v);
-                  setSubcategoryId("");
-                }}
-                options={categories
-                  .filter((c) => c.type === type)
-                  .map((c) => ({
-                    value: c.id,
-                    label: c.name,
-                    color: c.color,
-                  }))}
-                searchable
-                onAddNew={() => setShowAddCategory(true)}
-              />
 
-              {(() => {
-                const selectedCat = categories.find((c) => c.id === categoryId);
-                if (
-                  selectedCat?.subCategories &&
-                  selectedCat.subCategories.length > 0
-                ) {
-                  return (
-                    <CustomSelect
-                      label={t("recurring.subcategoryOptional")}
-                      value={subcategoryId}
-                      onChange={setSubcategoryId}
-                      options={[
-                        { value: "", label: t("recurring.none") },
-                        ...selectedCat.subCategories.map((sc) => ({
-                          value: sc.id,
-                          label: sc.name,
-                        })),
-                      ]}
-                    />
-                  );
-                }
-                return null;
-              })()}
-
-              <CustomSelect
-                label={t("common.wallet")}
-                value={walletId}
-                onChange={setWalletId}
-                options={wallets.map((w) => ({ value: w.id, label: w.name }))}
-                onAddNew={() => setShowAddWallet(true)}
-              />
-
-              <div>
-                <CustomDatePicker
-                  value={startDate}
-                  onChange={setStartDate}
-                  label={t("recurring.startDate")}
-                  className="bg-slate-50 dark:bg-black border-slate-200 dark:border-zinc-800"
-                />
-                {isDatePast && !editingRule && (
-                  <p className="text-xs text-amber-500 mt-2 font-medium">
-                    ⚠️ Start date is in the past. Transactions will be generated
-                    immediately to catch up.
-                  </p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl border border-slate-100 dark:border-zinc-800">
                 <div>
-                  <h4 className="font-bold text-sm">
-                    {t("recurring.autoAddTransaction")}
-                  </h4>
-                  <p className="text-xs text-slate-500">
-                    {t("recurring.autoAddDesc")}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setAutoAdd(!autoAdd)}
-                  className={cn(
-                    "w-12 h-6 rounded-full transition-colors flex items-center shrink-0",
-                    autoAdd ? "bg-brand-500" : "bg-slate-300 dark:bg-zinc-600",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform ml-1",
-                      autoAdd ? "translate-x-6" : "translate-x-0",
-                    )}
+                  <CustomDatePicker
+                    value={startDate}
+                    onChange={setStartDate}
+                    label={t("recurring.startDate")}
+                    className="bg-slate-50 dark:bg-black border-slate-200 dark:border-zinc-800"
                   />
+                  {isDatePast && !editingRule && (
+                    <p className="text-xs text-amber-500 mt-2 font-medium">
+                      ⚠️ Start date is in the past. Transactions will be generated
+                      immediately to catch up.
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-zinc-800/50 rounded-2xl border border-slate-100 dark:border-zinc-800">
+                  <div>
+                    <h4 className="font-bold text-sm">
+                      {t("recurring.autoAddTransaction")}
+                    </h4>
+                    <p className="text-xs text-slate-500">
+                      {t("recurring.autoAddDesc")}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setAutoAdd(!autoAdd)}
+                    className={cn(
+                      "w-12 h-6 rounded-full transition-colors flex items-center shrink-0",
+                      autoAdd ? "bg-brand-500" : "bg-slate-300 dark:bg-zinc-600",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "w-4 h-4 rounded-full bg-white shadow-sm transform transition-transform ml-1",
+                        autoAdd ? "translate-x-6" : "translate-x-0",
+                      )}
+                    />
+                  </button>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg hover:bg-brand-700 transition-colors"
+                >
+                  {t("recurring.saveRule")}
+                </button>
+              </form>
+            </MotionDiv>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {ruleToDelete && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setRuleToDelete(null)}
+            />
+            <MotionDiv
+              initial={{ opacity: 0, scale: 0.95, y: 30 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 30 }}
+              transition={{
+                type: "spring",
+                damping: 20,
+                stiffness: 220,
+                mass: 0.8,
+              }}
+              className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-sm relative z-10 p-6 shadow-2xl border border-slate-100 dark:border-zinc-800"
+            >
+              <h3 className="text-xl font-bold mb-2">
+                {t("recurring.deleteRecurringRule")}
+              </h3>
+              <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+                {t("recurring.deleteQuestion")}
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    deleteRecurringTransaction(ruleToDelete, true);
+                    setRuleToDelete(null);
+                  }}
+                  className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-rose-500/20"
+                >
+                  {t("recurring.deleteRuleAndHistory")}
+                </button>
+
+                <button
+                  onClick={() => {
+                    deleteRecurringTransaction(ruleToDelete, false);
+                    setRuleToDelete(null);
+                  }}
+                  className="w-full py-3 px-4 bg-white dark:bg-zinc-800 border-2 border-slate-200 dark:border-zinc-700 hover:border-rose-200 dark:hover:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-700 dark:text-slate-300 hover:text-rose-600 font-bold rounded-xl transition-all"
+                >
+                  {t("recurring.deleteRuleOnly")}
+                </button>
+
+                <button
+                  onClick={() => setRuleToDelete(null)}
+                  className="w-full py-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-medium transition-colors"
+                >
+                  {t("common.cancel")}
                 </button>
               </div>
+            </MotionDiv>
+          </div>
+        )}
+      </AnimatePresence>
 
-              <button
-                type="submit"
-                className="w-full py-4 bg-brand-600 text-white font-bold rounded-2xl shadow-lg hover:bg-brand-700 transition-colors"
-              >
-                {t("recurring.saveRule")}
-              </button>
-            </form>
-          </MotionDiv>
-        </div>
-      )}
-
-      {ruleToDelete && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setRuleToDelete(null)}
+      <AnimatePresence>
+        {showAddWallet && (
+          <WalletModal onClose={() => setShowAddWallet(false)} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showAddCategory && (
+          <CategoryModal
+            onClose={() => setShowAddCategory(false)}
+            initialType={type === "income" ? "income" : "expense"}
           />
-          <MotionDiv
-            initial={{ opacity: 0, scale: 0.95, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{
-              type: "spring",
-              damping: 20,
-              stiffness: 220,
-              mass: 0.8,
-            }}
-            className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-sm relative z-10 p-6 shadow-2xl border border-slate-100 dark:border-zinc-800"
-          >
-            <h3 className="text-xl font-bold mb-2">
-              {t("recurring.deleteRecurringRule")}
-            </h3>
-            <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
-              {t("recurring.deleteQuestion")}
-            </p>
-
-            <div className="space-y-3">
-              <button
-                onClick={() => {
-                  deleteRecurringTransaction(ruleToDelete, true);
-                  setRuleToDelete(null);
-                }}
-                className="w-full py-3 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-colors shadow-lg shadow-rose-500/20"
-              >
-                {t("recurring.deleteRuleAndHistory")}
-              </button>
-
-              <button
-                onClick={() => {
-                  deleteRecurringTransaction(ruleToDelete, false);
-                  setRuleToDelete(null);
-                }}
-                className="w-full py-3 px-4 bg-white dark:bg-zinc-800 border-2 border-slate-200 dark:border-zinc-700 hover:border-rose-200 dark:hover:border-rose-900/50 hover:bg-rose-50 dark:hover:bg-rose-900/20 text-slate-700 dark:text-slate-300 hover:text-rose-600 font-bold rounded-xl transition-all"
-              >
-                {t("recurring.deleteRuleOnly")}
-              </button>
-
-              <button
-                onClick={() => setRuleToDelete(null)}
-                className="w-full py-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-medium transition-colors"
-              >
-                {t("common.cancel")}
-              </button>
-            </div>
-          </MotionDiv>
-        </div>
-      )}
-
-      {showAddWallet && <WalletModal onClose={() => setShowAddWallet(false)} />}
-      {showAddCategory && (
-        <CategoryModal
-          onClose={() => setShowAddCategory(false)}
-          initialType={type === "income" ? "income" : "expense"}
-        />
-      )}
+        )}
+      </AnimatePresence>
 
       {batchWarning && (
         <ConfirmModal

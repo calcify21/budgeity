@@ -1,6 +1,10 @@
 import React from "react";
 import { X, AlertTriangle } from "lucide-react";
 import { cn } from "../utils";
+import { useEscapeKey } from "../hooks/useEscapeKey";
+import { motion } from "framer-motion";
+
+const MotionDiv = motion.div as any;
 
 interface Props {
   isOpen: boolean;
@@ -23,11 +27,26 @@ const ConfirmationModal: React.FC<Props> = ({
   cancelText = "Cancel",
   variant = "neutral",
 }) => {
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-zinc-900 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <MotionDiv
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <MotionDiv
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="bg-white dark:bg-zinc-900 w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden flex flex-col relative z-10"
+      >
         <div className="p-6 text-center">
           <div
             className={cn(
@@ -69,7 +88,7 @@ const ConfirmationModal: React.FC<Props> = ({
             {confirmText}
           </button>
         </div>
-      </div>
+      </MotionDiv>
     </div>
   );
 };

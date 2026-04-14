@@ -19,7 +19,7 @@ const PrivacyPolicy: React.FC = () => {
         </h1>
         <div className="prose prose-slate dark:prose-invert max-w-none text-slate-600 dark:text-slate-300 space-y-4">
           <p className="font-medium">
-            Last updated: {new Date().toLocaleDateString()}
+            Last updated: February 26, 2026
           </p>
 
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white mt-8 mb-4">

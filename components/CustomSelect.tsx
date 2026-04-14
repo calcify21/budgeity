@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check, Search, Plus, LucideIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn, ICON_MAP } from "../utils";
+import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 export interface SelectOption {
   value: string;
@@ -41,20 +43,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // Dismissal logic
+  useEscapeKey(isOpen, () => setIsOpen(false));
+  useClickOutside(containerRef as any, () => setIsOpen(false), isOpen);
 
   // Scroll dropdown into view when opened
   useEffect(() => {

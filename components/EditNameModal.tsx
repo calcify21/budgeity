@@ -4,6 +4,7 @@ import { X, User, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useTranslation } from "react-i18next";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -15,6 +16,8 @@ interface Props {
 const EditNameModal: React.FC<Props> = ({ onClose }) => {
   const { user, updateName } = useAuth();
   const { t } = useTranslation();
+
+  useEscapeKey(true, onClose);
 
   const [name, setName] = useState(user?.displayName || "");
   const [isLoading, setIsLoading] = useState(false);

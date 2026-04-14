@@ -21,7 +21,7 @@ import {
 import { ICON_MAP } from "../utils";
 import { Wallet, WalletType } from "../types";
 import ImportWizard from "../components/ImportWizard";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CustomSelect from "../components/CustomSelect";
 import WalletActionModal from "../components/WalletActionModal";
 import WalletModal from "../components/WalletModal";
@@ -409,221 +409,232 @@ const Wallets: React.FC = () => {
       )}
 
       {/* Wallet Details Modal */}
-      {selectedWallet && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setSelectedWalletId(null)}
-          />
+      <AnimatePresence>
+        {selectedWallet && (
+          <div className="fixed inset-0 z-50 flex items-center justify-end">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setSelectedWalletId(null)}
+            />
 
-          <MotionDiv
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="bg-white dark:bg-zinc-950 w-full max-w-lg relative z-10 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-white/5"
-          >
-            <div className="p-8 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-black/50">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg"
-                  style={{ backgroundColor: selectedWallet.color }}
+            <MotionDiv
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+              className="bg-white dark:bg-zinc-950 w-full max-w-lg relative z-10 h-full shadow-2xl flex flex-col border-l border-slate-200 dark:border-white/5"
+            >
+              <div className="p-8 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-black/50">
+                <div className="flex items-center gap-4">
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg"
+                    style={{ backgroundColor: selectedWallet.color }}
+                  >
+                    {(() => {
+                      const IconComp = selectedWallet.icon
+                        ? ICON_MAP[selectedWallet.icon]
+                        : null;
+                      return IconComp ? (
+                        <IconComp size={28} />
+                      ) : (
+                        <CreditCard size={28} />
+                      );
+                    })()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h2
+                      className="text-2xl font-bold truncate"
+                      title={selectedWallet.name}
+                    >
+                      {selectedWallet.name}
+                    </h2>
+                    <p
+                      className="text-slate-500 font-medium truncate"
+                      title={formatAmount(selectedWallet.balance)}
+                    >
+                      {formatAmount(selectedWallet.balance)}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedWalletId(null)}
+                  className="p-2 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                  title="Close"
                 >
-                  {(() => {
-                    const IconComp = selectedWallet.icon
-                      ? ICON_MAP[selectedWallet.icon]
-                      : null;
-                    return IconComp ? (
-                      <IconComp size={28} />
-                    ) : (
-                      <CreditCard size={28} />
-                    );
-                  })()}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h2
-                    className="text-2xl font-bold truncate"
-                    title={selectedWallet.name}
-                  >
-                    {selectedWallet.name}
-                  </h2>
-                  <p
-                    className="text-slate-500 font-medium truncate"
-                    title={formatAmount(selectedWallet.balance)}
-                  >
-                    {formatAmount(selectedWallet.balance)}
-                  </p>
-                </div>
+                  <X size={24} />
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedWalletId(null)}
-                className="p-2 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-full transition-colors"
-                title="Close"
-              >
-                <X size={24} />
-              </button>
-            </div>
 
-            {/* Actions for Mobile */}
-            <div className="p-4 grid grid-cols-4 gap-2 border-b border-slate-100 dark:border-white/5">
-              <button
-                onClick={() => openEdit(selectedWallet)}
-                className="flex flex-col items-center justify-center gap-1 p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 font-semibold hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors text-xs"
-              >
-                <Pencil size={18} /> {t("common.edit")}
-              </button>
-              <button
-                onClick={() => setShowAnalytics(!showAnalytics)}
-                className={cn(
-                  "flex flex-col items-center justify-center gap-1 p-2 rounded-xl font-semibold transition-colors text-xs",
-                  showAnalytics
-                    ? "bg-brand-100 dark:bg-brand-900/30 text-brand-600"
-                    : "bg-slate-100 dark:bg-zinc-800",
-                )}
-              >
-                <BarChart3 size={18} /> {t("wallets.analytics")}
-              </button>
-              <button
-                onClick={() => setWalletToDelete(selectedWallet.id)}
-                className="flex flex-col items-center justify-center gap-1 p-2 rounded-xl bg-rose-50 dark:bg-rose-900/10 font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-colors text-xs text-rose-600 dark:text-rose-400"
-              >
-                <Trash2 size={18} /> {t("common.delete")}
-              </button>
-            </div>
+              {/* Actions for Mobile */}
+              <div className="p-4 grid grid-cols-4 gap-2 border-b border-slate-100 dark:border-white/5">
+                <button
+                  onClick={() => openEdit(selectedWallet)}
+                  className="flex flex-col items-center justify-center gap-1 p-2 rounded-xl bg-slate-100 dark:bg-zinc-800 font-semibold hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors text-xs"
+                >
+                  <Pencil size={18} /> {t("common.edit")}
+                </button>
+                <button
+                  onClick={() => setShowAnalytics(!showAnalytics)}
+                  className={cn(
+                    "flex flex-col items-center justify-center gap-1 p-2 rounded-xl font-semibold transition-colors text-xs",
+                    showAnalytics
+                      ? "bg-brand-100 dark:bg-brand-900/30 text-brand-600"
+                      : "bg-slate-100 dark:bg-zinc-800",
+                  )}
+                >
+                  <BarChart3 size={18} /> {t("wallets.analytics")}
+                </button>
+                <button
+                  onClick={() => setWalletToDelete(walletToDelete)}
+                  className="flex flex-col items-center justify-center gap-1 p-2 rounded-xl bg-rose-50 dark:bg-rose-900/10 font-semibold hover:bg-rose-100 dark:hover:bg-rose-900/20 transition-colors text-xs text-rose-600 dark:text-rose-400"
+                >
+                  <Trash2 size={18} /> {t("common.delete")}
+                </button>
+              </div>
 
-            <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
-              {showAnalytics ? (
-                <div className="p-6">
-                  <WalletAnalytics
-                    walletId={selectedWallet.id}
-                    transactions={selectedWalletTxs}
-                  />
-                </div>
-              ) : (
-                <div className="p-6">
-                  <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
-                    {t("wallets.transactionHistory")}
-                  </h3>
-                  {selectedWalletTxs.length === 0 ? (
-                    <div className="py-20 text-center text-slate-400">
-                      {t("wallets.noTransactionsYet")}
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {selectedWalletTxs.map((t, idx) => {
-                        const cat = categories.find(
-                          (c) => c.id === t.categoryId,
-                        );
-                        const isTransfer = t.type === "transfer";
-                        const Icon = cat
-                          ? getCategoryIcon(cat.icon)
-                          : ArrowRightLeft;
-                        let amount = t.amount;
-                        let isPositive = false;
-                        if (t.type === "income") isPositive = true;
-                        if (t.type === "expense") isPositive = false;
-                        if (t.type === "transfer") {
-                          if (t.toWalletId === selectedWallet.id)
-                            isPositive = true;
-                          else isPositive = false;
-                        }
+              <div className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+                {showAnalytics ? (
+                  <div className="p-6">
+                    <WalletAnalytics
+                      walletId={selectedWallet.id}
+                      transactions={selectedWalletTxs}
+                    />
+                  </div>
+                ) : (
+                  <div className="p-6">
+                    <h3 className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-4">
+                      {t("wallets.transactionHistory")}
+                    </h3>
+                    {selectedWalletTxs.length === 0 ? (
+                      <div className="py-20 text-center text-slate-400">
+                        {t("wallets.noTransactionsYet")}
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {selectedWalletTxs.map((t, idx) => {
+                          const cat = categories.find(
+                            (c) => c.id === t.categoryId,
+                          );
+                          const isTransfer = t.type === "transfer";
+                          const Icon = cat
+                            ? getCategoryIcon(cat.icon)
+                            : ArrowRightLeft;
+                          let amount = t.amount;
+                          let isPositive = false;
+                          if (t.type === "income") isPositive = true;
+                          if (t.type === "expense") isPositive = false;
+                          if (t.type === "transfer") {
+                            if (t.toWalletId === selectedWallet.id)
+                              isPositive = true;
+                            else isPositive = false;
+                          }
 
-                        return (
-                          <MotionDiv
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            key={t.id}
-                            className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-white/5"
-                          >
-                            <div className="flex items-center gap-4">
+                          return (
+                            <MotionDiv
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: idx * 0.05 }}
+                              key={t.id}
+                              className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-zinc-900 border border-slate-100 dark:border-white/5"
+                            >
+                              <div className="flex items-center gap-4">
+                                <div
+                                  className={cn(
+                                    "w-10 h-10 rounded-full flex items-center justify-center text-white shadow-sm",
+                                    isTransfer ? "bg-slate-500" : "",
+                                  )}
+                                  style={{
+                                    backgroundColor: !isTransfer
+                                      ? cat?.color
+                                      : undefined,
+                                  }}
+                                >
+                                  {isTransfer ? (
+                                    <ArrowRightLeft size={16} />
+                                  ) : (
+                                    <Icon size={16} />
+                                  )}
+                                </div>
+                                <div>
+                                  <div className="font-semibold text-slate-900 dark:text-slate-100">
+                                    {t.note ||
+                                      (isTransfer ? "Transfer" : cat?.name)}
+                                  </div>
+                                  <div className="text-xs text-slate-500 font-medium">
+                                    {formatDate(t.date)}
+                                  </div>
+                                </div>
+                              </div>
                               <div
                                 className={cn(
-                                  "w-10 h-10 rounded-full flex items-center justify-center text-white shadow-sm",
-                                  isTransfer ? "bg-slate-500" : "",
+                                  "font-bold text-lg",
+                                  isPositive
+                                    ? "text-emerald-500"
+                                    : "text-slate-900 dark:text-white",
                                 )}
-                                style={{
-                                  backgroundColor: !isTransfer
-                                    ? cat?.color
-                                    : undefined,
-                                }}
                               >
-                                {isTransfer ? (
-                                  <ArrowRightLeft size={16} />
-                                ) : (
-                                  <Icon size={16} />
-                                )}
+                                {isPositive ? "+" : "-"}
+                                {formatAmount(amount)}
                               </div>
-                              <div>
-                                <div className="font-semibold text-slate-900 dark:text-slate-100">
-                                  {t.note ||
-                                    (isTransfer ? "Transfer" : cat?.name)}
-                                </div>
-                                <div className="text-xs text-slate-500 font-medium">
-                                  {formatDate(t.date)}
-                                </div>
-                              </div>
-                            </div>
-                            <div
-                              className={cn(
-                                "font-bold text-lg",
-                                isPositive
-                                  ? "text-emerald-500"
-                                  : "text-slate-900 dark:text-white",
-                              )}
-                            >
-                              {isPositive ? "+" : "-"}
-                              {formatAmount(amount)}
-                            </div>
-                          </MotionDiv>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                            </MotionDiv>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-black/50">
-              <button
-                onClick={() => handleImportExisting(selectedWallet.id)}
-                className="w-full py-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white font-bold hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
-              >
-                <Upload size={18} /> {t("wallets.importTransactions")}
-              </button>
-            </div>
-          </MotionDiv>
-        </div>
-      )}
+              <div className="p-6 border-t border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-black/50">
+                <button
+                  onClick={() => handleImportExisting(selectedWallet.id)}
+                  className="w-full py-4 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-900 dark:text-white font-bold hover:bg-slate-50 dark:hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Upload size={18} /> {t("wallets.importTransactions")}
+                </button>
+              </div>
+            </MotionDiv>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Add/Edit Wallet Modal */}
-      {isModalOpen && (
-        <WalletModal
-          onClose={() => {
-            setIsModalOpen(false);
-            resetForm();
-          }}
-          walletToEdit={walletToEdit}
-          onImportRequested={(newWalletId) => {
-            setTargetWalletForImport(newWalletId);
-            setIsImportOpen(true);
-          }}
-        />
-      )}
+      <AnimatePresence>
+        {isModalOpen && (
+          <WalletModal
+            onClose={() => {
+              setIsModalOpen(false);
+              resetForm();
+            }}
+            walletToEdit={walletToEdit}
+            onImportRequested={(newWalletId) => {
+              setTargetWalletForImport(newWalletId);
+              setIsImportOpen(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
-      {isImportOpen && (
-        <ImportWizard
-          onClose={() => setIsImportOpen(false)}
-          targetWalletId={targetWalletForImport}
-        />
-      )}
+      <AnimatePresence>
+        {isImportOpen && (
+          <ImportWizard
+            onClose={() => setIsImportOpen(false)}
+            targetWalletId={targetWalletForImport}
+          />
+        )}
+      </AnimatePresence>
 
-      {walletToDelete && (
-        <WalletActionModal
-          walletId={walletToDelete}
-          onClose={() => setWalletToDelete(null)}
-        />
-      )}
+      <AnimatePresence>
+        {walletToDelete && (
+          <WalletActionModal
+            walletId={walletToDelete}
+            onClose={() => setWalletToDelete(null)}
+          />
+        )}
+      </AnimatePresence>
     </MotionDiv>
   );
 };

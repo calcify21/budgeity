@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useTranslation } from "react-i18next";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 // Fix motion type
 const MotionDiv = motion.div as any;
@@ -25,6 +26,8 @@ interface Props {
 const ChangePasswordModal: React.FC<Props> = ({ onClose }) => {
   const { updateUserPassword, logout, user } = useAuth();
   const { t } = useTranslation();
+
+  useEscapeKey(true, onClose);
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

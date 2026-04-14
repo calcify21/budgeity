@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { AlertTriangle, Trash2, X, AlertCircle } from "lucide-react";
 import CustomSelect from "./CustomSelect";
 import { cn } from "../utils";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 // Cast motion component to avoid type issues in some environments
 const MotionDiv = motion.div as any;
@@ -26,6 +27,8 @@ const WalletActionModal: React.FC<Props> = ({ walletId, onClose }) => {
   } = useData();
   const [action, setAction] = useState<ActionOption>("move");
   const [targetWalletId, setTargetWalletId] = useState("");
+
+  useEscapeKey(true, onClose);
 
   const wallet = wallets.find((w) => w.id === walletId);
   if (!wallet) return null;

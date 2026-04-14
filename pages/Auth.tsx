@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useData } from "../context/DataContext";
 import {
@@ -179,7 +179,7 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black flex transition-colors duration-300">
+    <div className="h-screen lg:overflow-hidden bg-slate-50 dark:bg-black flex transition-colors duration-300">
       {/* Left panel - Branding (Hidden on Mobile) */}
       <div className="hidden lg:flex lg:w-1/2 bg-brand-600 dark:bg-zinc-900 relative overflow-hidden flex-col p-12 lg:p-16">
         {/* Background Ambience */}
@@ -219,7 +219,7 @@ const Auth: React.FC = () => {
       </div>
 
       {/* Right panel - Auth Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center p-4 sm:p-8 relative min-h-[100dvh] lg:min-h-screen pb-8">
+      <div className="w-full lg:w-1/2 flex flex-col items-center p-4 sm:p-8 relative h-[100dvh] lg:h-screen">
         
         {/* Mobile Header (Flow Layout) */}
         <div className="w-full flex justify-between items-center lg:hidden mt-2 mb-6 z-20 max-w-md">
@@ -257,13 +257,13 @@ const Auth: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center w-full max-w-md w-full relative z-10">
+        <div className="flex-1 flex flex-col justify-center w-full max-w-md relative z-10">
           <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="w-full bg-white dark:bg-black lg:bg-transparent lg:dark:bg-transparent lg:border-none lg:shadow-none bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-slate-200 dark:border-zinc-800 p-8 rounded-[2.5rem] shadow-2xl relative"
           >
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
               {mode === "login" && "Welcome Back"}
               {mode === "signup" && "Create Account"}
@@ -610,7 +610,7 @@ const Auth: React.FC = () => {
           </form>
 
           {(mode === "login" || mode === "signup") && (
-            <div className="mt-8">
+            <div className="mt-6">
               <div className="relative mb-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-slate-200 dark:border-zinc-800"></div>
@@ -669,7 +669,7 @@ const Auth: React.FC = () => {
             </div>
           )}
 
-          <div className="mt-8 text-center space-y-2">
+          <div className="mt-6 text-center space-y-2">
             {mode === "login" && (
               <>
                 <p className="text-slate-500 text-sm">
@@ -712,12 +712,16 @@ const Auth: React.FC = () => {
         </MotionDiv>
         </div>
 
-        {/* Footer (Flow on Mobile, Absolute on Desktop) */}
         <div className="mt-8 lg:mt-0 lg:absolute lg:bottom-6 text-slate-400 text-[11px] lg:text-xs text-center z-10 max-w-sm px-4 pb-4 lg:pb-0">
           <p>
             &copy; {new Date().getFullYear()} Budgeity. Secure Cloud Finance.
           </p>
-          <p className="mt-1 opacity-60 text-[10px]">
+          <div className="flex items-center justify-center gap-3 mt-1 underline-offset-4">
+            <Link to="/privacy-policy" className="hover:text-brand-500 hover:underline transition-colors">Privacy Policy</Link>
+            <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-800" />
+            <Link to="/terms-of-service" className="hover:text-brand-500 hover:underline transition-colors">Terms of Service</Link>
+          </div>
+          <p className="mt-2 opacity-60 text-[10px]">
             Protected by Google Firebase. Your data is encrypted and secure.
           </p>
         </div>

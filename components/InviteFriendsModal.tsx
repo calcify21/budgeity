@@ -52,6 +52,8 @@ const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ onClose }) => {
   const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
+  useEscapeKey(true, onClose);
+
   // Construct the full URL including possible sub-paths (ignoring the hash for HashRouter)
   const fullUrl = window.location.origin + window.location.pathname;
   // Remove trailing slash for a cleaner look if it's there

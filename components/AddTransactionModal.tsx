@@ -832,10 +832,14 @@ const AddTransactionModal: React.FC<Props> = ({
         message="You're spending from a Savings wallet. Proceed?"
         confirmText="Confirm Spend"
       />
-      {showAddWallet && <WalletModal onClose={() => setShowAddWallet(false)} />}
-      {showAddCategory && (
-        <CategoryModal onClose={() => setShowAddCategory(false)} />
-      )}
+      <AnimatePresence>
+        {showAddWallet && <WalletModal onClose={() => setShowAddWallet(false)} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showAddCategory && (
+          <CategoryModal onClose={() => setShowAddCategory(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

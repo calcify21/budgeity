@@ -11,6 +11,7 @@ import CustomSelect from "./CustomSelect";
 import CustomDatePicker from "./CustomDatePicker";
 import { cn } from "../utils";
 import { useTranslation } from "react-i18next";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 interface Props {
   isOpen: boolean;
@@ -51,6 +52,8 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
     item.quantity > 1 ? "1" : item.quantity.toString(),
   );
 
+  useEscapeKey(isOpen, onClose);
+
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -74,8 +77,12 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
   const isPartial = parseInt(quantity) < maxQty;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden flex flex-col relative z-10">
         <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <Check className="text-emerald-500" />

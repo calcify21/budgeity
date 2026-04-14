@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -37,6 +37,8 @@ import { useData } from "../../context/DataContext";
 import { useHousehold } from "../../context/HouseholdContext";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { useToast } from "../../context/ToastContext";
+import { useEscapeKey } from "../../hooks/useEscapeKey";
+import { useClickOutside } from "../../hooks/useClickOutside";
 import { Reorder, useDragControls } from "framer-motion";
 
 const ReorderGroup = Reorder.Group as any;
@@ -200,6 +202,10 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
   const [isCustomizing, setIsCustomizing] = React.useState(false);
   const [localPinnedIds, setLocalPinnedIds] = React.useState<string[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  useEscapeKey(isOpen, onClose);
+  useClickOutside(sheetRef, onClose);
 
   // Close on route change
   useEffect(() => {
@@ -409,6 +415,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 
           {/* Sheet */}
           <motion.div
+            ref={sheetRef}
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}

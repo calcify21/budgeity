@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils";
+import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useClickOutside } from "../hooks/useClickOutside";
 
 interface Props {
   value: string; // ISO date string YYYY-MM-DD
@@ -105,21 +107,9 @@ const CustomDatePicker: React.FC<Props> = ({
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Node;
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(target) &&
-        calendarRef.current &&
-        !calendarRef.current.contains(target)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // Dismissal logic
+  useEscapeKey(isOpen, () => setIsOpen(false));
+  useClickOutside(containerRef as any, () => setIsOpen(false), isOpen);
 
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();

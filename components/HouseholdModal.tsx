@@ -4,6 +4,10 @@ import { X, Home, Plus, Loader2, AlertCircle } from "lucide-react";
 import IconPicker from "./IconPicker";
 import { useToast } from "../context/ToastContext";
 import { useScrollToError } from "../hooks/useScrollToError";
+import { useEscapeKey } from "../hooks/useEscapeKey";
+import { motion } from "framer-motion";
+
+const MotionDiv = motion.div as any;
 
 interface HouseholdModalProps {
   isOpen: boolean;
@@ -21,6 +25,7 @@ const HouseholdModal: React.FC<HouseholdModalProps> = ({ isOpen, onClose }) => {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   useScrollToError(error, scrollRef);
+  useEscapeKey(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -52,8 +57,21 @@ const HouseholdModal: React.FC<HouseholdModalProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+      <MotionDiv
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <MotionDiv
+        initial={{ scale: 0.95, opacity: 0, y: 20 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.95, opacity: 0, y: 20 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+        className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-[2rem] shadow-2xl flex flex-col max-h-[90vh] relative z-10"
+      >
         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between shrink-0">
           <h2 className="text-xl font-bold">Create Household</h2>
           <button
@@ -108,7 +126,7 @@ const HouseholdModal: React.FC<HouseholdModalProps> = ({ isOpen, onClose }) => {
             {isCreating ? "Creating..." : "Create Household"}
           </button>
         </div>
-      </div>
+      </MotionDiv>
     </div>
   );
 };
