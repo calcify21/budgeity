@@ -179,9 +179,9 @@ const Auth: React.FC = () => {
   };
 
   return (
-    <div className="h-screen lg:overflow-hidden bg-slate-50 dark:bg-black flex transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 dark:bg-black flex flex-col lg:flex-row transition-colors duration-300">
       {/* Left panel - Branding (Hidden on Mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 bg-brand-600 dark:bg-zinc-900 relative overflow-hidden flex-col p-12 lg:p-16">
+      <div className="hidden lg:flex lg:w-1/2 bg-brand-600 dark:bg-zinc-900 relative flex-col p-12 lg:p-16 lg:sticky lg:top-0 lg:h-screen overflow-y-auto">
         {/* Background Ambience */}
         <div className="absolute top-0 w-full h-full left-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-indigo-500/30 rounded-full blur-[120px]" />
@@ -210,8 +210,8 @@ const Auth: React.FC = () => {
         </div>
 
         {/* Vibey Hero Art Container */}
-        <div className="relative z-10 flex-1 w-full mt-10 xl:mt-12 flex items-center justify-center min-h-[300px] xl:min-h-[350px]">
-          <div className="w-full max-w-[350px] xl:max-w-[480px]">
+        <div className="relative z-10 w-full mt-6 xl:mt-10 flex items-center justify-center">
+          <div className="w-full max-w-[320px] xl:max-w-[420px]">
              <img src={authGraphicLight} alt="Budgeity Finance Concept" className="w-full h-auto object-contain animate-float drop-shadow-[0_30px_50px_rgba(0,0,0,0.4)] hover:scale-105 transition-transform duration-[800ms] ease-out rounded-3xl dark:hidden" />
              <img src={authGraphicDark} alt="Budgeity Finance Concept" className="w-full h-auto object-contain animate-float drop-shadow-[0_30px_50px_rgba(0,0,0,0.4)] hover:scale-105 transition-transform duration-[800ms] ease-out rounded-3xl hidden dark:block" />
           </div>
@@ -219,10 +219,10 @@ const Auth: React.FC = () => {
       </div>
 
       {/* Right panel - Auth Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center p-4 sm:p-8 relative h-[100dvh] lg:h-screen">
+      <div className="w-full lg:w-1/2 flex flex-col h-[100dvh] lg:h-screen relative">
         
         {/* Mobile Header (Flow Layout) */}
-        <div className="w-full flex justify-between items-center lg:hidden mt-2 mb-6 z-20 max-w-md">
+        <div className="w-full flex justify-between items-center lg:hidden mt-2 mb-4 z-20 px-4 sm:px-8 flex-shrink-0">
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => navigate("/")}
@@ -257,7 +257,10 @@ const Auth: React.FC = () => {
           </button>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center w-full max-w-md relative z-10">
+        {/* Scrollable content area */}
+        <div className="flex-1 overflow-y-auto">
+        <div className="flex flex-col items-center justify-center w-full min-h-full px-4 sm:px-8 py-8 lg:py-12">
+        <div className="w-full max-w-md relative z-10">
           <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -711,8 +714,11 @@ const Auth: React.FC = () => {
           </div>
         </MotionDiv>
         </div>
+        </div>
+        </div>
 
-        <div className="mt-8 lg:mt-0 lg:absolute lg:bottom-6 text-slate-400 text-[11px] lg:text-xs text-center z-10 max-w-sm px-4 pb-4 lg:pb-0">
+        {/* Sticky Footer */}
+        <div className="flex-shrink-0 py-4 text-slate-400 text-[11px] lg:text-xs text-center z-10 px-4 border-t border-slate-100 dark:border-zinc-900 bg-slate-50 dark:bg-black">
           <p>
             &copy; {new Date().getFullYear()} Budgeity. Secure Cloud Finance.
           </p>
@@ -721,7 +727,7 @@ const Auth: React.FC = () => {
             <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-800" />
             <Link to="/terms-of-service" className="hover:text-brand-500 hover:underline transition-colors">Terms of Service</Link>
           </div>
-          <p className="mt-2 opacity-60 text-[10px]">
+          <p className="mt-1 opacity-60 text-[10px]">
             Protected by Google Firebase. Your data is encrypted and secure.
           </p>
         </div>

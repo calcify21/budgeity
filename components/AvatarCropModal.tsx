@@ -15,37 +15,37 @@ interface AvatarCropModalProps {
 }
 
 /**
- * Creates a canvas-cropped image, resized to 80x80, exported as WebP Base64 < 10 KB.
+ * Creates a canvas-cropped image, resized to 400x400, exported as WebP Base64 < 50 KB.
  */
 async function getCroppedImg(imageSrc: string, crop: Area): Promise<string> {
   const image = await loadImage(imageSrc);
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
-  canvas.width = 80;
-  canvas.height = 80;
+  canvas.width = 400;
+  canvas.height = 400;
 
-  ctx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, 80, 80);
+  ctx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, 400, 400);
 
-  // Try WebP first, then fallback to PNG if WebP not supported
-  let quality = 0.7;
+  // Try WebP first, then fallback to JPEG if WebP not supported
+  let quality = 0.85;
   let dataUrl = canvas.toDataURL("image/webp", quality);
 
   // If browser doesn't support webp, dataUrl will start with "data:image/png"
   const isWebP = dataUrl.startsWith("data:image/webp");
 
   if (isWebP) {
-    // Iteratively reduce quality to stay under 10 KB
-    while (dataUrl.length > 13_650 && quality > 0.1) {
-      // ~10KB in base64 ~ 13650 chars
-      quality -= 0.1;
+    // Iteratively reduce quality to stay under 50 KB
+    while (dataUrl.length > 68_270 && quality > 0.1) {
+      // ~50KB in base64 ~ 68270 chars
+      quality -= 0.05;
       dataUrl = canvas.toDataURL("image/webp", quality);
     }
   } else {
     // Fallback: use jpeg with compression
-    quality = 0.6;
+    quality = 0.82;
     dataUrl = canvas.toDataURL("image/jpeg", quality);
-    while (dataUrl.length > 13_650 && quality > 0.1) {
-      quality -= 0.1;
+    while (dataUrl.length > 68_270 && quality > 0.1) {
+      quality -= 0.05;
       dataUrl = canvas.toDataURL("image/jpeg", quality);
     }
   }

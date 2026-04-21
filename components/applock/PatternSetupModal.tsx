@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Lock } from "lucide-react";
+import { X, Lock, ShieldAlert } from "lucide-react";
 import PatternLock from "./PatternLock";
 import { useTranslation } from "react-i18next";
 
@@ -9,19 +9,46 @@ interface PatternSetupModalProps {
   onSetup: (points: number[]) => Promise<void>;
   /** True if changing an existing pattern */
   isChange?: boolean;
+  /** Verify the current pattern before allowing change. Required when isChange is true. */
+  verifyPattern?: (points: number[]) => Promise<boolean>;
 }
 
 const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
   onClose,
   onSetup,
   isChange = false,
+  verifyPattern,
 }) => {
   const { t } = useTranslation();
-  const [step, setStep] = useState<"draw" | "confirm">("draw");
+  const [step, setStep] = useState<"verify" | "draw" | "confirm">(
+    isChange && verifyPattern ? "verify" : "draw",
+  );
   const [firstPattern, setFirstPattern] = useState<number[]>([]);
   const [mismatchError, setMismatchError] = useState(false);
+  const [verifyError, setVerifyError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [resetKey, setResetKey] = useState(0);
+
+  const handleVerifyPattern = useCallback(
+    async (points: number[]) => {
+      if (!verifyPattern) return;
+      setIsLoading(true);
+      const valid = await verifyPattern(points);
+      setIsLoading(false);
+      if (valid) {
+        setStep("draw");
+        setResetKey((k) => k + 1);
+        setVerifyError(false);
+      } else {
+        setVerifyError(true);
+        setTimeout(() => {
+          setVerifyError(false);
+          setResetKey((k) => k + 1);
+        }, 800);
+      }
+    },
+    [verifyPattern],
+  );
 
   const handleFirstPattern = useCallback((points: number[]) => {
     setFirstPattern(points);
@@ -56,6 +83,17 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
     [firstPattern, onSetup, onClose],
   );
 
+  const totalSteps = isChange && verifyPattern ? 3 : 2;
+  const currentStep = step === "verify" ? 1 : step === "draw" ? (totalSteps === 3 ? 2 : 1) : totalSteps;
+
+  const getSubtitle = () => {
+    if (step === "verify")
+      return t("appLock.drawCurrentPattern", "Draw your current pattern");
+    if (step === "draw")
+      return t("appLock.drawNewPattern", "Draw your unlock pattern");
+    return t("appLock.confirmPattern", "Draw it again to confirm");
+  };
+
   return (
     <div className="fixed inset-0 z-[9998] flex items-center justify-center">
       {/* Backdrop */}
@@ -78,10 +116,11 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-500/20 flex items-center justify-center">
-              <Lock
-                size={20}
-                className="text-brand-600 dark:text-brand-400"
-              />
+              {step === "verify" ? (
+                <ShieldAlert size={20} className="text-amber-600 dark:text-amber-400" />
+              ) : (
+                <Lock size={20} className="text-brand-600 dark:text-brand-400" />
+              )}
             </div>
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -90,9 +129,7 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
                   : t("appLock.setupPattern", "Set Up Pattern")}
               </h3>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
-                {step === "draw"
-                  ? t("appLock.drawNewPattern", "Draw your unlock pattern")
-                  : t("appLock.confirmPattern", "Draw it again to confirm")}
+                {getSubtitle()}
               </p>
             </div>
           </div>
@@ -106,19 +143,31 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
 
         {/* Steps indicator */}
         <div className="flex items-center gap-2 px-6 py-4">
-          <div
-            className={`flex-1 h-1 rounded-full transition-colors ${
-              step === "draw" ? "bg-brand-500" : "bg-brand-500"
-            }`}
-          />
-          <div
-            className={`flex-1 h-1 rounded-full transition-colors ${
-              step === "confirm"
-                ? "bg-brand-500"
-                : "bg-slate-200 dark:bg-zinc-700"
-            }`}
-          />
+          {Array.from({ length: totalSteps }, (_, i) => (
+            <div
+              key={i}
+              className={`flex-1 h-1 rounded-full transition-colors ${
+                i < currentStep ? "bg-brand-500" : "bg-slate-200 dark:bg-zinc-700"
+              }`}
+            />
+          ))}
         </div>
+
+        {/* Verify Error */}
+        <AnimatePresence>
+          {verifyError && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mx-6 mb-2 p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl"
+            >
+              <p className="text-xs font-bold text-rose-600 dark:text-rose-400 text-center">
+                {t("appLock.wrongPattern", "Incorrect pattern. Try again.")}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Mismatch Error */}
         <AnimatePresence>
@@ -142,7 +191,22 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
         {/* Pattern Lock */}
         <div className="px-6 pb-8 pt-2 flex justify-center">
           <AnimatePresence mode="wait">
-            {step === "draw" ? (
+            {step === "verify" ? (
+              <motion.div
+                key="verify"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+              >
+                <PatternLock
+                  onComplete={handleVerifyPattern}
+                  error={verifyError}
+                  loading={isLoading}
+                  label={t("appLock.currentPattern", "Current pattern")}
+                  resetKey={resetKey}
+                />
+              </motion.div>
+            ) : step === "draw" ? (
               <motion.div
                 key="draw"
                 initial={{ opacity: 0, x: -20 }}
@@ -195,3 +259,4 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
 };
 
 export default PatternSetupModal;
+

@@ -41,6 +41,8 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
     toggleAutoLockOnBackground,
     lockApp,
     isUnlocked,
+    verifyPin,
+    verifyPattern,
   } = useAppLock();
   const { success, error: toastError } = useToast();
   const { t } = useTranslation();
@@ -449,6 +451,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
             onClose={() => setShowPinSetup(false)}
             onSetup={handlePinSetup}
             isChange={pinIsChange}
+            verifyPin={pinIsChange ? verifyPin : undefined}
           />
         )}
         {showPatternSetup && (
@@ -456,6 +459,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
             onClose={() => setShowPatternSetup(false)}
             onSetup={handlePatternSetup}
             isChange={patternIsChange}
+            verifyPattern={patternIsChange ? verifyPattern : undefined}
           />
         )}
       </AnimatePresence>

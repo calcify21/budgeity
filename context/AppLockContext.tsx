@@ -52,6 +52,10 @@ interface AppLockContextType {
   unlockWithPin: (pin: string) => Promise<boolean>;
   unlockWithPattern: (points: number[]) => Promise<boolean>;
   unlockWithBiometrics: () => Promise<boolean>;
+  /** Verify PIN without unlocking the app (for settings confirmation) */
+  verifyPin: (pin: string) => Promise<boolean>;
+  /** Verify pattern without unlocking the app (for settings confirmation) */
+  verifyPattern: (points: number[]) => Promise<boolean>;
   setupPin: (pin: string) => Promise<void>;
   setupPattern: (points: number[]) => Promise<void>;
   setupBiometrics: () => Promise<boolean>;
@@ -448,6 +452,25 @@ export const AppLockProvider: React.FC<{ children: React.ReactNode }> = ({
     handleSuccessfulUnlock,
   ]);
 
+  // ── Verify-Only (no unlock side-effect) ────────────────────────────
+
+  const verifyPin = useCallback(
+    async (pin: string): Promise<boolean> => {
+      if (!storedData.hashedPin) return false;
+      return verifyHash(pin, storedData.hashedPin);
+    },
+    [storedData.hashedPin],
+  );
+
+  const verifyPattern = useCallback(
+    async (points: number[]): Promise<boolean> => {
+      if (!storedData.hashedPattern) return false;
+      const patternStr = patternToString(points);
+      return verifyHash(patternStr, storedData.hashedPattern);
+    },
+    [storedData.hashedPattern],
+  );
+
   const setupPin = useCallback(
     async (pin: string): Promise<void> => {
       const hashed = await hashValue(pin);
@@ -705,6 +728,8 @@ export const AppLockProvider: React.FC<{ children: React.ReactNode }> = ({
     unlockWithPin,
     unlockWithPattern,
     unlockWithBiometrics,
+    verifyPin,
+    verifyPattern,
     setupPin,
     setupPattern,
     setupBiometrics,
