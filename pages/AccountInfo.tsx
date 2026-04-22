@@ -80,13 +80,14 @@ const providerIcon = (providerId: string) => {
 };
 
 const AccountInfo: React.FC = () => {
-  const { user, deleteAccount } = useAuth();
+  const { user, deleteAccount, logout } = useAuth();
   const { deleteCurrentUserData } = useData();
   const { success, error } = useToast();
   const { t } = useTranslation();
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showEditName, setShowEditName] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [showFinalStepModal, setShowFinalStepModal] = useState(false);
   const [isChangePhotoOpen, setIsChangePhotoOpen] = useState(false);
   const [showFullPhoto, setShowFullPhoto] = useState(false);
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
@@ -97,14 +98,17 @@ const AccountInfo: React.FC = () => {
 
   const handleDeleteAccount = async () => {
     try {
-      // 1. Delete Firestore Data
+      // 1. Delete Firestore data first (requires valid auth token)
       await deleteCurrentUserData();
       // 2. Delete Auth Account
       await deleteAccount();
       success("Account deleted successfully.");
     } catch (err: any) {
-      if (err.message.includes("log out")) {
-        error(err.message);
+      if (err.message.includes("log out") || err.message.includes("recent-login")) {
+        // Auth deletion failed (requires-recent-login) but Firestore data
+        // is already gone. Prompt user to complete the final step by logging out and back in.
+        setShowDeleteAccount(false);
+        setShowFinalStepModal(true);
       } else {
         error("Failed to delete account: " + err.message);
       }
@@ -273,6 +277,23 @@ const AccountInfo: React.FC = () => {
         checkboxLabel="I understand that this action will permanently delete my account and data."
         verificationText="DELETE"
       />
+
+      <ConfirmModal
+        isOpen={showFinalStepModal}
+        onClose={() => setShowFinalStepModal(false)}
+        onConfirm={async () => {
+          setShowFinalStepModal(false);
+          try {
+            await logout();
+          } catch {}
+        }}
+        title="Final Step Required"
+        message="Your data has been successfully deleted. However, for your security, Firebase requires a recent login to delete your account credentials. Please log out, log back in, and click 'Delete Account' one last time to fully remove your account."
+        confirmText="Acknowledge & Logout"
+        isDestructive
+        showCheckbox={false}
+      />
+
       <ChangePhotoModal
         isOpen={isChangePhotoOpen}
         onClose={() => setIsChangePhotoOpen(false)}

@@ -402,13 +402,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       const result = await signInWithPopup(auth, provider);
 
-      console.log(
-        "Social Login Result:",
-        result.user,
-        "Verified:",
-        result.user.emailVerified,
-      );
-
       // Sync photoURL if missing or invalid but available in providerData
       const currentPhoto = result.user.photoURL;
       const isPhotoInvalid =

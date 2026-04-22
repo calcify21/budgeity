@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import {
   AppState,
   Budget,
@@ -208,6 +208,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   >("online");
   const { success: toastSuccess, error: toastError } = useToast();
   const [isRetrying, setIsRetrying] = useState(false);
+  const isDeletingAccountRef = useRef(false);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -290,7 +291,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
                 );
                 setIsOnboarding(false);
               } else {
-                if (activeWorkspace.type === "personal") {
+                // Don't trigger onboarding if we're in the middle of deleting the account
+                if (isDeletingAccountRef.current) {
+                  setIsOnboarding(false);
+                } else if (activeWorkspace.type === "personal") {
                   setIsOnboarding(true);
                 } else {
                   setState(INITIAL_STATE);
@@ -1619,11 +1623,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const deleteCurrentUserData = async () => {
     if (!user || !user.uid) return;
     try {
+      // Signal that we're deleting the account so the onSnapshot listener
+      // doesn't trigger the onboarding wizard when the doc disappears.
+      isDeletingAccountRef.current = true;
       await deleteDoc(doc(db, "users", user.uid));
-      // Reset local state
-      setState(INITIAL_STATE);
-      localStorage.removeItem(STORAGE_KEY);
+      // Don't reset local state here — the subsequent auth deletion + signout
+      // will take care of clearing everything.
     } catch (e) {
+      isDeletingAccountRef.current = false;
       console.error("Failed to delete user data:", e);
       throw new Error("Failed to delete your data from the server.");
     }
