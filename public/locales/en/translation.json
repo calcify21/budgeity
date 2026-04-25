@@ -82,7 +82,15 @@
     "soon": "Soon",
     "personal": "Personal",
     "members": "members",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "menu": "Menu",
+    "editing": "Editing",
+    "nav_customize_desc": "Drag items to pin them to your nav bar.",
+    "nav_menu_desc": "Navigate Budgeity faster.",
+    "pinned_reorder": "Pinned (Drag to Reorder)",
+    "more_items": "More Items",
+    "no_results": "No results found.",
+    "max_items": "(Max {{count}})"
   },
   "dashboard": {
     "title": "Dashboard",

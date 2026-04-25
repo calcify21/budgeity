@@ -26,7 +26,7 @@ export const RecentTransactionsWidget: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <h3 className="font-bold flex items-center gap-2">
           <Activity className="text-brand-500" size={18} />{" "}
-          {t("dashboard.recent_transactions", "Recent Transactions")}
+          {t("dashboard.recent_transactions")}
         </h3>
         <button
           onClick={() => navigate("/transactions")}
@@ -38,7 +38,7 @@ export const RecentTransactionsWidget: React.FC = () => {
 
       {recentTransactions.length === 0 ? (
         <div className="text-center text-slate-400 py-6 text-sm flex-1 flex items-center justify-center">
-          {t("dashboard.no_transactions", "No recent transactions")}
+          {t("dashboard.no_transactions")}
         </div>
       ) : (
         <div className="space-y-3 flex-1 overflow-y-auto custom-scrollbar pr-2">

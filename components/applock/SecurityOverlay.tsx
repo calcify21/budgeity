@@ -143,9 +143,9 @@ const SecurityOverlay: React.FC = () => {
   };
 
   const tabLabels: Record<UnlockTab, string> = {
-    pin: t("appLock.pin", "PIN"),
-    pattern: t("appLock.pattern", "Pattern"),
-    biometrics: t("appLock.biometrics", "Biometrics"),
+    pin: t("appLock.pin"),
+    pattern: t("appLock.pattern"),
+    biometrics: t("appLock.biometrics"),
   };
 
   return (
@@ -174,7 +174,7 @@ const SecurityOverlay: React.FC = () => {
             Budgeity
           </h1>
           <p className="text-[10px] text-white/50 font-bold uppercase tracking-[0.2em]">
-            {t("appLock.unlockPrompt", "Authentication Required")}
+            {t("appLock.unlockPrompt")}
           </p>
         </div>
 
@@ -208,7 +208,7 @@ const SecurityOverlay: React.FC = () => {
               className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-white/50 hover:text-rose-400 transition-all active:scale-95 group font-bold text-[11px] uppercase tracking-wider"
             >
               <LogOutIconAnimated size={16} className="transition-transform" />
-              <span>{t("common.logout", "Logout")}</span>
+              <span>{t("common.logout")}</span>
             </button>
           </div>
         </div>
@@ -281,7 +281,7 @@ const SecurityOverlay: React.FC = () => {
                     onComplete={handlePinComplete}
                     error={pinError}
                     loading={isCoolingDown}
-                    label={t("appLock.enterPin", "Enter your PIN")}
+                    label={t("appLock.enterPin")}
                     resetKey={pinResetKey}
                     isOverlay
                   />
@@ -329,7 +329,7 @@ const SecurityOverlay: React.FC = () => {
                     />
                   </button>
                   <p className="text-sm font-semibold text-white/60">
-                    {t("appLock.touchToUnlock", "Touch to unlock")}
+                    {t("appLock.touchToUnlock")}
                   </p>
                 </motion.div>
               )}
@@ -344,7 +344,7 @@ const SecurityOverlay: React.FC = () => {
               onClick={() => setShowForgotConfirm(true)}
               className="text-sm font-bold text-white/30 hover:text-white/50 transition-colors"
             >
-              {t("appLock.forgotLock", "Forgot Lock?")}
+              {t("appLock.forgotLock")}
             </button>
           ) : (
             <motion.div
@@ -355,7 +355,7 @@ const SecurityOverlay: React.FC = () => {
               <div className="flex items-center justify-center gap-2 mb-2">
                 <LogOutIconAnimated size={16} className="text-rose-400" />
                 <p className="text-sm font-bold text-rose-300">
-                  {t("appLock.resetWarningTitle", "Reset App Lock?")}
+                  {t("appLock.resetWarningTitle")}
                 </p>
               </div>
               <p className="text-xs text-rose-300/70 mb-4">
@@ -369,7 +369,7 @@ const SecurityOverlay: React.FC = () => {
                   onClick={() => setShowForgotConfirm(false)}
                   className="flex-1 py-2 text-xs font-bold text-white/50 hover:text-white/70 bg-white/5 rounded-xl transition-colors"
                 >
-                  {t("common.cancel", "Cancel")}
+                  {t("common.cancel")}
                 </button>
                 <button
                   onClick={handleForgotLock}
@@ -377,8 +377,8 @@ const SecurityOverlay: React.FC = () => {
                   className="flex-1 py-2 text-xs font-bold text-white bg-rose-500 hover:bg-rose-600 rounded-xl transition-colors disabled:opacity-50"
                 >
                   {isResetting
-                    ? t("common.loading", "Loading...")
-                    : t("appLock.resetConfirm", "Reset & Logout")}
+                    ? t("common.loading")
+                    : t("appLock.resetConfirm")}
                 </button>
               </div>
             </motion.div>

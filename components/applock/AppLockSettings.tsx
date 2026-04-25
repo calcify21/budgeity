@@ -56,7 +56,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
     if (isLockEnabled) {
       // Disabling — confirm
       await updatePreferences({ enabled: false });
-      success(t("appLock.disabled", "App Lock disabled"));
+      success(t("appLock.disabled"));
     } else {
       // Enabling — check if any method is configured
       if (
@@ -65,11 +65,11 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
         preferences.configured.biometrics
       ) {
         await updatePreferences({ enabled: true });
-        success(t("appLock.enabled", "App Lock enabled"));
+        success(t("appLock.enabled"));
       } else {
         // No method configured — show setup
         toastError(
-          t("appLock.noMethodConfigured", "Please set up at least one lock method first"),
+          t("appLock.noMethodConfigured"),
         );
       }
     }
@@ -79,8 +79,8 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
     await setupPin(pin);
     success(
       pinIsChange
-        ? t("appLock.pinChanged", "PIN changed successfully")
-        : t("appLock.pinSet", "PIN set up successfully"),
+        ? t("appLock.pinChanged")
+        : t("appLock.pinSet"),
     );
   };
 
@@ -88,17 +88,17 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
     await setupPattern(points);
     success(
       patternIsChange
-        ? t("appLock.patternChanged", "Pattern changed successfully")
-        : t("appLock.patternSet", "Pattern set up successfully"),
+        ? t("appLock.patternChanged")
+        : t("appLock.patternSet"),
     );
   };
 
   const handleBiometricSetup = async () => {
     const result = await setupBiometrics();
     if (result) {
-      success(t("appLock.biometricsSet", "Biometrics registered successfully"));
+      success(t("appLock.biometricsSet"));
     } else {
-      toastError(t("appLock.biometricsFailed", "Biometric setup failed"));
+      toastError(t("appLock.biometricsFailed"));
     }
   };
 
@@ -112,9 +112,9 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
   };
 
   const timingOptions: { value: AutoLockTiming; label: string }[] = [
-    { value: "30s", label: t("appLock.timing30s", "30 seconds") },
-    { value: "1min", label: t("appLock.timing1min", "1 minute") },
-    { value: "5min", label: t("appLock.timing5min", "5 minutes") },
+    { value: "30s", label: t("appLock.timing30s") },
+    { value: "1min", label: t("appLock.timing1min") },
+    { value: "5min", label: t("appLock.timing5min") },
   ];
 
   return (
@@ -123,7 +123,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
         {!embeddedMode && (
           <h3 className="text-xl font-bold flex items-center gap-2">
             <Shield className="text-brand-500" size={24} />
-            {t("appLock.title", "App Lock")}
+            {t("appLock.title")}
           </h3>
         )}
 
@@ -135,10 +135,10 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
             </div>
             <div>
               <div className="font-bold text-lg">
-                {t("appLock.enable", "Enable App Lock")}
+                {t("appLock.enable")}
               </div>
               <div className="text-sm text-slate-500">
-                {t("appLock.enableDesc", "Add a second layer of security")}
+                {t("appLock.enableDesc")}
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
         {/* Lock Methods */}
         <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 space-y-5">
           <h4 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-            {t("appLock.methods", "Unlock Methods")}
+            {t("appLock.methods")}
           </h4>
 
           {/* PIN */}
@@ -172,12 +172,12 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
               </div>
               <div>
                 <div className="font-bold">
-                  {t("appLock.pin", "PIN")}
+                  {t("appLock.pin")}
                 </div>
                 <div className="text-xs text-slate-500 dark:text-zinc-400">
                   {preferences.configured.pin
-                    ? t("appLock.configured", "Configured ✓")
-                    : t("appLock.notConfigured", "Not set up")}
+                    ? t("appLock.configured")
+                    : t("appLock.notConfigured")}
                 </div>
               </div>
             </div>
@@ -199,8 +199,8 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                 className="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-zinc-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-slate-700 dark:text-zinc-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors"
               >
                 {preferences.configured.pin
-                  ? t("appLock.change", "Change")
-                  : t("appLock.setup", "Set Up")}
+                  ? t("appLock.change")
+                  : t("appLock.setup")}
               </button>
             </div>
           </div>
@@ -213,12 +213,12 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
               </div>
               <div>
                 <div className="font-bold">
-                  {t("appLock.pattern", "Pattern")}
+                  {t("appLock.pattern")}
                 </div>
                 <div className="text-xs text-slate-500 dark:text-zinc-400">
                   {preferences.configured.pattern
-                    ? t("appLock.configured", "Configured ✓")
-                    : t("appLock.notConfigured", "Not set up")}
+                    ? t("appLock.configured")
+                    : t("appLock.notConfigured")}
                 </div>
               </div>
             </div>
@@ -240,8 +240,8 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                 className="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-zinc-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-slate-700 dark:text-zinc-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors"
               >
                 {preferences.configured.pattern
-                  ? t("appLock.change", "Change")
-                  : t("appLock.setup", "Set Up")}
+                  ? t("appLock.change")
+                  : t("appLock.setup")}
               </button>
             </div>
           </div>
@@ -262,7 +262,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                 <div
                   className={`font-bold ${!isBiometricsAvailable ? "text-slate-400 dark:text-zinc-500" : ""}`}
                 >
-                  {t("appLock.biometrics", "Biometrics")}
+                  {t("appLock.biometrics")}
                 </div>
                 <div className="text-xs text-slate-500 dark:text-zinc-400">
                   {!isBiometricsAvailable
@@ -271,8 +271,8 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                         "Not available on this device",
                       )
                     : preferences.configured.biometrics
-                      ? t("appLock.configured", "Configured ✓")
-                      : t("appLock.notConfigured", "Not set up")}
+                      ? t("appLock.configured")
+                      : t("appLock.notConfigured")}
                 </div>
               </div>
             </div>
@@ -292,7 +292,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                     onClick={handleBiometricSetup}
                     className="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-zinc-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-slate-700 dark:text-zinc-300 hover:text-brand-600 dark:hover:text-brand-400 rounded-xl transition-colors"
                   >
-                    {t("appLock.register", "Register")}
+                    {t("appLock.register")}
                   </button>
                 )}
               </div>
@@ -328,7 +328,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
         {isLockEnabled && (
           <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 space-y-5">
             <h4 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-              {t("appLock.autoLock", "Auto-Lock Behaviour")}
+              {t("appLock.autoLock")}
             </h4>
 
             {/* Lock on App Open */}
@@ -339,7 +339,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                 </div>
                 <div>
                   <div className="font-bold text-sm">
-                    {t("appLock.lockOnOpen", "Lock on app open")}
+                    {t("appLock.lockOnOpen")}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-zinc-400">
                     {t(
@@ -375,7 +375,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                 </div>
                 <div>
                   <div className="font-bold text-sm">
-                    {t("appLock.lockOnBg", "Lock on background")}
+                    {t("appLock.lockOnBg")}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-zinc-400">
                     {t(
@@ -424,7 +424,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
                   setAutoLockTiming(val as AutoLockTiming)
                 }
                 options={timingOptions}
-                placeholder={t("appLock.selectTimeout", "Select Timeout")}
+                placeholder={t("appLock.selectTimeout")}
               />
             </div>
           </div>
@@ -438,7 +438,7 @@ const AppLockSettings: React.FC<AppLockSettingsProps> = ({ embeddedMode = false 
               className="w-full flex items-center justify-center gap-3 py-3.5 bg-slate-900 dark:bg-white dark:text-black text-white font-bold rounded-2xl hover:bg-slate-800 dark:hover:bg-zinc-100 transition-colors shadow-md"
             >
               <LockKeyhole size={18} />
-              {t("appLock.lockNow", "Lock App Now")}
+              {t("appLock.lockNow")}
             </button>
           </div>
         )}

@@ -77,7 +77,11 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
               : "bg-slate-100 dark:bg-white/5 text-slate-400",
           )}
         >
-          {isPinned ? <PinOff size={20} strokeWidth={2} /> : <Plus size={22} strokeWidth={2.5} />}
+          {isPinned ? (
+            <PinOff size={20} strokeWidth={2} />
+          ) : (
+            <Plus size={22} strokeWidth={2.5} />
+          )}
         </button>
       )}
 
@@ -85,8 +89,8 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
         <div
           className={cn(
             "flex-1 flex items-center justify-between p-3 rounded-2xl transition-all group border border-transparent shadow-sm",
-            "text-slate-600 dark:text-zinc-400 bg-white/50 dark:bg-zinc-800/50 backdrop-blur-sm",
-            isPinned && "border-brand-500/20 bg-brand-50/30 dark:bg-brand-500/5"
+            "text-slate-600 dark:text-zinc-400 bg-slate-50 dark:bg-zinc-800/80",
+            isPinned && "border-brand-500/20 bg-brand-50 dark:bg-brand-950/50",
           )}
         >
           <div className="flex items-center gap-4">
@@ -140,13 +144,16 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
                   : "bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-slate-400 group-hover:bg-brand-50 dark:group-hover:bg-brand-500/20 group-hover:text-brand-500",
               )}
             >
-              <Icon
-                size={22}
-                strokeWidth={isActive ? 2.5 : 1.5}
-                fill="none"
-              />
+              <Icon size={22} strokeWidth={isActive ? 2.5 : 1.5} fill="none" />
             </div>
-            <span className={cn("text-[16px] tracking-tight", isActive ? "font-bold text-brand-700 dark:text-brand-300" : "font-medium group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors")}>
+            <span
+              className={cn(
+                "text-[16px] tracking-tight",
+                isActive
+                  ? "font-bold text-brand-700 dark:text-brand-300"
+                  : "font-medium group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors",
+              )}
+            >
               {item.label}
             </span>
           </div>
@@ -171,7 +178,15 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
     );
   }
 
-  return <motion.div variants={itemVariants} className="w-full">{content}</motion.div>;
+  if (isCustomizing) {
+    return <div className="w-full">{content}</div>;
+  }
+
+  return (
+    <motion.div variants={itemVariants} className="w-full">
+      {content}
+    </motion.div>
+  );
 };
 
 interface NavMoreSheetProps {
@@ -214,44 +229,56 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
 
-  const navLinks = [
-    { to: "/dashboard", icon: LayoutDashboard, label: t("common.dashboard") },
-    { to: "/analytics", icon: BarChart3, label: t("common.analytics") },
-    { to: "/analytics-v2", icon: BarChart3, label: t("common.analytics_v2") },
-    {
-      to: "/transactions",
-      icon: ArrowRightLeft,
-      label: t("common.transactions"),
-    },
-    { to: "/recurring", icon: Repeat, label: t("common.recurring") },
-    { to: "/wallets", icon: Wallet, label: t("common.wallets") },
-    { to: "/goals", icon: Target, label: t("common.goals") },
-    { to: "/budgets", icon: PiggyBank, label: t("common.budgets") },
-    {
-      to: "/shopping-list",
-      icon: ShoppingCart,
-      label: t("common.shopping_list"),
-    },
-    { to: "/categories", icon: Tags, label: t("common.categories") },
-    { to: "/export", icon: Download, label: t("common.export") },
-    { to: "/reports", icon: FileBarChart2, label: "Reports" },
-    { to: "/settings", icon: Settings, label: t("common.settings") },
-    { to: "/account-info", icon: UserCircle, label: t("common.account_info") },
-    { to: "/whats-new", icon: Sparkles, label: t("common.whats_new") },
-  ];
-
   const { activeWorkspace } = useHousehold();
-  if (activeWorkspace.type === "household") {
-    navLinks.push({
-      to: "/household-settings",
-      icon: Home,
-      label: "Household Settings",
-    });
-  }
+  const navLinks = React.useMemo(() => {
+    const links = [
+      { to: "/dashboard", icon: LayoutDashboard, label: t("common.dashboard") },
+      { to: "/analytics", icon: BarChart3, label: t("common.analytics") },
+      { to: "/analytics-v2", icon: BarChart3, label: t("common.analytics_v2") },
+      {
+        to: "/transactions",
+        icon: ArrowRightLeft,
+        label: t("common.transactions"),
+      },
+      { to: "/recurring", icon: Repeat, label: t("common.recurring") },
+      { to: "/wallets", icon: Wallet, label: t("common.wallets") },
+      { to: "/goals", icon: Target, label: t("common.goals") },
+      { to: "/budgets", icon: PiggyBank, label: t("common.budgets") },
+      {
+        to: "/shopping-list",
+        icon: ShoppingCart,
+        label: t("common.shopping_list"),
+      },
+      { to: "/categories", icon: Tags, label: t("common.categories") },
+      { to: "/export", icon: Download, label: t("common.export") },
+      { to: "/reports", icon: FileBarChart2, label: "Reports" },
+      { to: "/settings", icon: Settings, label: t("common.settings") },
+      {
+        to: "/account-info",
+        icon: UserCircle,
+        label: t("common.account_info"),
+      },
+      { to: "/whats-new", icon: Sparkles, label: t("common.whats_new") },
+    ];
 
-  if (userEmail === "jainshr21@gmail.com") {
-    navLinks.push({ to: "/admin/feedback", icon: Shield, label: t("common.user_feedback") });
-  }
+    if (activeWorkspace.type === "household") {
+      links.push({
+        to: "/household-settings",
+        icon: Home,
+        label: "Household Settings",
+      });
+    }
+
+    if (userEmail === "jainshr21@gmail.com") {
+      links.push({
+        to: "/admin/feedback",
+        icon: Shield,
+        label: t("common.user_feedback"),
+      });
+    }
+
+    return links;
+  }, [t, userEmail, activeWorkspace.type]);
 
   const rawPinnedIds = isTablet
     ? navPreferences?.tabletPinned || [
@@ -349,11 +376,15 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 
   // Regular filtered links
   const visibleLinks = navLinks.filter(
-    (link) => !searchQuery || link.label.toLowerCase().includes(searchQuery.toLowerCase())
+    (link) =>
+      !searchQuery ||
+      link.label.toLowerCase().includes(searchQuery.toLowerCase()),
   );
-  
+
   const searchResults = searchQuery
-    ? navLinks.filter((link) => link.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    ? navLinks.filter((link) =>
+        link.label.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
     : [];
 
   const actions = [
@@ -386,17 +417,17 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.05,
+        staggerChildren: 0.02, // Reduced from 0.05 for faster feel
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 15 },
+    hidden: { opacity: 0, y: 10 }, // Reduced y offset
     show: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", damping: 20, stiffness: 200 },
+      transition: { type: "spring", damping: 25, stiffness: 300 }, // Faster spring
     },
   };
 
@@ -409,7 +440,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
+            className="fixed inset-0 bg-black/40 z-[60]" // Removed backdrop-blur-md from backdrop
             onClick={onClose}
           />
 
@@ -419,8 +450,8 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
-            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] rounded-t-[2.5rem] z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_-10px_40px_rgba(0,0,0,0.5)] border-t border-slate-200 dark:border-white/5 pb-[env(safe-area-inset-bottom,24px)] overflow-hidden"
+            transition={{ type: "spring", damping: 30, stiffness: 350 }} // Snappier entry
+            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] rounded-t-[2.5rem] z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-200 dark:border-white/5 pb-[env(safe-area-inset-bottom,24px)] overflow-hidden will-change-transform"
           >
             {/* Handle */}
             <div className="flex justify-center pt-4 pb-2">
@@ -431,7 +462,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <h2 className="text-[22px] font-extrabold text-slate-900 dark:text-white tracking-tight">
-                    {isCustomizing ? "Customize Nav" : "Menu"}
+                    {t("common.menu")}
                   </h2>
                   {isCustomizing && (
                     <motion.div
@@ -439,14 +470,14 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                       animate={{ scale: 1 }}
                       className="px-2 py-0.5 bg-brand-500 text-white text-[10px] font-black uppercase rounded-full"
                     >
-                      Editing
+                      {t("common.editing")}
                     </motion.div>
                   )}
                 </div>
                 <p className="text-[12px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                   {isCustomizing
-                    ? "Drag items to pin them to your nav bar."
-                    : "Navigate Budgeity faster."}
+                    ? t("common.nav_customize_desc")
+                    : t("common.nav_menu_desc")}
                 </p>
               </div>
 
@@ -461,7 +492,11 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                   )}
                   aria-label={isCustomizing ? "Done" : "Edit Nav"}
                 >
-                  {isCustomizing ? <Check size={18} strokeWidth={2.5} /> : <Edit2 size={16} />}
+                  {isCustomizing ? (
+                    <Check size={18} strokeWidth={2.5} />
+                  ) : (
+                    <Edit2 size={16} />
+                  )}
                 </button>
                 <button
                   onClick={onClose}
@@ -473,21 +508,19 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
             </div>
 
             <div className="px-4 pb-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                className="grid grid-cols-1 gap-2"
-              >
+              <div className="grid grid-cols-1 gap-2">
                 <div className="space-y-4">
                   {/* Search Bar */}
                   {!isCustomizing && (
                     <div className="mb-2 px-2">
                       <div className="relative group">
-                        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors" />
+                        <Search
+                          size={18}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors"
+                        />
                         <input
                           type="text"
-                          placeholder={t("common.search", "Search...")}
+                          placeholder={t("common.search")}
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="w-full pl-11 pr-4 py-3 bg-slate-100 dark:bg-white/5 rounded-2xl text-[15px] focus:outline-none focus:ring-2 focus:ring-brand-500/30 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium"
@@ -497,10 +530,12 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                   )}
 
                   {searchQuery ? (
-                     <div className="space-y-1">
+                    <div className="space-y-1">
                       {searchResults.length === 0 ? (
                         <div className="text-center py-6 px-4">
-                          <p className="text-sm text-slate-500 dark:text-zinc-500">No results found.</p>
+                          <p className="text-sm text-slate-500 dark:text-zinc-500">
+                            {t("common.no_results")}
+                          </p>
                         </div>
                       ) : (
                         searchResults.map((item) => (
@@ -513,11 +548,11 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                       )}
                     </div>
                   ) : isCustomizing ? (
-                    <>
+                    <div className="space-y-6">
                       {/* Pinned Section */}
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-4">
-                          Pinned (Drag to Reorder){" "}
+                          {t("common.pinned_reorder")}{" "}
                           {isTablet
                             ? `(${displayPinnedIds.length}/6)`
                             : `(${displayPinnedIds.length}/3)`}
@@ -541,9 +576,12 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                       </div>
 
                       {/* Unpinned Section */}
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-400 px-4">
-                          More Items {isTablet ? "(Max 6)" : "(Max 3)"}
+                          {t("common.more_items")}{" "}
+                          {isTablet
+                            ? t("common.max_items", { count: 6 })
+                            : t("common.max_items", { count: 3 })}
                         </h3>
                         <div className="space-y-1">
                           {unpinnedLinks.map((item) => (
@@ -557,9 +595,14 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                           ))}
                         </div>
                       </div>
-                    </>
+                    </div>
                   ) : (
-                    <div className="space-y-1">
+                    <motion.div
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="show"
+                      className="space-y-1"
+                    >
                       {visibleLinks.map((item) => (
                         <ReorderItemPin
                           key={item.to}
@@ -567,7 +610,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                           itemVariants={itemVariants}
                         />
                       ))}
-                    </div>
+                    </motion.div>
                   )}
                 </div>
 
@@ -579,7 +622,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                   {actions.map((action) => {
                     const Icon = action.icon;
                     return (
-                      <motion.div key={action.id} variants={itemVariants}>
+                      <div key={action.id}>
                         <button
                           onClick={() => {
                             action.onClick();
@@ -610,11 +653,11 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                             />
                           )}
                         </button>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>
-              </motion.div>
+              </div>
             </div>
           </motion.div>
         </>

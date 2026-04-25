@@ -11,49 +11,49 @@ export const QuickActionsWidget: React.FC = () => {
 
   const actions = [
     {
-      label: t("common.add_expense", "Add Expense"),
+      label: t("common.add_expense"),
       icon: <Minus size={20} />,
       color: "bg-rose-500 text-white",
       onClick: () => navigate("?add=expense"),
     },
     {
-      label: t("common.add_income", "Add Income"),
+      label: t("common.add_income"),
       icon: <Plus size={20} />,
       color: "bg-emerald-500 text-white",
       onClick: () => navigate("?add=income"),
     },
     {
-      label: t("common.add_transfer", "Add Transfer"),
+      label: t("common.add_transfer"),
       icon: <ArrowRightLeft size={20} />,
       color: "bg-indigo-500 text-white",
       onClick: () => navigate("?add=transfer"),
     },
     {
-      label: t("common.new_goal", "New Goal"),
+      label: t("common.new_goal"),
       icon: <Target size={20} />,
       color: "bg-amber-500 text-white",
       onClick: () => navigate("/goals?add=true"),
     },
     {
-      label: t("common.new_budget", "New Budget"),
+      label: t("common.new_budget"),
       icon: <PiggyBank size={20} />,
       color: "bg-sky-500 text-white",
       onClick: () => navigate("/budgets?add=true"),
     },
     {
-      label: t("common.shopping_list", "Shopping List"),
+      label: t("common.shopping_list"),
       icon: <ShoppingCart size={20} />,
       color: "bg-teal-500 text-white",
       onClick: () => navigate("/shopping-list?add=item"),
     },
     {
-      label: t("categories.addCategory", "New Category"),
+      label: t("categories.addCategory"),
       icon: <Tags size={20} />,
       color: "bg-fuchsia-500 text-white",
       onClick: () => navigate("/categories?add=true"),
     },
     {
-      label: t("recurring.addRule", "Recurring Rule"),
+      label: t("recurring.addRule"),
       icon: <Repeat size={20} />,
       color: "bg-blue-500 text-white",
       onClick: () => navigate("/recurring?add=true"),
@@ -62,7 +62,7 @@ export const QuickActionsWidget: React.FC = () => {
     ...(isLockEnabled && isUnlocked
       ? [
           {
-            label: t("appLock.lockNow", "Lock App"),
+            label: t("appLock.lockNow"),
             icon: <LockKeyhole size={20} />,
             color: "bg-slate-800 dark:bg-zinc-200 text-white dark:text-black",
             onClick: () => lockApp(),
@@ -75,7 +75,7 @@ export const QuickActionsWidget: React.FC = () => {
     <div className="glass-card rounded-[2rem] p-6 h-full flex flex-col cursor-default">
       <h3 className="font-bold flex items-center gap-2 mb-6">
         <Zap className="text-brand-500" size={18} />{" "}
-        {t("dashboard.quick_actions", "Quick Actions")}
+        {t("dashboard.quick_actions")}
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1">
         {actions.map((action, idx) => (

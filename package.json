@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "dev:emu": "concurrently \"npm run emu\" \"npm run dev\" --kill-others",
-    "emu": "powershell -Command \"Get-NetTCPConnection -LocalPort 8085 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; firebase emulators:start --import=./emulator-data --export-on-exit\"",
+    "emu": "node -e \"const cp=require('child_process'); try { const pid=cp.execSync('lsof -t -i:8085').toString().trim(); if(pid) process.kill(pid, 'SIGKILL'); } catch(e) {} try { const out=cp.execSync('netstat -ano | findstr :8085').toString(); const lines=out.split('\\n'); lines.forEach(l => { const m=l.trim().match(/\\s+(\\d+)$/); if(m) process.kill(m[1], 'SIGKILL'); }); } catch(e) {}\" && firebase emulators:start --import=./emulator-data --export-on-exit",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "build": "tsc && vite build",

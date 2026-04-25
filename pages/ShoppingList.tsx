@@ -192,7 +192,7 @@ const ShoppingList: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <ShoppingCart className="text-brand-600" />{" "}
-            {t("common.shoppingList")}
+            {t("common.shopping_list")}
           </h2>
           <p className="text-sm text-slate-500">
             {t("shoppingList.planPurchases")}

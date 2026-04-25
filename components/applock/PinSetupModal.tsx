@@ -84,10 +84,10 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
 
   const getSubtitle = () => {
     if (step === "verify")
-      return t("appLock.enterCurrentPin", "Enter your current PIN");
+      return t("appLock.enterCurrentPin");
     if (step === "enter")
-      return t("appLock.enterNewPin", "Enter a 4-digit PIN");
-    return t("appLock.confirmPin", "Confirm your PIN");
+      return t("appLock.enterNewPin");
+    return t("appLock.confirmPin");
   };
 
   return (
@@ -121,8 +121,8 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                 {isChange
-                  ? t("appLock.changePin", "Change PIN")
-                  : t("appLock.setupPin", "Set Up PIN")}
+                  ? t("appLock.changePin")
+                  : t("appLock.setupPin")}
               </h3>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
                 {getSubtitle()}
@@ -159,7 +159,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
               className="mx-6 mb-2 p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl"
             >
               <p className="text-xs font-bold text-rose-600 dark:text-rose-400 text-center">
-                {t("appLock.wrongPin", "Incorrect PIN. Try again.")}
+                {t("appLock.wrongPin")}
               </p>
             </motion.div>
           )}
@@ -175,7 +175,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
               className="mx-6 mb-2 p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl"
             >
               <p className="text-xs font-bold text-rose-600 dark:text-rose-400 text-center">
-                {t("appLock.pinMismatch", "PINs don't match. Try again.")}
+                {t("appLock.pinMismatch")}
               </p>
             </motion.div>
           )}
@@ -195,7 +195,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
                   onComplete={handleVerifyPin}
                   error={verifyError}
                   loading={isLoading}
-                  label={t("appLock.currentPin", "Current PIN")}
+                  label={t("appLock.currentPin")}
                   resetKey={resetKey}
                 />
               </motion.div>
@@ -208,7 +208,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
               >
                 <PinInput
                   onComplete={handleFirstPin}
-                  label={t("appLock.choosePin", "Choose your PIN")}
+                  label={t("appLock.choosePin")}
                   resetKey={resetKey}
                 />
               </motion.div>
@@ -223,7 +223,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
                   onComplete={handleConfirmPin}
                   error={mismatchError}
                   loading={isLoading}
-                  label={t("appLock.reEnterPin", "Re-enter your PIN")}
+                  label={t("appLock.reEnterPin")}
                   resetKey={resetKey}
                 />
               </motion.div>
@@ -242,7 +242,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
               }}
               className="w-full py-3 text-sm font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 transition-colors"
             >
-              ← {t("appLock.goBack", "Go back")}
+              ← {t("appLock.goBack")}
             </button>
           </div>
         )}

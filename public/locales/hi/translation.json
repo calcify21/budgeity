@@ -83,7 +83,15 @@
     "soon": "जल्द",
     "personal": "व्यक्तिगत",
     "members": "सदस्य",
-    "unknown": "अज्ञात"
+    "unknown": "अज्ञात",
+    "menu": "मेन्यू",
+    "editing": "संपादन",
+    "nav_customize_desc": "अपनी नेविगेशन बार में पिन करने के लिए आइटम को खींचें।",
+    "nav_menu_desc": "Budgeity को तेज़ी से नेविगेट करें।",
+    "pinned_reorder": "पिन किया गया (पुन: व्यवस्थित करने के लिए खींचें)",
+    "more_items": "अधिक आइटम",
+    "no_results": "कोई परिणाम नहीं मिला।",
+    "max_items": "(अधिकतम {{count}})"
   },
   "dashboard": {
     "title": "डैशबोर्ड",

@@ -82,7 +82,15 @@
     "soon": "Bientôt",
     "personal": "Personnel",
     "members": "membres",
-    "unknown": "Inconnu"
+    "unknown": "Inconnu",
+    "menu": "Menu",
+    "editing": "Modification",
+    "nav_customize_desc": "Faites glisser les éléments pour les épingler à votre barre de navigation.",
+    "nav_menu_desc": "Naviguez plus rapidement dans Budgeity.",
+    "pinned_reorder": "Épinglé (Glisser pour réorganiser)",
+    "more_items": "Plus d'éléments",
+    "no_results": "Aucun résultat trouvé.",
+    "max_items": "(Max {{count}})"
   },
   "dashboard": {
     "title": "Tableau de Bord",

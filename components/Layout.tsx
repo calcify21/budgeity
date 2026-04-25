@@ -410,7 +410,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             />
             <input
               type="text"
-              placeholder={t("common.search", "Search...")}
+              placeholder={t("common.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 border border-transparent dark:border-white/5 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 transition-all"
@@ -1084,7 +1084,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               >
                 <LockKeyhole size={16} strokeWidth={2.5} />
                 <span className="hidden sm:inline">
-                  {t("appLock.lockNow", "Lock App")}
+                  {t("appLock.lockNow")}
                 </span>
               </button>
             )}

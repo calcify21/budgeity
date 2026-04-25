@@ -186,11 +186,11 @@ const Settings: React.FC = () => {
   const numberSystemOptions = [
     {
       value: "AUTO",
-      label: "Auto (Based on Currency)",
-      subLabel: "Recommended",
+      label: t("settingsPage.autoSystem"),
+      subLabel: t("settingsPage.recommended"),
     },
-    { value: "IN", label: "Indian System", subLabel: "12,34,567.89" },
-    { value: "INTL", label: "International System", subLabel: "1,234,567.89" },
+    { value: "IN", label: t("settingsPage.indianSystem"), subLabel: t("settingsPage.indianExample") },
+    { value: "INTL", label: t("settingsPage.intlSystem"), subLabel: t("settingsPage.intlExample") },
   ];
 
   const languageOptions = [
@@ -221,18 +221,18 @@ const Settings: React.FC = () => {
             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
             <circle cx="12" cy="12" r="3" />
           </svg>
-          App Tour
+          {t("settingsPage.appTour")}
         </h3>
         <div className="flex items-center justify-between">
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Missed something? Restart the guided tour to explore all features.
+            {t("settingsPage.appTourDesc")}
           </p>
           <button
             onClick={() => startTour()}
             className="px-4 py-2 bg-slate-100 dark:bg-zinc-800 hover:bg-brand-100 dark:hover:bg-brand-900/30 text-slate-700 dark:text-slate-300 hover:text-brand-600 font-bold rounded-xl transition-colors"
             id="restart-tour-btn"
           >
-            Restart Tour
+            {t("settingsPage.restartTour")}
           </button>
         </div>
       </section>
@@ -274,9 +274,9 @@ const Settings: React.FC = () => {
               <Lock size={24} />
             </div>
             <div>
-              <div className="font-bold text-lg">Hide Balances</div>
+              <div className="font-bold text-lg">{t("settingsPage.hideBalances")}</div>
               <div className="text-sm text-slate-500">
-                Hide your wallet balances from the dashboard
+                {t("settingsPage.hideBalancesDesc")}
               </div>
             </div>
           </div>
@@ -311,14 +311,14 @@ const Settings: React.FC = () => {
                 onChange={setCurrency}
                 options={currencyOptions}
                 searchable
-                placeholder="Select Currency"
+                placeholder={t("settingsPage.preferencePlaceholder")}
               />
             </div>
             <button
               onClick={handleUseLocation}
               disabled={isLoadingLocation}
               className="px-4 py-2 bg-slate-100 dark:bg-zinc-800 hover:bg-brand-100 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-400 font-medium rounded-xl transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Use my location to set currency"
+              title={t("settingsPage.useLocation")}
             >
               {isLoadingLocation ? (
                 <div className="w-4 h-4 border-2 border-brand-600 border-t-transparent rounded-full animate-spin" />
@@ -326,7 +326,7 @@ const Settings: React.FC = () => {
                 <Globe size={18} />
               )}
               <span className="hidden sm:inline">
-                {isLoadingLocation ? "Locating..." : "Use Location"}
+                {isLoadingLocation ? t("settingsPage.locating") : t("settingsPage.useLocation")}
               </span>
             </button>
           </div>
@@ -352,7 +352,7 @@ const Settings: React.FC = () => {
             value={numberSystem}
             onChange={(val) => setNumberSystem(val as any)}
             options={numberSystemOptions}
-            placeholder="Select Number System"
+            placeholder={t("settingsPage.selectNumberSystem")}
           />
         </div>
 
@@ -376,7 +376,7 @@ const Settings: React.FC = () => {
             value={defaultWalletId || ""}
             onChange={setDefaultWallet}
             options={walletOptions}
-            placeholder="Select Default Wallet"
+            placeholder={t("settingsPage.selectDefaultWallet")}
             onAddNew={() => setShowAddWallet(true)}
           />
         </div>
@@ -399,7 +399,7 @@ const Settings: React.FC = () => {
             value={i18n.language}
             onChange={(val) => i18n.changeLanguage(val as string)}
             options={languageOptions}
-            placeholder="Select Language"
+            placeholder={t("settingsPage.selectLanguage")}
           />
         </div>
       </section>
@@ -455,9 +455,9 @@ const Settings: React.FC = () => {
         isOpen={confirmResetData}
         onClose={() => setConfirmResetData(false)}
         onConfirm={handleResetData}
-        title="Reset All Local Data?"
-        message="This will wipe your local wallets and transactions. If you are synced to the cloud, data might be restored on refresh."
-        confirmText="Reset Everything"
+        title={t("settingsPage.resetDataTitle")}
+        message={t("settingsPage.resetDataMsg")}
+        confirmText={t("settingsPage.resetEverything")}
         isDestructive
       />
     </div>

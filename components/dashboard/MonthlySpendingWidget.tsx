@@ -76,7 +76,7 @@ export const MonthlySpendingWidget: React.FC<MonthlySpendingWidgetProps> = ({
           <PieChartIcon className="text-brand-500" size={18} />{" "}
           {timeRange === "this_month"
             ? t("dashboard.monthly_spending")
-            : t("dashboard.period_spending", "Period Spending")}
+            : t("dashboard.period_spending")}
         </h3>
         <button
           onClick={() => navigate("/analytics")}
@@ -92,7 +92,7 @@ export const MonthlySpendingWidget: React.FC<MonthlySpendingWidgetProps> = ({
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-1">
           {timeRange === "this_month"
             ? t("dashboard.total_this_month")
-            : t("dashboard.total_in_period", "Total in period")}
+            : t("dashboard.total_in_period")}
         </p>
       </div>
       {expenseByCategory.length > 0 ? (
@@ -100,7 +100,7 @@ export const MonthlySpendingWidget: React.FC<MonthlySpendingWidgetProps> = ({
           <div className="h-[200px] relative w-full group/chart shrink-0">
             <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0">
               <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-[0.2em] mb-1">
-                {t("dashboard.total_effort", "Total")}
+                {t("dashboard.total_effort")}
               </span>
               <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
                 {formatAmount(totalExpense)}
@@ -218,7 +218,7 @@ export const MonthlySpendingWidget: React.FC<MonthlySpendingWidgetProps> = ({
         <div className="flex-1 flex flex-col items-center justify-center text-slate-400 opacity-50 min-h-[200px]">
           <PieChartIcon size={48} className="mb-4 stroke-[1.5]" />
           <p className="text-sm font-medium tracking-wide">
-            {t("dashboard.no_data_interval", "No spending data available")}
+            {t("dashboard.no_data_interval")}
           </p>
         </div>
       )}

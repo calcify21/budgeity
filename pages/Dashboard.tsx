@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center sm:items-center justify-between gap-4 py-2">
         <h2 className="text-3xl font-bold tracking-tight">
-          {t("dashboard.title", "Dashboard")}
+          {t("dashboard.title")}
         </h2>
 
         <div className="flex items-center gap-3">
@@ -280,7 +280,7 @@ const Dashboard: React.FC = () => {
               onClick={() => setIsEditing(true)}
               className="tour-dash-edit-layout flex items-center gap-2 px-4 py-2 font-bold text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-white/5 dark:hover:bg-white/10 rounded-xl transition-colors shrink-0"
             >
-              <Settings size={16} /> {t("common.edit", "Edit layout")}
+              <Settings size={16} /> {t("common.edit")}
             </button>
           )}
         </div>

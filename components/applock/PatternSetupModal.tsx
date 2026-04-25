@@ -88,10 +88,10 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
 
   const getSubtitle = () => {
     if (step === "verify")
-      return t("appLock.drawCurrentPattern", "Draw your current pattern");
+      return t("appLock.drawCurrentPattern");
     if (step === "draw")
-      return t("appLock.drawNewPattern", "Draw your unlock pattern");
-    return t("appLock.confirmPattern", "Draw it again to confirm");
+      return t("appLock.drawNewPattern");
+    return t("appLock.confirmPattern");
   };
 
   return (
@@ -125,8 +125,8 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
             <div>
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                 {isChange
-                  ? t("appLock.changePattern", "Change Pattern")
-                  : t("appLock.setupPattern", "Set Up Pattern")}
+                  ? t("appLock.changePattern")
+                  : t("appLock.setupPattern")}
               </h3>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
                 {getSubtitle()}
@@ -163,7 +163,7 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
               className="mx-6 mb-2 p-3 bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 rounded-xl"
             >
               <p className="text-xs font-bold text-rose-600 dark:text-rose-400 text-center">
-                {t("appLock.wrongPattern", "Incorrect pattern. Try again.")}
+                {t("appLock.wrongPattern")}
               </p>
             </motion.div>
           )}
@@ -202,7 +202,7 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
                   onComplete={handleVerifyPattern}
                   error={verifyError}
                   loading={isLoading}
-                  label={t("appLock.currentPattern", "Current pattern")}
+                  label={t("appLock.currentPattern")}
                   resetKey={resetKey}
                 />
               </motion.div>
@@ -215,7 +215,7 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
               >
                 <PatternLock
                   onComplete={handleFirstPattern}
-                  label={t("appLock.choosePattern", "Choose your pattern")}
+                  label={t("appLock.choosePattern")}
                   resetKey={resetKey}
                 />
               </motion.div>
@@ -230,7 +230,7 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
                   onComplete={handleConfirmPattern}
                   error={mismatchError}
                   loading={isLoading}
-                  label={t("appLock.redrawPattern", "Redraw your pattern")}
+                  label={t("appLock.redrawPattern")}
                   resetKey={resetKey}
                 />
               </motion.div>
@@ -249,7 +249,7 @@ const PatternSetupModal: React.FC<PatternSetupModalProps> = ({
               }}
               className="w-full py-3 text-sm font-bold text-slate-500 dark:text-zinc-400 hover:text-slate-700 dark:hover:text-zinc-300 transition-colors"
             >
-              ← {t("appLock.goBack", "Go back")}
+              ← {t("appLock.goBack")}
             </button>
           </div>
         )}
