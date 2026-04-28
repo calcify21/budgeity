@@ -117,7 +117,7 @@ export const BalanceTrendWidget: React.FC<BalanceTrendWidgetProps> = ({
       });
     }
     return { chartData: data.reverse() };
-  }, [wallets, transactions, goals, timeRange]);
+  }, [wallets, transactions, goals, timeRange, filteredTransactions, daysToInclude]);
 
   return (
     <div className="tour-balance-trend w-full rounded-[2rem] glass-card p-8 h-full">

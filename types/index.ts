@@ -240,10 +240,14 @@ export interface AnalyticsWidgetConfig {
   order: number;
 }
 
-export type PrimaryGoal = 'track_spending' | 'save_goal' | 'debt_free' | 'build_wealth';
+export type PrimaryGoal =
+  | "track_spending"
+  | "save_goal"
+  | "debt_free"
+  | "build_wealth";
 
 export interface OnboardingMeta {
-  trackingMode?: 'solo' | 'shared';
+  trackingMode?: "solo" | "shared";
   inviteEmail?: string;
   completedAt?: string;
 }

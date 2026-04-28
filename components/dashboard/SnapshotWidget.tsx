@@ -69,7 +69,7 @@ export const SnapshotWidget: React.FC<SnapshotWidgetProps> = ({
     const overspendWarning = projectedSpend > income && income > 0;
 
     return { savingsRate, burnRate, projectedSpend, overspendWarning };
-  }, [transactions, wallets, timeRange]);
+  }, [transactions, wallets, timeRange, customStartDate, customEndDate]);
 
   return (
     <MotionDiv

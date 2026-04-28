@@ -38,7 +38,7 @@ export const IncomeExpenseWidget: React.FC<IncomeExpenseWidgetProps> = ({
     });
 
     return calculateTotals(filtered);
-  }, [transactions, wallets, timeRange]);
+  }, [filteredTransactions, wallets]);
 
   return (
     <div className="tour-income-expense grid grid-cols-1 md:grid-cols-2 gap-4 w-full h-full">

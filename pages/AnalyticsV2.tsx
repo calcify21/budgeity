@@ -18,6 +18,7 @@ import { ANALYTICS_WIDGET_DEFAULTS } from "../constants";
 import { cn } from "../utils";
 import { filterTransactionsByRange } from "../utils/analytics";
 import CustomDatePicker from "../components/CustomDatePicker";
+import { PeriodPicker } from "../components/PeriodPicker";
 import CustomSelect, { SelectOption } from "../components/CustomSelect";
 import { useHousehold } from "../context/HouseholdContext";
 import { AnalyticsWidgetSkeleton } from "../components/analytics/AnalyticsWidgetSkeleton";
@@ -413,32 +414,14 @@ const AnalyticsV2: React.FC = () => {
       {!isEditing && (
         <div className="flex flex-col gap-4">
           <div className="flex flex-wrap items-center gap-4">
-            {/* Time Period */}
-            <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-white/5 rounded-xl p-1.5 border border-slate-200/50 dark:border-white/5 overflow-x-auto no-scrollbar max-w-[calc(100vw-4rem)]">
-              <Calendar size={16} className="text-slate-400 ml-2 mr-1 shrink-0" />
-              {[
-                { key: "this_month" as TimeRange, label: "1M" },
-                { key: "last_month" as TimeRange, label: "LM" },
-                { key: "last_30_days" as TimeRange, label: "30D" },
-                { key: "last_3_months" as TimeRange, label: "3M" },
-                { key: "last_6_months" as TimeRange, label: "6M" },
-                { key: "this_year" as TimeRange, label: "1Y" },
-                { key: "all_time" as TimeRange, label: "All" },
-                { key: "custom" as TimeRange, label: "Custom" },
-              ].map((opt) => (
-                <button
-                  key={opt.key}
-                  onClick={() => setTimeRange(opt.key)}
-                  className={`px-4 py-2 text-sm font-bold rounded-[0.6rem] transition-all shrink-0 ${
-                    timeRange === opt.key
-                      ? "bg-white dark:bg-white/10 text-brand-600 shadow-sm ring-1 ring-slate-200/50 dark:ring-white/10"
-                      : "text-slate-500 hover:text-slate-700 dark:text-zinc-400 hover:bg-slate-200/50 dark:hover:bg-white/5"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+            <PeriodPicker
+              timeRange={timeRange}
+              onChangeTimeRange={setTimeRange}
+              customStartDate={customStartDate}
+              onChangeCustomStartDate={setCustomStartDate}
+              customEndDate={customEndDate}
+              onChangeCustomEndDate={setCustomEndDate}
+            />
 
             {/* Wallet Filter */}
             <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-white/5 rounded-xl p-1.5 border border-slate-200/50 dark:border-white/5">
@@ -465,31 +448,7 @@ const AnalyticsV2: React.FC = () => {
             )}
           </div>
 
-          {/* Custom Date Range Pickers */}
-          {timeRange === "custom" && (
-            <motion.div 
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex flex-wrap gap-4 p-4 bg-white dark:bg-zinc-900 rounded-[2rem] border border-slate-200 dark:border-white/5 shadow-sm"
-            >
-              <div className="flex-1 min-w-[200px]">
-                <CustomDatePicker
-                  label="Start Date"
-                  value={customStartDate}
-                  onChange={setCustomStartDate}
-                  className="bg-slate-50 dark:bg-black"
-                />
-              </div>
-              <div className="flex-1 min-w-[200px]">
-                <CustomDatePicker
-                  label="End Date"
-                  value={customEndDate}
-                  onChange={setCustomEndDate}
-                  className="bg-slate-50 dark:bg-black"
-                />
-              </div>
-            </motion.div>
-          )}
+
         </div>
       )}
 

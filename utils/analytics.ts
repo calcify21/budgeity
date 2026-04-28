@@ -43,19 +43,18 @@ export const filterTransactionsByRange = (
       break;
     case "all_time":
       return transactions;
-    case "custom":
-      if (customStart && customEnd) {
-        const s = new Date(customStart);
-        s.setHours(0, 0, 0, 0);
-        const e = new Date(customEnd);
-        e.setHours(23, 59, 59, 999);
-        return transactions.filter((t) => {
-          if (!t.date) return false;
-          const d = new Date(t.date);
-          return d >= s && d <= e;
-        });
-      }
-      return transactions;
+    case "custom": {
+      if (!customStart && !customEnd) return transactions;
+      const s = customStart ? new Date(customStart) : new Date(2000, 0, 1);
+      s.setHours(0, 0, 0, 0);
+      const e = customEnd ? new Date(customEnd) : new Date();
+      e.setHours(23, 59, 59, 999);
+      return transactions.filter((t) => {
+        if (!t.date) return false;
+        const d = new Date(t.date);
+        return d >= s && d <= e;
+      });
+    }
     default:
       start.setDate(1);
   }

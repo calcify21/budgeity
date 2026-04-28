@@ -26,6 +26,7 @@ import {
   Wallet as WalletIcon,
 } from "lucide-react";
 import CustomSelect from "../components/CustomSelect";
+import { PeriodPicker } from "../components/PeriodPicker";
 import { useNavigate } from "react-router-dom";
 import {
   PieChart,
@@ -48,13 +49,7 @@ import {
   ReferenceLine,
 } from "recharts";
 
-type TimeRange =
-  | "this-month"
-  | "last-month"
-  | "last-30"
-  | "this-year"
-  | "all-time"
-  | "custom";
+import { TimeRange } from "../types";
 
 interface SummaryCardProps {
   label: string;
@@ -140,7 +135,7 @@ const Analytics: React.FC = () => {
   const isHouseholdMode = activeWorkspace.type === "household";
   const navigate = useNavigate();
 
-  const [timeRange, setTimeRange] = useState<TimeRange>("this-month");
+  const [timeRange, setTimeRange] = useState<TimeRange>("this_month");
   const [walletFilter, setWalletFilter] = useState("all");
   const [memberFilter, setMemberFilter] = useState("all");
   const [isCustomDateOpen, setIsCustomDateOpen] = useState(false);
@@ -176,16 +171,25 @@ const Analytics: React.FC = () => {
     let e = new Date();
     e.setHours(23, 59, 59);
 
-    if (timeRange === "this-month") {
+    if (timeRange === "this_month") {
       s = new Date(now.getFullYear(), now.getMonth(), 1);
-    } else if (timeRange === "last-month") {
+    } else if (timeRange === "last_month") {
       s = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       e = new Date(now.getFullYear(), now.getMonth(), 0);
-    } else if (timeRange === "last-30") {
+    } else if (timeRange === "last_30_days") {
       s.setDate(now.getDate() - 30);
-    } else if (timeRange === "this-year") {
+    } else if (timeRange === "last_3_months") {
+      s.setMonth(now.getMonth() - 3);
+      s.setDate(1);
+    } else if (timeRange === "last_6_months") {
+      s.setMonth(now.getMonth() - 6);
+      s.setDate(1);
+    } else if (timeRange === "this_year") {
       s = new Date(now.getFullYear(), 0, 1);
-    } else if (timeRange === "all-time") {
+    } else if (timeRange === "last_year") {
+      s = new Date(now.getFullYear() - 1, 0, 1);
+      e = new Date(now.getFullYear() - 1, 11, 31);
+    } else if (timeRange === "all_time") {
       if (transactions.length > 0) {
         const sortedDates = [...transactions].sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
@@ -194,9 +198,13 @@ const Analytics: React.FC = () => {
       } else {
         s = new Date(2000, 0, 1);
       }
-    } else if (timeRange === "custom" && customStart && customEnd) {
-      s = new Date(customStart);
-      e = new Date(customEnd);
+    } else if (timeRange === "custom") {
+      if (customStart && customEnd) {
+        s = new Date(customStart);
+        e = new Date(customEnd);
+      } else {
+        s = new Date(2000, 0, 1);
+      }
     }
 
     params.append("from", s.toISOString().split("T")[0]);
@@ -208,14 +216,6 @@ const Analytics: React.FC = () => {
   // Drill-down state
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
 
-  const TIME_OPTIONS: { value: TimeRange; label: string }[] = [
-    { value: "this-month", label: "This Month" },
-    { value: "last-month", label: "Last Month" },
-    { value: "last-30", label: "Last 30 Days" },
-    { value: "this-year", label: "This Year" },
-    { value: "all-time", label: "All Time" },
-    { value: "custom", label: "Custom Range" },
-  ];
 
   const walletOptions = [
     { value: "all", label: "All Wallets", icon: Filter },
@@ -234,17 +234,25 @@ const Analytics: React.FC = () => {
     let end = new Date();
     end.setHours(23, 59, 59, 999);
 
-    if (timeRange === "last-month") {
+    if (timeRange === "last_month") {
       start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
       end = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-    } else if (timeRange === "last-30") {
+    } else if (timeRange === "last_30_days") {
       start = new Date();
       start.setDate(now.getDate() - 30);
       start.setHours(0, 0, 0, 0);
-    } else if (timeRange === "this-year") {
+    } else if (timeRange === "last_3_months") {
+      start.setMonth(now.getMonth() - 3);
+      start.setDate(1);
+    } else if (timeRange === "last_6_months") {
+      start.setMonth(now.getMonth() - 6);
+      start.setDate(1);
+    } else if (timeRange === "this_year") {
       start = new Date(now.getFullYear(), 0, 1);
-    } else if (timeRange === "all-time") {
-      // Find the earliest transaction date
+    } else if (timeRange === "last_year") {
+      start = new Date(now.getFullYear() - 1, 0, 1);
+      end = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
+    } else if (timeRange === "all_time") {
       if (transactions.length > 0) {
         const sortedDates = [...transactions].sort(
           (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
@@ -254,11 +262,15 @@ const Analytics: React.FC = () => {
       } else {
         start = new Date(2000, 0, 1);
       }
-    } else if (timeRange === "custom" && customStart && customEnd) {
-      start = new Date(customStart);
-      start.setHours(0, 0, 0, 0);
-      end = new Date(customEnd);
-      end.setHours(23, 59, 59, 999);
+    } else if (timeRange === "custom") {
+      if (customStart && customEnd) {
+        start = new Date(customStart);
+        start.setHours(0, 0, 0, 0);
+        end = new Date(customEnd);
+        end.setHours(23, 59, 59, 999);
+      } else {
+        start = new Date(2000, 0, 1);
+      }
     }
 
     const filtered = transactions.filter((t) => {
@@ -369,16 +381,29 @@ const Analytics: React.FC = () => {
     let prevEnd = new Date(start);
     prevEnd.setMilliseconds(-1);
 
-    if (timeRange === "this-month") {
+    if (timeRange === "this_month") {
       prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    } else if (timeRange === "last-month") {
+    } else if (timeRange === "last_month") {
       prevStart = new Date(now.getFullYear(), now.getMonth() - 2, 1);
-    } else if (timeRange === "last-30") {
+    } else if (timeRange === "last_30_days") {
       prevStart = new Date(start);
       prevStart.setDate(start.getDate() - 30);
-    } else if (timeRange === "this-year") {
+    } else if (timeRange === "last_3_months") {
+      prevStart = new Date(start);
+      prevStart.setMonth(start.getMonth() - 3);
+    } else if (timeRange === "last_6_months") {
+      prevStart = new Date(start);
+      prevStart.setMonth(start.getMonth() - 6);
+    } else if (timeRange === "this_year") {
       prevStart = new Date(now.getFullYear() - 1, 0, 1);
       prevEnd = new Date(now.getFullYear(), 0, 0, 23, 59, 59, 999);
+    } else if (timeRange === "last_year") {
+      prevStart = new Date(now.getFullYear() - 2, 0, 1);
+      prevEnd = new Date(now.getFullYear() - 1, 0, 0, 23, 59, 59, 999);
+    } else if (timeRange === "custom" && customStart && customEnd) {
+      const duration = end.getTime() - start.getTime();
+      prevStart = new Date(start.getTime() - duration);
+      prevEnd = new Date(start.getTime() - 1);
     }
 
     const prevFiltered = transactions.filter((t) => {
@@ -666,13 +691,14 @@ const Analytics: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
-          <div className="w-full sm:w-48">
-            <CustomSelect
-              value={timeRange}
-              onChange={(val) => setTimeRange(val as TimeRange)}
-              options={TIME_OPTIONS}
-            />
-          </div>
+          <PeriodPicker
+            timeRange={timeRange as any}
+            onChangeTimeRange={(val) => setTimeRange(val as any)}
+            customStartDate={customStart}
+            onChangeCustomStartDate={setCustomStart}
+            customEndDate={customEnd}
+            onChangeCustomEndDate={setCustomEnd}
+          />
           <div className="w-full sm:w-48">
             <CustomSelect
               value={walletFilter}
@@ -701,26 +727,6 @@ const Analytics: React.FC = () => {
         </div>
       </div>
 
-      {timeRange === "custom" && (
-        <div className="p-4 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-white/5 flex flex-wrap gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="flex-1 min-w-[140px]">
-            <CustomDatePicker
-              value={customStart}
-              onChange={setCustomStart}
-              label="Start Date"
-              className="bg-slate-50 dark:bg-black border-slate-200 dark:border-zinc-800"
-            />
-          </div>
-          <div className="flex-1 min-w-[140px]">
-            <CustomDatePicker
-              value={customEnd}
-              onChange={setCustomEnd}
-              label="End Date"
-              className="bg-slate-50 dark:bg-black border-slate-200 dark:border-zinc-800"
-            />
-          </div>
-        </div>
-      )}
 
       {/* Core Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">

@@ -577,36 +577,36 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black overflow-x-hidden selection:bg-brand-500/30 transition-colors duration-300">
-      <nav className="fixed top-2 sm:top-4 left-1/2 -translate-x-1/2 w-[calc(100%-1rem)] sm:w-[calc(100%-2rem)] max-w-6xl z-50 bg-white/70 dark:bg-zinc-950/70 backdrop-blur-xl border border-white/40 dark:border-zinc-800/60 shadow-md sm:shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] rounded-3xl transition-all duration-300">
-        <div className="px-3 sm:px-6 h-14 sm:h-20 flex items-center justify-between gap-1.5 overflow-hidden">
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            <img src={logo} alt="Budgeity" className="w-6 h-6 sm:w-9 sm:h-9" />
-            <span className="font-bold text-base sm:text-lg lg:text-xl text-slate-900 dark:text-white tracking-tight hidden min-[380px]:block">
+      <nav className="fixed top-0 sm:top-4 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[calc(100%-2rem)] max-w-6xl z-50 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b sm:border border-slate-200/60 dark:border-zinc-800/60 shadow-sm sm:shadow-xl rounded-none sm:rounded-3xl transition-all duration-300">
+        <div className="px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <img src={logo} alt="Budgeity" className="w-8 h-8 sm:w-10 sm:h-10" />
+            <span className="font-bold text-lg sm:text-xl text-slate-900 dark:text-white tracking-tight hidden min-[360px]:block">
               Budgeity
             </span>
           </div>
-          <div className="flex items-center gap-1 sm:gap-4 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <button
               onClick={toggleTheme}
-              className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-slate-100/80 dark:bg-zinc-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:text-brand-600 dark:hover:text-brand-400 transition-all duration-300 shrink-0"
+              className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center rounded-full bg-slate-100/80 dark:bg-zinc-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 hover:text-brand-600 dark:hover:text-brand-400 transition-all duration-300 shrink-0"
               title={
                 theme === "dark"
                   ? "Switch to Light Mode"
                   : "Switch to Dark Mode"
               }
             >
-              {theme === "dark" ? <Sun className="w-4 h-4 sm:w-5 sm:h-5" /> : <Moon className="w-4 h-4 sm:w-5 sm:h-5" />}
+              {theme === "dark" ? <Sun className="w-5 h-5 sm:w-6 sm:h-6" /> : <Moon className="w-5 h-5 sm:w-6 sm:h-6" />}
             </button>
-            <div className="h-4 sm:h-5 w-[1px] bg-slate-200 dark:bg-zinc-800 hidden sm:block"></div>
+            <div className="h-5 sm:h-6 w-[1px] bg-slate-200 dark:bg-zinc-800 hidden sm:block"></div>
             <button
               onClick={() => navigate("/login")}
-              className="text-xs sm:text-base text-slate-600 dark:text-slate-300 font-medium hover:text-brand-600 dark:hover:text-brand-400 transition-colors whitespace-nowrap shrink-0 px-2"
+              className="text-sm sm:text-base text-slate-600 dark:text-slate-300 font-medium hover:text-brand-600 dark:hover:text-brand-400 transition-colors whitespace-nowrap shrink-0 px-2 sm:px-3"
             >
               Login
             </button>
             <button
               onClick={() => navigate("/login?mode=signup")}
-              className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/20 whitespace-nowrap text-xs sm:text-base shrink-0"
+              className="px-4 py-2 sm:px-6 sm:py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-brand-500/20 whitespace-nowrap text-sm sm:text-base shrink-0"
             >
               Sign Up
             </button>

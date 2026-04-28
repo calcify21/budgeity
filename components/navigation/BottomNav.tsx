@@ -119,12 +119,12 @@ const BottomNav: React.FC<BottomNavProps> = ({
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed z-50 bottom-6 left-0 right-0 px-4 flex justify-center pointer-events-none"
+            className="fixed z-50 bottom-3 sm:bottom-6 left-0 right-0 px-3 sm:px-4 flex justify-center pointer-events-none"
           >
             <div
               className={cn(
-                "bottom-nav-floating backdrop-blur-3xl border border-white/20 dark:border-white/10 flex items-center justify-evenly pb-[env(safe-area-inset-bottom,4px)] transition-all duration-300 w-full rounded-[2.5rem] p-2 pointer-events-auto",
-                isTablet ? "max-w-[700px] px-6" : "max-w-[500px] px-2",
+                "bottom-nav-floating backdrop-blur-3xl border border-white/20 dark:border-white/10 flex items-center justify-evenly pb-[env(safe-area-inset-bottom,4px)] transition-all duration-300 w-full rounded-[2rem] sm:rounded-[2.5rem] p-1.5 sm:p-2 pointer-events-auto",
+                isTablet ? "max-w-[700px] px-6" : "max-w-[480px] px-1",
               )}
             >
               {leftItems.map((item) => (
@@ -175,7 +175,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
 
               <button
                 onClick={() => setIsMoreOpen(true)}
-                className="flex flex-col items-center justify-center min-w-[64px] h-14 rounded-2xl text-slate-400 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors shrink-0"
+                className="flex flex-col items-center justify-center min-w-[48px] sm:min-w-[64px] h-14 rounded-2xl text-slate-400 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors shrink-0"
               >
                 <div className="h-6 flex items-center justify-center">
                   <Menu size={24} strokeWidth={1.5} />
@@ -211,7 +211,7 @@ const NavItem: React.FC<{ item: any; isActive: boolean }> = ({
     <Link
       to={item.to}
       className={cn(
-        "flex flex-col items-center justify-center min-w-[64px] h-14 relative group outline-none select-none isolate",
+        "flex flex-col items-center justify-center min-w-[48px] sm:min-w-[64px] h-14 relative group outline-none select-none isolate",
         isActive
           ? "text-brand-600 dark:text-brand-400"
           : "text-slate-400 dark:text-zinc-500",

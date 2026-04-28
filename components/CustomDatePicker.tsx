@@ -109,7 +109,7 @@ const CustomDatePicker: React.FC<Props> = ({
 
   // Dismissal logic
   useEscapeKey(isOpen, () => setIsOpen(false));
-  useClickOutside(containerRef as any, () => setIsOpen(false), isOpen);
+  useClickOutside([containerRef as any, calendarRef as any], () => setIsOpen(false), isOpen);
 
   const getDaysInMonth = (date: Date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -352,9 +352,9 @@ const CustomDatePicker: React.FC<Props> = ({
                         exit={{ opacity: 0, x: -10 }}
                       >
                         <div className="grid grid-cols-7 mb-2">
-                          {DAYS.map((d) => (
+                          {DAYS.map((d, i) => (
                             <div
-                              key={d}
+                              key={i}
                               className="text-center text-xs font-bold text-slate-400 uppercase"
                             >
                               {d}

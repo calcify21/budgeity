@@ -18,6 +18,7 @@ import CustomDatePicker from "../components/CustomDatePicker";
 import { useTranslation } from "react-i18next";
 import { useHousehold } from "../context/HouseholdContext";
 import { DashboardWidgetConfig, TimeRange } from "../types";
+import { PeriodPicker } from "../components/PeriodPicker";
 import { cn } from "../utils";
 
 // Import Widgets
@@ -66,16 +67,6 @@ const widgetLabels: Record<string, string> = {
   trend: "Balance Trend",
 };
 
-const timeRangeOptions: { value: TimeRange; label: string }[] = [
-  { value: "this_month", label: "This Month" },
-  { value: "last_month", label: "Last Month" },
-  { value: "last_3_months", label: "Last 3 Months" },
-  { value: "last_6_months", label: "Last 6 Months" },
-  { value: "this_year", label: "This Year" },
-  { value: "last_year", label: "Last Year" },
-  { value: "all_time", label: "All Time" },
-  { value: "custom", label: "Custom Range" },
-];
 
 const MotionDiv = motion.div as any;
 
@@ -106,7 +97,6 @@ const Dashboard: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>("this_month");
   const [customStartDate, setCustomStartDate] = useState<string>("");
   const [customEndDate, setCustomEndDate] = useState<string>("");
-  const [isRangeDropdownOpen, setIsRangeDropdownOpen] = useState(false);
 
   // Master list of all possible widget IDs
   const allWidgetIds = [
@@ -199,59 +189,15 @@ const Dashboard: React.FC = () => {
 
         <div className="flex items-center gap-3">
           {!isEditing && (
-            <div className="relative">
-              <button
-                onClick={() => setIsRangeDropdownOpen(!isRangeDropdownOpen)}
-                className="tour-dash-time-range flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm hover:shadow-md transition-all group"
-              >
-                <Calendar size={18} className="text-brand-500" />
-                <span className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                  {timeRangeOptions.find((opt) => opt.value === timeRange)?.label}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className={cn(
-                    "text-slate-400 transition-transform duration-300",
-                    isRangeDropdownOpen && "rotate-180",
-                  )}
-                />
-              </button>
-
-              <AnimatePresence>
-                {isRangeDropdownOpen && (
-                  <>
-                    <div
-                      className="fixed inset-0 z-40"
-                      onClick={() => setIsRangeDropdownOpen(false)}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                      className="absolute right-0 mt-2 w-48 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-white/10 rounded-[1.5rem] shadow-xl z-50 overflow-hidden py-1 backdrop-blur-xl"
-                    >
-                      {timeRangeOptions.map((option) => (
-                        <button
-                          key={option.value}
-                          onClick={() => {
-                            setTimeRange(option.value as TimeRange);
-                            setIsRangeDropdownOpen(false);
-                          }}
-                          className={cn(
-                            "w-full px-4 py-2.5 text-left text-sm font-medium transition-colors",
-                            timeRange === option.value
-                              ? "bg-brand-50 text-brand-600 dark:bg-brand-500/10 dark:text-brand-400"
-                              : "text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-white/5",
-                          )}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
+            <PeriodPicker 
+              timeRange={timeRange}
+              onChangeTimeRange={setTimeRange}
+              customStartDate={customStartDate}
+              onChangeCustomStartDate={setCustomStartDate}
+              customEndDate={customEndDate}
+              onChangeCustomEndDate={setCustomEndDate}
+              className="tour-dash-time-range"
+            />
           )}
 
           {isEditing ? (
@@ -260,19 +206,19 @@ const Dashboard: React.FC = () => {
                 onClick={handleReset}
                 className="flex items-center gap-1.5 px-4 py-2 font-bold text-sm text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-500/10 rounded-xl transition-colors"
               >
-                <RotateCcw size={14} /> Reset
+                <RotateCcw size={14} /> {t("common.reset")}
               </button>
               <button
                 onClick={() => setIsEditing(false)}
                 className="px-4 py-2 font-bold text-sm text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-white/10 rounded-xl transition-colors"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
               <button
                 onClick={handleSave}
                 className="px-4 py-2 font-bold text-sm bg-brand-500 text-white hover:bg-brand-600 rounded-xl transition-colors shadow-sm"
               >
-                Save Layout
+                {t("common.save_layout")}
               </button>
             </div>
           ) : (
@@ -300,10 +246,10 @@ const Dashboard: React.FC = () => {
               </div>
               <div className="flex-1">
                 <h3 className="text-base font-bold text-emerald-800 dark:text-emerald-300">
-                  App Lock Securely Reset
+                  {t("dashboard.app_lock_reset_title")}
                 </h3>
                 <p className="text-sm text-emerald-600 dark:text-emerald-400/80 mt-1">
-                  Your previous App Lock settings were successfully cleared. You can set up a new PIN or pattern in your security settings to protect your device again.
+                  {t("dashboard.app_lock_reset_desc")}
                 </p>
               </div>
               <div className="flex items-center justify-end gap-3 mt-4 sm:mt-0 shrink-0 w-full sm:w-auto">
@@ -311,7 +257,7 @@ const Dashboard: React.FC = () => {
                   onClick={() => navigate("/settings#security")}
                   className="px-5 py-2.5 flex-1 sm:flex-none bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl transition-colors shadow-sm text-center"
                 >
-                  Set Up App Lock
+                  {t("dashboard.setup_app_lock")}
                 </button>
                 <button
                   onClick={() => setShowLockResetAlert(false)}
@@ -369,30 +315,6 @@ const Dashboard: React.FC = () => {
         </motion.div>
       )}
 
-      {timeRange === "custom" && !isEditing && (
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 bg-white dark:bg-zinc-900 rounded-3xl border border-slate-200 dark:border-white/5 flex flex-wrap gap-4 mb-6 shadow-sm"
-        >
-          <div className="flex-1 min-w-[140px]">
-            <CustomDatePicker
-              value={customStartDate}
-              onChange={setCustomStartDate}
-              label="Start Date"
-              className="bg-slate-50 dark:bg-black border-slate-200 dark:border-zinc-800"
-            />
-          </div>
-          <div className="flex-1 min-w-[140px]">
-            <CustomDatePicker
-              value={customEndDate}
-              onChange={setCustomEndDate}
-              label="End Date"
-              className="bg-slate-50 dark:bg-black border-slate-200 dark:border-zinc-800"
-            />
-          </div>
-        </motion.div>
-      )}
 
       {isEditing && disabledWidgets.length > 0 && (
         <MotionDiv

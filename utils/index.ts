@@ -67,6 +67,7 @@ export const ICON_CATEGORIES = [
       "cooking",
       "apple",
       "carrot",
+      "food",
     ],
   },
   {

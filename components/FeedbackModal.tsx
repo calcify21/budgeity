@@ -138,7 +138,16 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
                 }`}
               >
                 {getIcon(ft)}
-                <span className="capitalize">{t(`feedbackModal.${ft}`)}</span>
+                <span className="capitalize">
+                  {(() => {
+                    const feedbackTypeMap: Record<string, string> = {
+                      general: "feedbackModal.general",
+                      bug: "feedbackModal.bug",
+                      feature: "feedbackModal.feature",
+                    };
+                    return t(feedbackTypeMap[ft] || "feedbackModal.general");
+                  })()}
+                </span>
               </button>
             ))}
           </div>

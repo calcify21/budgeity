@@ -67,7 +67,7 @@ export const MonthlySpendingWidget: React.FC<MonthlySpendingWidgetProps> = ({
       expenseByCategory: data.sort((a, b) => b.value - a.value),
       totalExpense: total
     };
-  }, [transactions, wallets, categories, timeRange]);
+  }, [filteredTransactions, wallets, categories, timeRange]);
 
   return (
     <div className="glass-card rounded-[2rem] p-6 h-full flex flex-col cursor-default">

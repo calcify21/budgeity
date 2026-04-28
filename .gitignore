@@ -49,3 +49,6 @@ skills-lock.json
 
 # Vite
 *.tsbuildinfo
+
+# Translation Audit
+logs/
