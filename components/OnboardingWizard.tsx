@@ -14,6 +14,7 @@ import AvatarCropModal from "./AvatarCropModal";
 import UserAvatar from "./ui/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "../utils";
+import { useTranslation } from "react-i18next";
 import logo from "../assets/logo-927x1024.png";
 import {
   BarChart3,
@@ -71,6 +72,7 @@ interface WizardState {
   householdName: string;
   inviteEmails: { id: string; email: string }[];
   wantsPin: boolean;
+  language: string;
 }
 
 const TOTAL_STEPS = 6;
@@ -237,6 +239,7 @@ const OnboardingWizard: React.FC = () => {
   const { setupPin } = useAppLock();
   const { saveAvatar } = useAvatar();
   const { success: toastSuccess, error: toastError } = useToast();
+  const { i18n, t } = useTranslation();
 
   // Local avatar base64 — stored here during wizard, saved to Firestore only on finish
   const [pendingAvatarBase64, setPendingAvatarBase64] = useState<string | null>(null);
@@ -266,6 +269,7 @@ const OnboardingWizard: React.FC = () => {
     householdName: "",
     inviteEmails: [{ id: "1", email: "" }],
     wantsPin: false,
+    language: i18n.language,
   });
 
   const update = <K extends keyof WizardState>(key: K, value: WizardState[K]) => {
@@ -424,6 +428,7 @@ const OnboardingWizard: React.FC = () => {
           trackingMode: wizard.trackingMode,
           inviteEmail: wizard.trackingMode === "shared" ? wizard.inviteEmails.map(e => e.email).filter(e => e.trim()).join(",") : undefined,
         },
+        language: wizard.language,
       };
       await completeOnboarding(payload);
 
@@ -472,6 +477,12 @@ const OnboardingWizard: React.FC = () => {
     { value: "AUTO", label: "Auto (Based on Currency)", subLabel: "Recommended" },
     { value: "IN", label: "Indian System", subLabel: "12,34,567.89" },
     { value: "INTL", label: "International System", subLabel: "1,234,567.89" },
+  ];
+
+  const languageOptions = [
+    { value: "en", label: "English", subLabel: "Primary" },
+    { value: "hi", label: "Hindi", subLabel: "हिंदी" },
+    { value: "fr", label: "French", subLabel: "Français" },
   ];
 
   // ── Animation Variants ─────────────────────────────────────────────
@@ -651,6 +662,21 @@ const OnboardingWizard: React.FC = () => {
             onChange={(v) => update("numberSystem", v as any)}
             options={numberSystemOptions}
             placeholder="Select Number System"
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            Language
+          </label>
+          <CustomSelect
+            value={wizard.language}
+            onChange={(v) => {
+              update("language", v as string);
+              i18n.changeLanguage(v as string);
+            }}
+            options={languageOptions}
+            placeholder="Select Language"
           />
         </div>
       </div>

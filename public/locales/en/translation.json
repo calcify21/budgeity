@@ -62,7 +62,16 @@
     "management": "Management",
     "account": "Account",
     "admin": "Admin",
-    "reports": "Reports"
+    "reports": "Reports",
+    "this_month": "This Month",
+    "last_month": "Last Month",
+    "last_30_days": "Last 30 Days",
+    "last_3_months": "Last 3 Months",
+    "last_6_months": "Last 6 Months",
+    "this_year": "This Year",
+    "last_year": "Last Year",
+    "all_time": "All Time",
+    "custom": "Custom Range"
   },
   "dashboard": {
     "title": "Dashboard",

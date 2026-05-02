@@ -63,7 +63,16 @@
     "management": "प्रबंधन",
     "account": "खाता",
     "admin": "व्यवस्थापक",
-    "reports": "रिपोर्ट्स"
+    "reports": "रिपोर्ट्स",
+    "this_month": "इस महीने",
+    "last_month": "पिछला महीना",
+    "last_30_days": "पिछले 30 दिन",
+    "last_3_months": "पिछले 3 महीने",
+    "last_6_months": "पिछले 6 महीने",
+    "this_year": "इस साल",
+    "last_year": "पिछले साल",
+    "all_time": "कुल समय",
+    "custom": "कस्टम रेंज"
   },
   "dashboard": {
     "title": "डैशबोर्ड",

@@ -62,7 +62,16 @@
     "management": "Gestion",
     "account": "Compte",
     "admin": "Administration",
-    "reports": "Rapports"
+    "reports": "Rapports",
+    "this_month": "Ce mois-ci",
+    "last_month": "Le mois dernier",
+    "last_30_days": "Les 30 derniers jours",
+    "last_3_months": "Les 3 derniers mois",
+    "last_6_months": "Les 6 derniers mois",
+    "this_year": "Cette année",
+    "last_year": "L'année dernière",
+    "all_time": "Tout le temps",
+    "custom": "Période personnalisée"
   },
   "dashboard": {
     "title": "Tableau de Bord",

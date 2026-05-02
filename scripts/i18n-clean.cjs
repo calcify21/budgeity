@@ -5,7 +5,7 @@ const localesDir = path.join(process.cwd(), 'public', 'locales');
 const reportPath = path.join(process.cwd(), 'logs', 'i18n_report.txt');
 
 if (!fs.existsSync(reportPath)) {
-    console.error('Report not found! Please run "npm run i18n:check" first.');
+    console.error('Report not found! Please run "npm run tran:check" first.');
     process.exit(1);
 }
 

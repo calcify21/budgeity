@@ -846,7 +846,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-full relative overflow-hidden z-10">
         {/* Header (Desktop & Mobile) */}
-        <header className="h-16 border-b border-slate-200 dark:border-white/5 flex items-center justify-between px-4 lg:px-8 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-30">
+        <header className="h-16 border-b border-slate-200 dark:border-white/5 flex items-center justify-between px-4 lg:px-8 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md sticky top-0 z-40">
           <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             <Tooltip content="Menu" side="right">
               <button

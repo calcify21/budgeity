@@ -23,25 +23,30 @@ export const PeriodPicker: React.FC<PeriodPickerProps> = ({
   onChangeCustomStartDate,
   customEndDate,
   onChangeCustomEndDate,
-  className
+  className,
 }) => {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   const timeRangeOptions: { value: TimeRange; label: string }[] = [
-    { value: "this_month", label: "This Month" },
-    { value: "last_month", label: "Last Month" },
-    { value: "last_30_days", label: "Last 30 Days" },
-    { value: "last_3_months", label: "Last 3 Months" },
-    { value: "last_6_months", label: "Last 6 Months" },
-    { value: "this_year", label: "This Year" },
-    { value: "last_year", label: "Last Year" },
-    { value: "all_time", label: "All Time" },
-    { value: "custom", label: "Custom Range" },
+    { value: "this_month", label: t("common.this_month") },
+    { value: "last_month", label: t("common.last_month") },
+    { value: "last_30_days", label: t("common.last_30_days") },
+    { value: "last_3_months", label: t("common.last_3_months") },
+    { value: "last_6_months", label: t("common.last_6_months") },
+    { value: "this_year", label: t("common.this_year") },
+    { value: "last_year", label: t("common.last_year") },
+    { value: "all_time", label: t("common.all_time") },
+    { value: "custom", label: t("common.custom") },
   ];
 
   return (
-    <div className={cn("flex flex-col sm:flex-row items-start sm:items-center gap-2 z-30", className)}>
+    <div
+      className={cn(
+        "flex flex-col sm:flex-row items-start sm:items-center gap-2 z-30",
+        className,
+      )}
+    >
       <div className="relative">
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -49,7 +54,8 @@ export const PeriodPicker: React.FC<PeriodPickerProps> = ({
         >
           <Calendar size={18} className="text-brand-500" />
           <span className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-            {timeRangeOptions.find((opt) => opt.value === timeRange)?.label || "Select Period"}
+            {timeRangeOptions.find((opt) => opt.value === timeRange)?.label ||
+              "Select Period"}
           </span>
           <ChevronDown
             size={16}
@@ -98,7 +104,7 @@ export const PeriodPicker: React.FC<PeriodPickerProps> = ({
 
       <AnimatePresence mode="popLayout">
         {timeRange === "custom" && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95, x: -10 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             exit={{ opacity: 0, scale: 0.95, x: -10 }}
@@ -107,16 +113,23 @@ export const PeriodPicker: React.FC<PeriodPickerProps> = ({
             <div className="w-[125px]">
               <CustomDatePicker
                 value={customStartDate || ""}
-                onChange={(v) => onChangeCustomStartDate && onChangeCustomStartDate(v)}
+                onChange={(v) =>
+                  onChangeCustomStartDate && onChangeCustomStartDate(v)
+                }
                 className="bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl !py-1.5 !px-2 shadow-none"
                 label=""
               />
             </div>
-            <ArrowRight size={14} className="text-slate-300 dark:text-zinc-600 shrink-0" />
+            <ArrowRight
+              size={14}
+              className="text-slate-300 dark:text-zinc-600 shrink-0"
+            />
             <div className="w-[125px]">
               <CustomDatePicker
                 value={customEndDate || ""}
-                onChange={(v) => onChangeCustomEndDate && onChangeCustomEndDate(v)}
+                onChange={(v) =>
+                  onChangeCustomEndDate && onChangeCustomEndDate(v)
+                }
                 className="bg-transparent border-transparent hover:bg-slate-50 dark:hover:bg-white/5 rounded-xl !py-1.5 !px-2 shadow-none"
                 label=""
               />

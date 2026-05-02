@@ -276,4 +276,5 @@ export interface AppState {
   analyticsWidgets?: AnalyticsWidgetConfig[];
   analyticsSectionNames?: Record<string, string>;
   accentTheme?: string;
+  language?: string;
 }

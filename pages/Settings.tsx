@@ -39,6 +39,7 @@ const Settings: React.FC = () => {
     setNumberSystem,
     hideAmounts,
     toggleHideAmounts,
+    setLanguage,
   } = useData();
   const { user } = useAuth();
   const { success, error } = useToast();
@@ -426,7 +427,7 @@ const Settings: React.FC = () => {
 
           <CustomSelect
             value={i18n.language}
-            onChange={(val) => i18n.changeLanguage(val as string)}
+            onChange={(val) => setLanguage(val as string)}
             options={languageOptions}
             placeholder={t("settingsPage.selectLanguage")}
           />

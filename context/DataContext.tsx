@@ -36,6 +36,7 @@ import {
 } from "firebase/firestore";
 import { adjustEntityBalance } from "../utils/transactionUtils";
 import { logActivity } from "../utils/activityLogger";
+import i18n from "../i18n";
 
 export interface OnboardingWizardPayload {
   currency: string;
@@ -45,6 +46,7 @@ export interface OnboardingWizardPayload {
   primaryGoal: PrimaryGoal;
   wallets: Array<{ name: string; type: WalletType; balance: number; color: string }>;
   onboardingMeta: OnboardingMeta;
+  language?: string;
 }
 
 interface DataContextType extends AppState {
@@ -141,6 +143,7 @@ interface DataContextType extends AppState {
   updateDashboardWidgets: (widgets: DashboardWidgetConfig[]) => void;
   updateAnalyticsWidgets: (widgets: AnalyticsWidgetConfig[]) => void;
   updateAnalyticsSectionNames: (names: Record<string, string>) => void;
+  setLanguage: (lang: string) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -186,6 +189,7 @@ const INITIAL_STATE: AppState = {
   analyticsWidgets: ANALYTICS_WIDGET_DEFAULTS,
   analyticsSectionNames: {},
   accentTheme: "emerald",
+  language: "en",
 };
 
 const STORAGE_KEY = "budgeity_local_v1";
@@ -371,6 +375,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", state.accentTheme || "emerald");
   }, [state.accentTheme]);
+  
+  // Handle Language
+  useEffect(() => {
+    if (state.language && i18n.language !== state.language) {
+      i18n.changeLanguage(state.language);
+    }
+  }, [state.language]);
 
   const syncState = async (newState: AppState) => {
     setState(newState);
@@ -509,6 +520,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       theme: data.theme,
       hideAmounts: data.hideAmounts,
       primaryGoal: data.primaryGoal,
+      language: data.language,
       onboardingMeta: {
         ...data.onboardingMeta,
         completedAt: now,
@@ -1614,6 +1626,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     syncState({ ...state, defaultWalletId: id });
   const setNumberSystem = (system: "IN" | "INTL" | "AUTO") =>
     syncState({ ...state, numberSystem: system });
+  const setLanguage = (lang: string) => syncState({ ...state, language: lang });
   const resetData = () => syncState(INITIAL_STATE);
 
   const formatAmount = (amount: number) => {
@@ -1719,6 +1732,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         updateDashboardWidgets,
         updateAnalyticsWidgets,
         updateAnalyticsSectionNames,
+        setLanguage,
       }}
     >
       {children}
