@@ -385,3 +385,162 @@ export const calculateSpendingDominance = (
   if (totalSpend === 0) return 0;
   return Number(((categorySpend / totalSpend) * 100).toFixed(1));
 };
+
+export interface CategoryForecast {
+  categoryId: string;
+  categoryName: string;
+  categoryColor: string;
+  currentSpend: number;
+  projectedSpend: number;
+  budgetAmount?: number;
+  isOverBudget: boolean;
+}
+
+export interface SpendingForecast {
+  currentMonthSpend: number;
+  projectedMonthEnd: number;
+  lastMonthTotal: number;
+  monthOverMonthChange: number; // percentage change vs last month
+  dailyBurnRate: number;
+  daysPassed: number;
+  daysRemaining: number;
+  totalDaysInMonth: number;
+  confidence: "low" | "medium" | "high"; // based on data volume
+  categoryForecasts: CategoryForecast[];
+}
+
+export const calculateSpendingForecast = (
+  transactions: Transaction[],
+  categories: Category[],
+  wallets: { id: string; type: string }[],
+  budgets: { categoryId: string; amount: number }[],
+  timeRange: TimeRange = "this_month",
+  customStart?: string,
+  customEnd?: string,
+): SpendingForecast => {
+  const now = new Date();
+  let daysPassed = now.getDate();
+  let totalDaysInMonth = getDaysInMonth(now.getMonth(), now.getFullYear());
+
+  if (timeRange === "last_month") {
+    const lastMonth = new Date();
+    lastMonth.setMonth(now.getMonth() - 1);
+    daysPassed = totalDaysInMonth = getDaysInMonth(lastMonth.getMonth(), lastMonth.getFullYear());
+  } else if (timeRange === "this_year") {
+    const yearStart = new Date(now.getFullYear(), 0, 1);
+    daysPassed = Math.max(1, Math.ceil((now.getTime() - yearStart.getTime()) / (1000 * 60 * 60 * 24)));
+    totalDaysInMonth = 365;
+  } else if (timeRange === "last_year") {
+    daysPassed = totalDaysInMonth = 365;
+  } else if (timeRange === "last_30_days") {
+    daysPassed = totalDaysInMonth = 30;
+  } else if (timeRange.includes("months")) {
+    const months = parseInt(timeRange.split("_")[1]);
+    const rangeStart = new Date();
+    rangeStart.setMonth(now.getMonth() - months);
+    daysPassed = Math.max(1, Math.ceil((now.getTime() - rangeStart.getTime()) / (1000 * 60 * 60 * 24)));
+    totalDaysInMonth = months * 30;
+  } else if (timeRange === "custom") {
+    if (customStart && customEnd) {
+      const s = new Date(customStart);
+      const e = new Date(customEnd);
+      totalDaysInMonth = Math.ceil((e.getTime() - s.getTime()) / (1000 * 3600 * 24)) + 1;
+      daysPassed = Math.max(1, Math.min(totalDaysInMonth, Math.ceil((now.getTime() - s.getTime()) / (1000 * 3600 * 24))));
+    } else {
+      daysPassed = totalDaysInMonth = 30;
+    }
+  }
+
+  const daysRemaining = Math.max(0, totalDaysInMonth - daysPassed);
+
+  // Filter out transfers and savings wallet transactions
+  const filterNonSavings = (txs: Transaction[]) =>
+    txs.filter((t) => {
+      if (t.type === "transfer") return false;
+      if (t.type !== "expense") return false;
+      const w = wallets.find(
+        (w) => w.id === t.fromWalletId,
+      );
+      if (w && w.type === "savings") return false;
+      return true;
+    });
+
+  // Current period expenses
+  const currentMonthExpenses = filterNonSavings(
+    filterTransactionsByRange(transactions, timeRange, customStart, customEnd)
+  );
+
+  const currentMonthSpend = currentMonthExpenses.reduce(
+    (sum, t) => sum + t.amount,
+    0,
+  );
+
+  // Last month expenses
+  const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+  const lastMonthExpenses = filterNonSavings(
+    transactions.filter((t) => {
+      const d = new Date(t.date);
+      return d >= lastMonthStart && d <= lastMonthEnd;
+    }),
+  );
+
+  const lastMonthTotal = lastMonthExpenses.reduce(
+    (sum, t) => sum + t.amount,
+    0,
+  );
+
+  // Projection
+  const dailyBurnRate = daysPassed > 0 ? currentMonthSpend / daysPassed : 0;
+  const projectedMonthEnd = dailyBurnRate * totalDaysInMonth;
+
+  // Month-over-month comparison
+  const monthOverMonthChange =
+    lastMonthTotal > 0
+      ? Number((((projectedMonthEnd - lastMonthTotal) / lastMonthTotal) * 100).toFixed(1))
+      : 0;
+
+  // Confidence based on how many days of data we have
+  let confidence: "low" | "medium" | "high" = "low";
+  if (daysPassed >= 20) confidence = "high";
+  else if (daysPassed >= 10) confidence = "medium";
+
+  // Per-category forecasts
+  const categoryTotals: Record<string, number> = {};
+  currentMonthExpenses.forEach((t) => {
+    categoryTotals[t.categoryId] =
+      (categoryTotals[t.categoryId] || 0) + t.amount;
+  });
+
+  const categoryForecasts: CategoryForecast[] = Object.entries(categoryTotals)
+    .map(([categoryId, currentSpend]) => {
+      const cat = categories.find((c) => c.id === categoryId);
+      const catBurnRate = daysPassed > 0 ? currentSpend / daysPassed : 0;
+      const projectedSpend = catBurnRate * totalDaysInMonth;
+      const budget = budgets.find((b) => b.categoryId === categoryId);
+
+      return {
+        categoryId,
+        categoryName: cat?.name || "Unknown",
+        categoryColor: cat?.color || "#64748b",
+        currentSpend,
+        projectedSpend: Number(projectedSpend.toFixed(2)),
+        budgetAmount: budget?.amount,
+        isOverBudget: budget ? projectedSpend > budget.amount : false,
+      };
+    })
+    .sort((a, b) => b.projectedSpend - a.projectedSpend);
+
+  return {
+    currentMonthSpend,
+    projectedMonthEnd: Number(projectedMonthEnd.toFixed(2)),
+    lastMonthTotal,
+    monthOverMonthChange,
+    dailyBurnRate: Number(dailyBurnRate.toFixed(2)),
+    daysPassed,
+    daysRemaining,
+    totalDaysInMonth,
+    confidence,
+    categoryForecasts,
+  };
+};

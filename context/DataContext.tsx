@@ -126,6 +126,7 @@ interface DataContextType extends AppState {
 
   setCurrency: (currency: string) => void;
   toggleTheme: () => void;
+  setAccentTheme: (theme: string) => void;
   toggleHideAmounts: () => void;
   setDefaultWallet: (id: string) => void;
   setNumberSystem: (system: "IN" | "INTL" | "AUTO") => void;
@@ -184,6 +185,7 @@ const INITIAL_STATE: AppState = {
   ],
   analyticsWidgets: ANALYTICS_WIDGET_DEFAULTS,
   analyticsSectionNames: {},
+  accentTheme: "emerald",
 };
 
 const STORAGE_KEY = "budgeity_local_v1";
@@ -364,6 +366,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     localStorage.setItem(THEME_STORAGE_KEY, state.theme);
   }, [state.theme]);
+
+  // Handle Accent Theme
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", state.accentTheme || "emerald");
+  }, [state.accentTheme]);
 
   const syncState = async (newState: AppState) => {
     setState(newState);
@@ -1600,6 +1607,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     // to keep it consistent with other settings.
     syncState({ ...state, theme: newTheme });
   };
+  const setAccentTheme = (theme: string) => syncState({ ...state, accentTheme: theme });
   const toggleHideAmounts = () =>
     syncState({ ...state, hideAmounts: !state.hideAmounts });
   const setDefaultWallet = (id: string) =>
@@ -1699,6 +1707,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         syncEngineResults,
         setCurrency,
         toggleTheme,
+        setAccentTheme,
         toggleHideAmounts,
         setDefaultWallet,
         setNumberSystem,

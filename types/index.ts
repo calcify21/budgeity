@@ -275,4 +275,5 @@ export interface AppState {
   dashboardWidgets?: DashboardWidgetConfig[];
   analyticsWidgets?: AnalyticsWidgetConfig[];
   analyticsSectionNames?: Record<string, string>;
+  accentTheme?: string;
 }

@@ -33,6 +33,7 @@ import { IncomeExpenseWidget } from "../components/dashboard/IncomeExpenseWidget
 import { SnapshotWidget } from "../components/dashboard/SnapshotWidget";
 import { PlannedSpendingWidget } from "../components/dashboard/PlannedSpendingWidget";
 import { BalanceTrendWidget } from "../components/dashboard/BalanceTrendWidget";
+import { SpendingForecastWidget } from "../components/dashboard/SpendingForecastWidget";
 import { WidgetSkeleton } from "../components/dashboard/WidgetSkeleton";
 
 const widgetComponents: Record<string, React.FC<{ 
@@ -51,6 +52,7 @@ const widgetComponents: Record<string, React.FC<{
   snapshot: SnapshotWidget as any,
   planned: PlannedSpendingWidget as any,
   trend: BalanceTrendWidget as any,
+  forecast: SpendingForecastWidget as any,
 };
 
 const widgetLabels: Record<string, string> = {
@@ -65,6 +67,7 @@ const widgetLabels: Record<string, string> = {
   snapshot: "Savings & Burn Rate",
   planned: "Planned Spending",
   trend: "Balance Trend",
+  forecast: "Spending Forecast",
 };
 
 
@@ -111,20 +114,22 @@ const Dashboard: React.FC = () => {
     "snapshot",
     "planned",
     "trend",
+    "forecast",
   ];
 
   const DASHBOARD_WIDGET_DEFAULTS: DashboardWidgetConfig[] = [
     { id: "networth", enabled: true, order: 1 },
     { id: "income_expense", enabled: true, order: 2 },
     { id: "snapshot", enabled: true, order: 3 },
-    { id: "wallets", enabled: true, order: 4 },
-    { id: "trend", enabled: true, order: 5 },
-    { id: "goals", enabled: true, order: 6 },
-    { id: "transactions", enabled: true, order: 7 },
-    { id: "spending", enabled: false, order: 8 },
-    { id: "budgets", enabled: false, order: 9 },
-    { id: "actions", enabled: false, order: 10 },
-    { id: "planned", enabled: false, order: 11 },
+    { id: "forecast", enabled: true, order: 4 },
+    { id: "wallets", enabled: true, order: 5 },
+    { id: "trend", enabled: true, order: 6 },
+    { id: "goals", enabled: true, order: 7 },
+    { id: "transactions", enabled: true, order: 8 },
+    { id: "spending", enabled: false, order: 9 },
+    { id: "budgets", enabled: false, order: 10 },
+    { id: "actions", enabled: false, order: 11 },
+    { id: "planned", enabled: false, order: 12 },
   ];
 
   // Sync local state when not editing

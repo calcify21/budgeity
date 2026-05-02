@@ -1,7 +1,6 @@
 {
   "common": {
     "dashboard": "Dashboard",
-    "analytics": "Analytics",
     "analytics_v2": "Analytics V2",
     "user_feedback": "User Feedback",
     "transactions": "Transactions",
@@ -55,7 +54,15 @@
     "add_income": "Add Income",
     "add_transfer": "Add Transfer",
     "new_goal": "New Goal",
-    "new_budget": "New Budget"
+    "new_budget": "New Budget",
+    "overview": "Overview",
+    "cashflow": "Cashflow",
+    "analytics": "Analytics",
+    "planning": "Planning",
+    "management": "Management",
+    "account": "Account",
+    "admin": "Admin",
+    "reports": "Reports"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -81,6 +88,24 @@
     "app_lock_reset_title": "App Lock Securely Reset",
     "app_lock_reset_desc": "Your previous App Lock settings were successfully cleared. You can set up a new PIN or pattern in your security settings to protect your device again.",
     "setup_app_lock": "Set Up App Lock"
+  },
+  "forecast": {
+    "title": "Spending Forecast",
+    "projected_month_end": "Projected Month-End",
+    "daily_average": "Daily Average",
+    "day": "day",
+    "days_remaining": "{{days}} days remaining",
+    "month_progress": "Month Progress",
+    "spent_of_projected": "{{spent}} of {{projected}}",
+    "budget_alert": "Budget Alert",
+    "top_categories": "Top Projected Categories",
+    "higher": "higher",
+    "lower": "lower",
+    "than_last_month": "than last month",
+    "same_as_last": "Same as last month",
+    "confidence_high": "High confidence",
+    "confidence_medium": "Medium confidence",
+    "confidence_low": "Low confidence — limited data"
   },
   "transactions": {
     "searchPlaceholder": "Search...",
@@ -267,6 +292,7 @@
     "title": "Settings",
     "preferences": "Preferences",
     "dark_mode": "Dark Mode",
+    "accent_theme": "Accent Theme",
     "dark_mode_desc": "Switch between light and dark themes",
     "currency": "Currency",
     "currency_desc": "Select your preferred currency",

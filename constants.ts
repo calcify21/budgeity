@@ -23,6 +23,15 @@ export const COLORS = [
   "#ec4899", // Pink
 ];
 
+export const ACCENT_THEMES = [
+  { id: "emerald", name: "Emerald", color: "#10b981" },
+  { id: "ocean", name: "Ocean", color: "#3b82f6" },
+  { id: "purple", name: "Purple", color: "#8b5cf6" },
+  { id: "sunset", name: "Sunset", color: "#f97316" },
+  { id: "rose", name: "Rose", color: "#f43f5e" },
+  { id: "slate", name: "Slate", color: "#64748b" },
+];
+
 // Symbols mapped from standard ISO lists
 export const CURRENCIES = [
   { code: "USD", symbol: "$", name: "United States Dollar" },

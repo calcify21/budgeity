@@ -14,7 +14,7 @@ import {
   Wallet,
   Globe,
 } from "lucide-react";
-import { CURRENCIES } from "../constants";
+import { CURRENCIES, ACCENT_THEMES } from "../constants";
 import CustomSelect from "../components/CustomSelect";
 import { ConfirmModal } from "../components/ConfirmModal";
 import WalletModal from "../components/WalletModal";
@@ -27,6 +27,8 @@ const Settings: React.FC = () => {
   const {
     theme,
     toggleTheme,
+    accentTheme,
+    setAccentTheme,
     resetData,
     currency,
     setCurrency,
@@ -265,6 +267,33 @@ const Settings: React.FC = () => {
               className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${theme === "dark" ? "translate-x-[1.625rem]" : "translate-x-1"}`}
             />
           </button>
+        </div>
+
+        {/* Accent Theme */}
+        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
+          <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
+            {t("settings.accent_theme", "Accent Theme")}
+          </h4>
+          <div className="flex flex-wrap gap-3">
+            {ACCENT_THEMES.map((accent) => {
+              const isActive = (accentTheme || "emerald") === accent.id;
+              return (
+                <button
+                  key={accent.id}
+                  onClick={() => setAccentTheme(accent.id)}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? "ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-zinc-900 scale-110" : "hover:scale-110 opacity-70 hover:opacity-100"}`}
+                  style={{ backgroundColor: accent.color }}
+                  title={accent.name}
+                >
+                  {isActive && (
+                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Hide Balances */}

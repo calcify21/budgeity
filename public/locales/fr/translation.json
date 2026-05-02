@@ -1,7 +1,6 @@
 {
   "common": {
     "dashboard": "Tableau de Bord",
-    "analytics": "Analytique",
     "analytics_v2": "Analytique V2",
     "user_feedback": "Commentaires des Utilisateurs",
     "transactions": "Transactions",
@@ -55,7 +54,15 @@
     "add_income": "Ajouter un Revenu",
     "add_transfer": "Ajouter un Transfert",
     "new_goal": "Nouvel Objectif",
-    "new_budget": "Nouveau Budget"
+    "new_budget": "Nouveau Budget",
+    "overview": "Aperçu",
+    "cashflow": "Flux de trésorerie",
+    "analytics": "Analyses",
+    "planning": "Planification",
+    "management": "Gestion",
+    "account": "Compte",
+    "admin": "Administration",
+    "reports": "Rapports"
   },
   "dashboard": {
     "title": "Tableau de Bord",
@@ -81,6 +88,24 @@
     "app_lock_reset_title": "Verrouillage de l'application réinitialisé",
     "app_lock_reset_desc": "Vos paramètres de verrouillage ont été effacés avec succès. Vous pouvez configurer un nouveau code PIN ou schéma dans vos paramètres de sécurité.",
     "setup_app_lock": "Configurer le verrouillage"
+  },
+  "forecast": {
+    "title": "Prévisions de dépenses",
+    "projected_month_end": "Fin de mois projetée",
+    "daily_average": "Moyenne quotidienne",
+    "day": "jour",
+    "days_remaining": "{{days}} jours restants",
+    "month_progress": "Progression du mois",
+    "spent_of_projected": "{{spent}} sur {{projected}}",
+    "budget_alert": "Alerte budget",
+    "top_categories": "Catégories les plus dépensées",
+    "higher": "plus élevé",
+    "lower": "plus bas",
+    "than_last_month": "que le mois dernier",
+    "same_as_last": "Identique au mois dernier",
+    "confidence_high": "Haute fiabilité",
+    "confidence_medium": "Fiabilité moyenne",
+    "confidence_low": "Faible fiabilité — données limitées"
   },
   "transactions": {
     "searchPlaceholder": "Rechercher...",
@@ -267,6 +292,7 @@
     "title": "Paramètres",
     "preferences": "Préférences",
     "dark_mode": "Mode Sombre",
+    "accent_theme": "Thème",
     "dark_mode_desc": "Basculer entre les thèmes clair et sombre",
     "currency": "Devise",
     "currency_desc": "Choisissez votre devise préférée",

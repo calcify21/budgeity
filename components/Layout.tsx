@@ -222,11 +222,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({
-    main: true,
-    insights: true,
+    overview: true,
+    cashflow: true,
+    analytics: true,
     planning: true,
     management: true,
-    general: true,
+    account: true,
     admin: true,
   });
   const [searchQuery, setSearchQuery] = useState("");
@@ -240,6 +241,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsSidebarCollapsed(newVal);
     localStorage.setItem("budgeity_sidebar_collapsed", String(newVal));
   };
+
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isHouseholdModalOpen, setIsHouseholdModalOpen] = useState(false);
@@ -307,7 +309,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const workspaceContainerRef = useRef<HTMLDivElement>(null);
 
   useEscapeKey(isProfileDropdownOpen, () => setIsProfileDropdownOpen(false));
-  useEscapeKey(isWorkspaceSwitcherOpen, () => setIsWorkspaceSwitcherOpen(false));
+  useEscapeKey(isWorkspaceSwitcherOpen, () =>
+    setIsWorkspaceSwitcherOpen(false),
+  );
   useEscapeKey(isInviteModalOpen, () => setIsInviteModalOpen(false));
   useEscapeKey(isFeedbackModalOpen, () => setIsFeedbackModalOpen(false));
   useEscapeKey(isHouseholdModalOpen, () => setIsHouseholdModalOpen(false));
@@ -315,13 +319,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEscapeKey(showFullPhoto, () => setShowFullPhoto(false));
   useEscapeKey(isTxModalOpen, () => setIsTxModalOpen(false));
 
-  useClickOutside(
-    profileContainerRef,
-    () => setIsProfileDropdownOpen(false)
-  );
-  useClickOutside(
-    workspaceContainerRef,
-    () => setIsWorkspaceSwitcherOpen(false)
+  useClickOutside(profileContainerRef, () => setIsProfileDropdownOpen(false));
+  useClickOutside(workspaceContainerRef, () =>
+    setIsWorkspaceSwitcherOpen(false),
   );
 
   const mainContentRef = React.useRef<HTMLDivElement>(null);
@@ -335,6 +335,222 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       });
     }
   }, [location.pathname]);
+
+  const navItems = React.useMemo(() => {
+    const items = [
+      {
+        section: "overview",
+        title: t("common.overview", "Overview"),
+        items: [
+          {
+            to: "/dashboard",
+            icon: LayoutDashboard,
+            label: t("common.dashboard"),
+            onClick: handleNavClick,
+            className: "tour-nav-dashboard",
+          },
+        ],
+      },
+      {
+        section: "cashflow",
+        title: t("common.cashflow", "Cashflow"),
+        items: [
+          {
+            to: "/transactions",
+            icon: ArrowRightLeft,
+            label: t("common.transactions"),
+            onClick: handleNavClick,
+            className: "tour-nav-transactions",
+          },
+          {
+            to: "/recurring",
+            icon: Repeat,
+            label: t("common.recurring"),
+            onClick: handleNavClick,
+            className: "tour-nav-recurring",
+          },
+          {
+            to: "/wallets",
+            icon: Wallet,
+            label: t("common.wallets"),
+            onClick: handleNavClick,
+            className: "tour-nav-wallets",
+          },
+        ],
+      },
+      {
+        section: "analytics",
+        title: t("common.analytics", "Analytics"),
+        items: [
+          {
+            to: "/analytics",
+            icon: BarChart3,
+            label: t("common.analytics"),
+            onClick: handleNavClick,
+            className: "tour-nav-analytics",
+          },
+          {
+            to: "/analytics-v2",
+            icon: BarChart3,
+            label: t("common.analytics_v2"),
+            onClick: handleNavClick,
+            className: "tour-nav-analytics-v2",
+          },
+          {
+            to: "/reports",
+            icon: FileBarChart2,
+            label: t("common.reports"),
+            onClick: handleNavClick,
+            className: "tour-nav-reports",
+          },
+        ],
+      },
+      {
+        section: "planning",
+        title: t("common.planning", "Planning"),
+        items: [
+          {
+            to: "/budgets",
+            icon: PiggyBank,
+            label: t("common.budgets"),
+            onClick: handleNavClick,
+            className: "tour-nav-budgets",
+          },
+          {
+            to: "/goals",
+            icon: Target,
+            label: t("common.goals"),
+            onClick: handleNavClick,
+            className: "tour-nav-goals",
+          },
+          {
+            to: "/shopping-list",
+            icon: ShoppingCart,
+            label: t("common.shopping_list"),
+            onClick: handleNavClick,
+            className: "tour-nav-shopping",
+          },
+        ],
+      },
+      {
+        section: "management",
+        title: t("common.management"),
+        items: [
+          {
+            to: "/categories",
+            icon: Tags,
+            label: t("common.categories"),
+            onClick: handleNavClick,
+            className: "tour-nav-categories",
+          },
+          {
+            to: "/export",
+            icon: Download,
+            label: t("common.export"),
+            onClick: handleNavClick,
+            className: "tour-nav-export",
+          },
+          ...(activeWorkspace.type === "household"
+            ? [
+                {
+                  to: "/household-settings",
+                  icon: Home,
+                  label: "Household Settings",
+                  onClick: handleNavClick,
+                },
+              ]
+            : []),
+        ],
+      },
+      {
+        section: "account",
+        title: t("common.account", "Account"),
+        items: [
+          {
+            to: "/settings",
+            icon: Settings,
+            label: t("common.settings"),
+            onClick: handleNavClick,
+            className: "tour-nav-settings",
+          },
+          {
+            to: "/account-info",
+            icon: UserCircle,
+            label: t("common.account_info"),
+            onClick: handleNavClick,
+            className: "tour-nav-account",
+          },
+          {
+            to: "/whats-new",
+            icon: Sparkles,
+            label: t("common.whats_new"),
+            onClick: handleNavClick,
+            className: "tour-nav-whats-new",
+          },
+        ],
+      },
+    ];
+
+    if (user?.email === "jainshr21@gmail.com") {
+      items.push({
+        section: "admin",
+        title: t("common.admin", "Admin"),
+        items: [
+          {
+            to: "/admin/feedback",
+            icon: Shield,
+            label: t("common.user_feedback"),
+            onClick: handleNavClick,
+            className:
+              location.pathname === "/admin/feedback"
+                ? "shadow-none"
+                : "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 font-bold",
+          },
+        ],
+      });
+    }
+
+    return items;
+  }, [t, activeWorkspace, user, location.pathname]);
+
+  const filteredNavItems = navItems
+    .map((section) => ({
+      ...section,
+      items: section.items.filter(
+        (item) =>
+          !searchQuery ||
+          item.label.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
+    }))
+    .filter((section) => section.items.length > 0);
+
+  const NavHeader = ({
+    title,
+    section,
+  }: {
+    title: string;
+    section: string;
+  }) => {
+    if (isSidebarCollapsed)
+      return (
+        <div className="h-px bg-slate-200 dark:bg-white/5 my-3 mx-4"></div>
+      );
+    return (
+      <button
+        onClick={() => toggleSection(section)}
+        className="w-full flex items-center justify-between px-4 py-1.5 mt-4 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition-colors group"
+      >
+        <span>{title}</span>
+        <ChevronDown
+          size={14}
+          className={cn(
+            "transition-transform",
+            expandedSections[section] ? "rotate-180" : "",
+          )}
+        />
+      </button>
+    );
+  };
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-slate-100 overflow-hidden relative selection:bg-brand-500/30">
@@ -403,282 +619,78 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             isSidebarCollapsed ? "hidden lg:hidden" : "block",
           )}
         >
-          <div className="relative">
+          <div className="relative group flex items-center">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors"
             />
             <input
               type="text"
               placeholder={t("common.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 bg-slate-100 dark:bg-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 border border-transparent dark:border-white/5 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 transition-all"
+              className="w-full pl-9 pr-9 py-2 bg-slate-100 dark:bg-white/5 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/50 border border-transparent dark:border-white/5 text-slate-900 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 transition-all"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                aria-label="Clear search"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         </div>
 
-        {(() => {
-          const NavHeader = ({
-            title,
-            section,
-          }: {
-            title: string;
-            section: string;
-          }) => {
-            if (isSidebarCollapsed)
-              return (
-                <div className="h-px bg-slate-200 dark:bg-white/5 my-3 mx-4"></div>
-              );
-            return (
-              <button
-                onClick={() => toggleSection(section)}
-                className="w-full flex items-center justify-between px-4 py-1.5 mt-4 mb-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider hover:text-slate-600 dark:hover:text-slate-300 transition-colors group"
-              >
-                <span>{title}</span>
-                <ChevronDown
-                  size={14}
-                  className={cn(
-                    "transition-transform",
-                    expandedSections[section] ? "rotate-180" : "",
+        <nav
+          className={cn(
+            "flex-1 space-y-1 overflow-y-auto custom-scrollbar",
+            isSidebarCollapsed && !searchQuery ? "px-2" : "px-4",
+          )}
+        >
+          {filteredNavItems.length === 0 ? (
+            <div className="text-center py-6 px-4">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                No results found.
+              </p>
+            </div>
+          ) : (
+            filteredNavItems.map(({ title, section, items }) => (
+              <React.Fragment key={section}>
+                <NavHeader title={title} section={section} />
+                <AnimatePresence>
+                  {(isSidebarCollapsed ||
+                    expandedSections[section] ||
+                    searchQuery) && (
+                    <MotionDiv
+                      initial={
+                        isSidebarCollapsed ? false : { height: 0, opacity: 0 }
+                      }
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden space-y-1"
+                    >
+                      {items.map((item) => (
+                        <SidebarItem
+                          key={item.to}
+                          to={item.to}
+                          icon={item.icon}
+                          label={item.label}
+                          onClick={item.onClick}
+                          location={location}
+                          className={item.className}
+                          isCollapsed={isSidebarCollapsed && !searchQuery}
+                        />
+                      ))}
+                    </MotionDiv>
                   )}
-                />
-              </button>
-            );
-          };
-
-          const navItems = [
-            {
-              section: "main",
-              title: "Main",
-              items: [
-                {
-                  to: "/dashboard",
-                  icon: LayoutDashboard,
-                  label: t("common.dashboard"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-dashboard",
-                },
-                {
-                  to: "/transactions",
-                  icon: ArrowRightLeft,
-                  label: t("common.transactions"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-transactions",
-                },
-                {
-                  to: "/wallets",
-                  icon: Wallet,
-                  label: t("common.wallets"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-wallets",
-                },
-              ],
-            },
-            {
-              section: "insights",
-              title: "Insights",
-              items: [
-                {
-                  to: "/analytics",
-                  icon: BarChart3,
-                  label: t("common.analytics"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-analytics",
-                },
-                {
-                  to: "/analytics-v2",
-                  icon: BarChart3,
-                  label: t("common.analytics_v2"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-analytics-v2",
-                },
-                {
-                  to: "/reports",
-                  icon: FileBarChart2,
-                  label: "Reports",
-                  onClick: handleNavClick,
-                  className: "tour-nav-reports",
-                },
-              ],
-            },
-            {
-              section: "planning",
-              title: "Planning",
-              items: [
-                {
-                  to: "/budgets",
-                  icon: PiggyBank,
-                  label: t("common.budgets"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-budgets",
-                },
-                {
-                  to: "/goals",
-                  icon: Target,
-                  label: t("common.goals"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-goals",
-                },
-                {
-                  to: "/recurring",
-                  icon: Repeat,
-                  label: t("common.recurring"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-recurring",
-                },
-                {
-                  to: "/shopping-list",
-                  icon: ShoppingCart,
-                  label: t("common.shopping_list"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-shopping",
-                },
-              ],
-            },
-            {
-              section: "management",
-              title: "Management",
-              items: [
-                {
-                  to: "/categories",
-                  icon: Tags,
-                  label: t("common.categories"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-categories",
-                },
-                {
-                  to: "/export",
-                  icon: Download,
-                  label: t("common.export"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-export",
-                },
-                ...(activeWorkspace.type === "household"
-                  ? [
-                      {
-                        to: "/household-settings",
-                        icon: Home,
-                        label: "Household Settings",
-                        onClick: handleNavClick,
-                        className: undefined,
-                      },
-                    ]
-                  : []),
-              ],
-            },
-            {
-              section: "general",
-              title: "General",
-              items: [
-                {
-                  to: "/settings",
-                  icon: Settings,
-                  label: t("common.settings"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-settings",
-                },
-                {
-                  to: "/account-info",
-                  icon: UserCircle,
-                  label: t("common.account_info"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-account",
-                },
-                {
-                  to: "/whats-new",
-                  icon: Sparkles,
-                  label: t("common.whats_new"),
-                  onClick: handleNavClick,
-                  className: "tour-nav-whats-new",
-                },
-              ],
-            },
-          ];
-
-          if (user?.email === "jainshr21@gmail.com") {
-            navItems.push({
-              section: "admin",
-              title: "Admin",
-              items: [
-                {
-                  to: "/admin/feedback",
-                  icon: Shield,
-                  label: t("common.user_feedback"),
-                  onClick: handleNavClick,
-                  className:
-                    location.pathname === "/admin/feedback"
-                      ? "shadow-none"
-                      : "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 font-bold",
-                },
-              ],
-            });
-          }
-
-          const filteredNavItems = navItems
-            .map((section) => ({
-              ...section,
-              items: section.items.filter(
-                (item) =>
-                  !searchQuery ||
-                  item.label.toLowerCase().includes(searchQuery.toLowerCase()),
-              ),
-            }))
-            .filter((section) => section.items.length > 0);
-
-          return (
-            <nav
-              className={cn(
-                "flex-1 space-y-1 overflow-y-auto custom-scrollbar",
-                isSidebarCollapsed && !searchQuery ? "px-2" : "px-4",
-              )}
-            >
-              {filteredNavItems.length === 0 ? (
-                <div className="text-center py-6 px-4">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    No results found.
-                  </p>
-                </div>
-              ) : (
-                filteredNavItems.map(({ title, section, items }) => (
-                  <React.Fragment key={section}>
-                    <NavHeader title={title} section={section} />
-                    <AnimatePresence>
-                      {(isSidebarCollapsed ||
-                        expandedSections[section] ||
-                        searchQuery) && (
-                        <MotionDiv
-                          initial={
-                            isSidebarCollapsed
-                              ? false
-                              : { height: 0, opacity: 0 }
-                          }
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: "easeInOut" }}
-                          className="overflow-hidden space-y-1"
-                        >
-                          {items.map((item) => (
-                            <SidebarItem
-                              key={item.to}
-                              to={item.to}
-                              icon={item.icon}
-                              label={item.label}
-                              onClick={item.onClick}
-                              location={location}
-                              className={item.className}
-                              isCollapsed={isSidebarCollapsed && !searchQuery}
-                            />
-                          ))}
-                        </MotionDiv>
-                      )}
-                    </AnimatePresence>
-                  </React.Fragment>
-                ))
-              )}
-            </nav>
-          );
-        })()}
+                </AnimatePresence>
+              </React.Fragment>
+            ))
+          )}
+        </nav>
 
         {/* Bottom Actions Section */}
         <div
@@ -862,9 +874,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           {/* Workspace Switcher */}
           <div className="relative" ref={workspaceContainerRef}>
             <button
-              onClick={() =>
-                setIsWorkspaceSwitcherOpen(prev => !prev)
-              }
+              onClick={() => setIsWorkspaceSwitcherOpen((prev) => !prev)}
               className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl transition-colors tour-nav-workspace"
             >
               <span className="text-base flex items-center justify-center">
@@ -1083,9 +1093,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 className="tour-nav-lock flex items-center gap-2 px-3 py-1.5 text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 rounded-lg transition-all text-[11px] font-black uppercase tracking-wider border border-amber-200/50 dark:border-amber-500/20 shadow-sm"
               >
                 <LockKeyhole size={16} strokeWidth={2.5} />
-                <span className="hidden sm:inline">
-                  {t("appLock.lockNow")}
-                </span>
+                <span className="hidden sm:inline">{t("appLock.lockNow")}</span>
               </button>
             )}
 
@@ -1105,7 +1113,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* User Profile Dropdown */}
             <div className="relative" ref={profileContainerRef}>
               <button
-                onClick={() => setIsProfileDropdownOpen(prev => !prev)}
+                onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
                 className="tour-nav-profile flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
               >
                 <UserAvatar

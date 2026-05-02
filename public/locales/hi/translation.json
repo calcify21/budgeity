@@ -1,7 +1,6 @@
 {
   "common": {
     "dashboard": "डैशबोर्ड",
-    "analytics": "वित्तीय विश्लेषण",
     "analytics_v2": "वित्तीय विश्लेषण V2",
     "insight": "अंतर्दृष्टि",
     "user_feedback": "उपयोगकर्ता प्रतिक्रिया",
@@ -56,7 +55,15 @@
     "add_income": "आय जोड़ें",
     "add_transfer": "स्थानांतरण जोड़ें",
     "new_goal": "नया लक्ष्य",
-    "new_budget": "नया बजट"
+    "new_budget": "नया बजट",
+    "overview": "अवलोकन",
+    "cashflow": "नकद प्रवाह",
+    "analytics": "विश्लेषण",
+    "planning": "योजना",
+    "management": "प्रबंधन",
+    "account": "खाता",
+    "admin": "व्यवस्थापक",
+    "reports": "रिपोर्ट्स"
   },
   "dashboard": {
     "title": "डैशबोर्ड",
@@ -82,6 +89,24 @@
     "app_lock_reset_title": "ऐप लॉक सुरक्षित रूप से रीसेट किया गया",
     "app_lock_reset_desc": "आपकी पिछली ऐप लॉक सेटिंग्स सफलतापूर्वक साफ़ कर दी गई हैं। आप सुरक्षा सेटिंग्स में नया पिन या पैटर्न सेट कर सकते हैं।",
     "setup_app_lock": "ऐप लॉक सेट करें"
+  },
+  "forecast": {
+    "title": "खर्च पूर्वानुमान",
+    "projected_month_end": "अनुमानित माह-अंत",
+    "daily_average": "दैनिक औसत",
+    "day": "दिन",
+    "days_remaining": "{{days}} दिन शेष",
+    "month_progress": "माह प्रगति",
+    "spent_of_projected": "{{spent}} / {{projected}}",
+    "budget_alert": "बजट चेतावनी",
+    "top_categories": "शीर्ष अनुमानित श्रेणियाँ",
+    "higher": "अधिक",
+    "lower": "कम",
+    "than_last_month": "पिछले महीने से",
+    "same_as_last": "पिछले महीने जैसा",
+    "confidence_high": "उच्च विश्वसनीयता",
+    "confidence_medium": "मध्यम विश्वसनीयता",
+    "confidence_low": "कम विश्वसनीयता — सीमित डेटा"
   },
   "transactions": {
     "searchPlaceholder": "खोजें...",
@@ -268,6 +293,7 @@
     "title": "सेटिंग्स",
     "preferences": "प्राथमिकताएँ",
     "dark_mode": "डार्क मोड",
+    "accent_theme": "एक्सेंट थीम",
     "dark_mode_desc": "लाइट और डार्क थीम के बीच स्विच करें",
     "currency": "मुद्रा",
     "currency_desc": "अपनी पसंदीदा मुद्रा चुनें",

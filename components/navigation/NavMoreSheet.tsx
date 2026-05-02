@@ -513,7 +513,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                   {/* Search Bar */}
                   {!isCustomizing && (
                     <div className="mb-2 px-2">
-                      <div className="relative group">
+                      <div className="relative group flex items-center">
                         <Search
                           size={18}
                           className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-500 transition-colors"
@@ -523,8 +523,17 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                           placeholder={t("common.search")}
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-11 pr-4 py-3 bg-slate-100 dark:bg-white/5 rounded-2xl text-[15px] focus:outline-none focus:ring-2 focus:ring-brand-500/30 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium"
+                          className="w-full pl-11 pr-10 py-3 bg-slate-100 dark:bg-white/5 rounded-2xl text-[15px] focus:outline-none focus:ring-2 focus:ring-brand-500/30 text-slate-900 dark:text-white placeholder-slate-500 transition-all font-medium"
                         />
+                        {searchQuery && (
+                          <button
+                            onClick={() => setSearchQuery("")}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                            aria-label="Clear search"
+                          >
+                            <X size={16} />
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
