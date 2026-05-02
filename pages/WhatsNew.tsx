@@ -46,6 +46,8 @@ import {
   SlidersHorizontal,
   AlertCircle,
   Camera,
+  Palette,
+  Search,
   Cloud,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -105,6 +107,21 @@ const WhatsNew: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ChangeItem
+          icon={Palette}
+          title="Premium Theme Engine"
+          description="Budgeity now fits your style! Choose from 6 stunning accent themes—Emerald, Ocean, Purple, Sunset, Rose, and Slate. Each theme instantly transforms the entire application with perfectly balanced light and dark mode variants."
+        />
+        <ChangeItem
+          icon={Search}
+          title="Interactive Search Clear"
+          description="Find things faster and easier. We've added one-tap clear buttons (X) to all search bars across the mobile menu and desktop sidebar, ensuring a frictionless navigation experience."
+        />
+        <ChangeItem
+          icon={Globe}
+          title="Advanced I18n Audit System"
+          description="Professional-grade localization! Our entire translation engine now features automated auditing and strict TypeScript safety, ensuring 100% accurate and consistent naming across English, Hindi, and French."
+        />
         <ChangeItem
           icon={Compass}
           title="Flawless Floating Navigation"
