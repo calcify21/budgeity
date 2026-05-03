@@ -62,7 +62,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
     "/analytics": { icon: BarChart3, label: t("common.analytics") },
     "/analytics-v2": { icon: BarChart3, label: t("common.analytics_v2") },
     "/transactions": { icon: ArrowRightLeft, label: t("common.transactions") },
-    "/recurring": { icon: Repeat, label: t("common.recurring") },
+    "/subscriptions": { icon: Repeat, label: t("common.subscriptions") },
     "/wallets": { icon: Wallet, label: t("common.wallets") },
     "/goals": { icon: Target, label: t("common.goals") },
     "/budgets": { icon: PiggyBank, label: t("common.budgets") },

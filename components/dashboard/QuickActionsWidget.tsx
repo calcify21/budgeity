@@ -53,10 +53,10 @@ export const QuickActionsWidget: React.FC = () => {
       onClick: () => navigate("/categories?add=true"),
     },
     {
-      label: t("recurring.addRule"),
+      label: t("subscriptions.addSubscription"),
       icon: <Repeat size={20} />,
       color: "bg-blue-500 text-white",
-      onClick: () => navigate("/recurring?add=true"),
+      onClick: () => navigate("/subscriptions?add=true"),
     },
     // Lock App action (only shown when lock is enabled)
     ...(isLockEnabled && isUnlocked

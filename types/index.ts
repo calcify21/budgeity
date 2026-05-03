@@ -160,6 +160,7 @@ export interface RecurringTransaction {
   type: "income" | "expense";
   amount: number;
   name?: string;
+  note?: string;
   categoryId: string;
   subcategoryId?: string;
   walletId: string;

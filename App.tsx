@@ -22,7 +22,7 @@ const Analytics = React.lazy(() => import("./pages/Analytics"));
 const AnalyticsV2 = React.lazy(() => import("./pages/AnalyticsV2"));
 const Budgets = React.lazy(() => import("./pages/Budgets"));
 const Goals = React.lazy(() => import("./pages/Goals"));
-const Recurring = React.lazy(() => import("./pages/Recurring"));
+const Subscriptions = React.lazy(() => import("./pages/Subscriptions"));
 const Export = React.lazy(() => import("./pages/Export"));
 const Reports = React.lazy(() => import("./pages/Reports"));
 const ShoppingList = React.lazy(() => import("./pages/ShoppingList"));
@@ -247,7 +247,8 @@ const AppContent: React.FC = () => {
               <Route path="/transactions" element={<Transactions />} />
               <Route path="/budgets" element={<Budgets />} />
               <Route path="/goals" element={<Goals />} />
-              <Route path="/recurring" element={<Recurring />} />
+              <Route path="/subscriptions" element={<Subscriptions />} />
+              <Route path="/recurring" element={<Navigate to="/subscriptions" replace />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/analytics-v2" element={<AnalyticsV2 />} />
               <Route path="/categories" element={<Categories />} />

@@ -11,6 +11,7 @@ import {
   RecurringTransaction,
   ShoppingItem,
   Transaction,
+  TransactionType,
   Wallet,
   WalletType,
   ActivityActionType,
@@ -118,7 +119,11 @@ interface DataContextType extends AppState {
   updateRecurringTransaction: (
     rule: Partial<RecurringTransaction> & { id: string },
   ) => void;
+  updateRecurringTransactionWithHistory: (
+    rule: Partial<RecurringTransaction> & { id: string },
+  ) => void;
   deleteRecurringTransaction: (id: string, deleteGenerated?: boolean) => void;
+  confirmManualSubscriptionPayment: (sub: RecurringTransaction, note: string, nextDate: string) => void;
   syncEngineResults: (
     newTransactions: Transaction[],
     updatedRules: RecurringTransaction[],
@@ -185,6 +190,7 @@ const INITIAL_STATE: AppState = {
     { id: "budgets", enabled: false, order: 9 },
     { id: "actions", enabled: false, order: 10 },
     { id: "planned", enabled: false, order: 11 },
+    { id: "subscriptions", enabled: true, order: 12 },
   ],
   analyticsWidgets: ANALYTICS_WIDGET_DEFAULTS,
   analyticsSectionNames: {},
@@ -468,6 +474,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         { id: "budgets", enabled: false, order: 9 },
         { id: "actions", enabled: false, order: 10 },
         { id: "planned", enabled: false, order: 11 },
+        { id: "subscriptions", enabled: true, order: 12 },
       ];
     } else if (data.primaryGoal === "build_wealth") {
       customDashboardWidgets = [
@@ -482,6 +489,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         { id: "budgets", enabled: false, order: 9 },
         { id: "actions", enabled: false, order: 10 },
         { id: "planned", enabled: false, order: 11 },
+        { id: "subscriptions", enabled: true, order: 12 },
       ];
     } else if (data.primaryGoal === "track_spending") {
       customDashboardWidgets = [
@@ -496,6 +504,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         { id: "goals", enabled: false, order: 9 },
         { id: "actions", enabled: false, order: 10 },
         { id: "planned", enabled: false, order: 11 },
+        { id: "subscriptions", enabled: true, order: 12 },
       ];
     } else if (data.primaryGoal === "save_goal") {
       customDashboardWidgets = [
@@ -510,6 +519,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         { id: "spending", enabled: false, order: 9 },
         { id: "actions", enabled: false, order: 10 },
         { id: "planned", enabled: false, order: 11 },
+        { id: "subscriptions", enabled: true, order: 12 },
       ];
     }
 
@@ -1492,6 +1502,188 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ),
     });
 
+  const updateRecurringTransactionWithHistory = (
+    rule: Partial<RecurringTransaction> & { id: string },
+  ) => {
+    const existingRule = state.recurringTransactions.find(
+      (r) => r.id === rule.id,
+    );
+    if (!existingRule) return;
+
+    const mergedRule = { ...existingRule, ...rule };
+    const linkedTransactions = state.transactions.filter(
+      (t) => t.recurringId === rule.id,
+    );
+
+    let nextWallets = [...state.wallets];
+    let nextGoals = [...state.goals];
+    const updatedTransactions = new Map<string, Transaction>();
+    const resolvedNote =
+      mergedRule.note?.trim() ||
+      mergedRule.name?.trim() ||
+      existingRule.note?.trim() ||
+      existingRule.name?.trim() ||
+      "";
+
+    const applyEffect = (tx: Transaction, direction: 1 | -1) => {
+      if (tx.type === "income") {
+        ({ wallets: nextWallets, goals: nextGoals } = adjustEntityBalance(
+          nextWallets,
+          nextGoals,
+          tx.toWalletId,
+          tx.amount * direction,
+        ));
+        return;
+      }
+
+      if (tx.type === "expense") {
+        if (direction > 0) {
+          const fromWallet = nextWallets.find((w) => w.id === tx.fromWalletId);
+          if (
+            fromWallet &&
+            fromWallet.type === "cash" &&
+            fromWallet.balance - tx.amount < 0
+          ) {
+            throw new Error(
+              `Insufficient funds in Cash wallet '${fromWallet.name}'.`,
+            );
+          }
+        }
+        ({ wallets: nextWallets, goals: nextGoals } = adjustEntityBalance(
+          nextWallets,
+          nextGoals,
+          tx.fromWalletId,
+          -tx.amount * direction,
+        ));
+        return;
+      }
+
+      if (tx.type === "transfer") {
+        if (direction > 0) {
+          const fromWallet = nextWallets.find((w) => w.id === tx.fromWalletId);
+          if (
+            fromWallet &&
+            fromWallet.type === "cash" &&
+            fromWallet.balance - tx.amount < 0
+          ) {
+            throw new Error(
+              `Insufficient funds in Cash wallet '${fromWallet.name}'.`,
+            );
+          }
+        }
+        ({ wallets: nextWallets, goals: nextGoals } = adjustEntityBalance(
+          nextWallets,
+          nextGoals,
+          tx.fromWalletId,
+          -tx.amount * direction,
+        ));
+        ({ wallets: nextWallets, goals: nextGoals } = adjustEntityBalance(
+          nextWallets,
+          nextGoals,
+          tx.toWalletId,
+          tx.amount * direction,
+        ));
+      }
+    };
+
+    linkedTransactions.forEach((oldTx) => {
+      const updatedTx: Transaction = {
+        ...oldTx,
+        categoryId: mergedRule.categoryId,
+        subCategoryId: mergedRule.subcategoryId,
+        note: resolvedNote || oldTx.note,
+        fromWalletId:
+          mergedRule.type === "expense"
+            ? mergedRule.walletId
+            : oldTx.fromWalletId,
+        toWalletId:
+          mergedRule.type === "income"
+            ? mergedRule.walletId
+            : oldTx.toWalletId,
+        lastModifiedBy: user?.email || "User",
+      };
+
+      applyEffect(oldTx, -1);
+      applyEffect(updatedTx, 1);
+      updatedTransactions.set(oldTx.id, updatedTx);
+    });
+
+    syncState({
+      ...state,
+      wallets: nextWallets,
+      goals: nextGoals,
+      transactions: state.transactions.map((t) =>
+        updatedTransactions.get(t.id) || t,
+      ),
+      recurringTransactions: state.recurringTransactions.map((r) =>
+        r.id === rule.id ? mergedRule : r,
+      ),
+    });
+  };
+
+  const confirmManualSubscriptionPayment = (sub: RecurringTransaction, note: string, nextDate: string) => {
+    const newTx: Transaction = {
+      id: Date.now().toString(),
+      type: sub.type as TransactionType,
+      amount: sub.amount,
+      categoryId: sub.categoryId,
+      subCategoryId: sub.subcategoryId,
+      fromWalletId: sub.type === "expense" ? sub.walletId : null,
+      toWalletId: sub.type === "income" ? sub.walletId : null,
+      date: new Date().toISOString(),
+      note,
+      isRecurring: true,
+      recurringId: sub.id,
+      generatedFromRecurring: false,
+      createdBy: user?.email || "User",
+      lastModifiedBy: user?.email || "User",
+    };
+
+    let { wallets: w1, goals: g1 } = {
+      wallets: state.wallets,
+      goals: state.goals,
+    };
+
+    if (newTx.type === "income") {
+      ({ wallets: w1, goals: g1 } = adjustEntityBalance(
+        w1,
+        g1,
+        newTx.toWalletId,
+        newTx.amount,
+      ));
+    } else if (newTx.type === "expense") {
+      checkCashWalletBalance(newTx.fromWalletId, -newTx.amount);
+      ({ wallets: w1, goals: g1 } = adjustEntityBalance(
+        w1,
+        g1,
+        newTx.fromWalletId,
+        -newTx.amount,
+      ));
+    }
+
+    const updatedRules = state.recurringTransactions.map((rule) =>
+      rule.id === sub.id
+        ? {
+            ...rule,
+            nextDueDate: nextDate,
+          }
+        : rule,
+    );
+
+    syncState({
+      ...state,
+      transactions: [...state.transactions, newTx],
+      wallets: w1,
+      goals: g1,
+      recurringTransactions: updatedRules,
+    });
+    logInHousehold("transaction_add", { 
+      amount: newTx.amount, 
+      type: newTx.type,
+      note: "Manual Subscription Payment"
+    });
+  };
+
   const syncEngineResults = (
     newTransactions: Transaction[],
     updatedRules: RecurringTransaction[],
@@ -1716,7 +1908,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         deleteGoal,
         addRecurringTransaction,
         updateRecurringTransaction,
+        updateRecurringTransactionWithHistory,
         deleteRecurringTransaction,
+        confirmManualSubscriptionPayment,
         syncEngineResults,
         setCurrency,
         toggleTheme,

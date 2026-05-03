@@ -533,7 +533,7 @@ export const ANALYTICS_WIDGET_DEFAULTS: AnalyticsWidgetConfig[] = [
   { id: "largestExpense", enabled: true, order: 16 },
   { id: "transactionFrequency", enabled: true, order: 17 },
   { id: "smallPurchaseLeak", enabled: true, order: 18 },
-  { id: "recurringExpenses", enabled: true, order: 19 },
+  { id: "subscriptionOverview", enabled: true, order: 19 },
   { id: "spendingPersonality", enabled: true, order: 20 },
   { id: "smartInsights", enabled: true, order: 21 },
 ];

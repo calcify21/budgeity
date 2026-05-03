@@ -67,7 +67,7 @@ const widgetLabels: Record<string, string> = {
   categoryTrend: "Category Trends",
   largestExpense: "Largest Expense",
   transactionFrequency: "Transaction Frequency",
-  recurringExpenses: "Recurring Expenses",
+  subscriptionOverview: "Subscription Overview",
   spendingPersonality: "Spending Personality",
   smartInsights: "Smart Insights",
 };
@@ -87,7 +87,7 @@ const widgetSections: Record<string, string> = {
   budgetCompliance: "Budget Control",
   dailyAverageSpend: "Budget Control",
   smallPurchaseLeak: "Budget Control",
-  recurringExpenses: "Budget Control",
+  subscriptionOverview: "Budget Control",
   netWorthTrend: "Financial Growth",
   savingsGoalsProgress: "Financial Growth",
   walletDistribution: "Financial Growth",
@@ -309,7 +309,7 @@ const AnalyticsV2: React.FC = () => {
         return <LargestExpense {...txProps} />;
       case "transactionFrequency":
         return <TransactionFrequency {...txProps} />;
-      case "recurringExpenses":
+      case "subscriptionOverview":
         return <RecurringExpenses />;
       case "spendingPersonality":
         return <SpendingPersonality {...txProps} />;
@@ -499,7 +499,7 @@ const AnalyticsV2: React.FC = () => {
               "netWorthTrend",
               "smartInsights",
               "budgetCompliance",
-              "recurringExpenses",
+              "subscriptionOverview",
               "categoryTrend",
               "transactionFrequency",
             ].includes(widget.id);
@@ -575,7 +575,7 @@ const AnalyticsV2: React.FC = () => {
                 "netWorthTrend",
                 "smartInsights",
                 "budgetCompliance",
-                "recurringExpenses",
+                "subscriptionOverview",
                 "categoryTrend",
                 "transactionFrequency",
               ].includes(widget.id);

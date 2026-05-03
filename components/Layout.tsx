@@ -363,11 +363,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className: "tour-nav-transactions",
           },
           {
-            to: "/recurring",
+            to: "/subscriptions",
             icon: Repeat,
-            label: t("common.recurring"),
+            label: t("common.subscriptions"),
             onClick: handleNavClick,
-            className: "tour-nav-recurring",
+            className: "tour-nav-subscriptions",
           },
           {
             to: "/wallets",

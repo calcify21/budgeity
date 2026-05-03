@@ -36,7 +36,14 @@ export const calculateNextDueDate = (
       // (e.g., Jan 31 + 1 month -> Mar 3 (or 2) instead of Feb 28)
       // We need to clamp to the last day of the intended target month.
       if (date.getDate() !== currentDay) {
-        // Go to day 0 of the current spilled-over month to get the last day of the previous (intended) month
+        date.setDate(0);
+      }
+      break;
+    case "yearly":
+      const targetYear = date.getFullYear() + interval;
+      date.setFullYear(targetYear);
+      // Handle leap year clamping (Feb 29 -> Feb 28)
+      if (date.getDate() !== currentDay) {
         date.setDate(0);
       }
       break;
@@ -137,9 +144,9 @@ export const processRecurringTransactions = (
           fromWalletId: rule.type === "expense" ? rule.walletId : undefined,
           toWalletId: rule.type === "income" ? rule.walletId : undefined,
           date: `${dateKey}T12:00:00.000Z`, // Record standard mid-day time
-          note: rule.name
-            ? `(Auto) ${rule.name}`
-            : `(Auto) ${rule.frequency} recurring`,
+          note: `(Auto) ${
+            rule.note?.trim() || rule.name?.trim() || `${rule.frequency} recurring`
+          }`,
           isRecurring: true,
           recurringId: rule.id,
           generatedFromRecurring: true,

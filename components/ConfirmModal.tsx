@@ -13,6 +13,8 @@ interface Props {
   title: string;
   message: React.ReactNode;
   confirmText?: string;
+  onConfirmSecondary?: () => void;
+  confirmSecondaryText?: string;
   isDestructive?: boolean;
   showCheckbox?: boolean;
   checkboxLabel?: string;
@@ -26,6 +28,8 @@ export const ConfirmModal: React.FC<Props> = ({
   title,
   message,
   confirmText = "Confirm",
+  onConfirmSecondary,
+  confirmSecondaryText,
   isDestructive = false,
   showCheckbox = false,
   checkboxLabel,
@@ -119,29 +123,42 @@ export const ConfirmModal: React.FC<Props> = ({
                 )}
               </div>
 
-              <div className="flex gap-3 w-full mt-2">
-                <button
-                  onClick={onClose}
-                  className="flex-1 py-2.5 px-4 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
-                >
-                  {t("confirmModal.cancel")}
-                </button>
+              <div className={`flex w-full mt-2 ${onConfirmSecondary ? "flex-col gap-2" : "gap-3"}`}>
                 <button
                   disabled={!isValid}
                   onClick={() => {
                     onConfirm();
                     onClose();
                   }}
-                  className={`flex-1 py-2.5 px-4 text-white font-medium rounded-xl transition-all shadow-lg 
+                  className={`w-full py-2.5 px-4 text-white font-medium rounded-xl transition-all shadow-lg 
                       ${
                         isValid
                           ? isDestructive
                             ? "bg-rose-600 hover:bg-rose-700 shadow-rose-500/20"
                             : "bg-brand-600 hover:bg-brand-700 shadow-brand-500/20"
                           : "bg-slate-300 dark:bg-zinc-700 cursor-not-allowed opacity-70 shadow-none"
-                      }`}
+                      } ${!onConfirmSecondary && "flex-1"}`}
                 >
                   {confirmText}
+                </button>
+                {onConfirmSecondary && (
+                  <button
+                    disabled={!isValid}
+                    onClick={() => {
+                      onConfirmSecondary();
+                      onClose();
+                    }}
+                    className={`w-full py-2.5 px-4 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors
+                        ${!isValid && "cursor-not-allowed opacity-70"}`}
+                  >
+                    {confirmSecondaryText}
+                  </button>
+                )}
+                <button
+                  onClick={onClose}
+                  className={`py-2.5 px-4 bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-slate-300 font-medium rounded-xl hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors ${onConfirmSecondary ? "w-full" : "flex-1"}`}
+                >
+                  {t("confirmModal.cancel")}
                 </button>
               </div>
             </div>

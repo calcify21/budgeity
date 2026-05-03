@@ -34,6 +34,7 @@ import { SnapshotWidget } from "../components/dashboard/SnapshotWidget";
 import { PlannedSpendingWidget } from "../components/dashboard/PlannedSpendingWidget";
 import { BalanceTrendWidget } from "../components/dashboard/BalanceTrendWidget";
 import { SpendingForecastWidget } from "../components/dashboard/SpendingForecastWidget";
+import { UpcomingSubscriptionsWidget } from "../components/dashboard/UpcomingSubscriptionsWidget";
 import { WidgetSkeleton } from "../components/dashboard/WidgetSkeleton";
 
 const widgetComponents: Record<string, React.FC<{ 
@@ -53,6 +54,7 @@ const widgetComponents: Record<string, React.FC<{
   planned: PlannedSpendingWidget as any,
   trend: BalanceTrendWidget as any,
   forecast: SpendingForecastWidget as any,
+  subscriptions: UpcomingSubscriptionsWidget as any,
 };
 
 const widgetLabels: Record<string, string> = {
@@ -68,6 +70,7 @@ const widgetLabels: Record<string, string> = {
   planned: "Planned Spending",
   trend: "Balance Trend",
   forecast: "Spending Forecast",
+  subscriptions: "Upcoming Subscriptions",
 };
 
 
@@ -115,6 +118,7 @@ const Dashboard: React.FC = () => {
     "planned",
     "trend",
     "forecast",
+    "subscriptions",
   ];
 
   const DASHBOARD_WIDGET_DEFAULTS: DashboardWidgetConfig[] = [
@@ -130,6 +134,7 @@ const Dashboard: React.FC = () => {
     { id: "budgets", enabled: false, order: 10 },
     { id: "actions", enabled: false, order: 11 },
     { id: "planned", enabled: false, order: 12 },
+    { id: "subscriptions", enabled: true, order: 13 },
   ];
 
   // Sync local state when not editing

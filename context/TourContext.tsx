@@ -445,8 +445,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       "Create <strong>savings targets</strong> with name, amount, and deadline. Link a wallet and watch your <strong>progress bar</strong> fill up.",
     );
     navStep(
-      ".tour-nav-recurring",
-      "🔄 Recurring Rules",
+      ".tour-nav-subscriptions",
+      "🔄 Subscriptions",
       "Automate <strong>rent, subscriptions, salary</strong> — any periodic transaction. Budgeity's engine auto-logs them on their due dates.",
     );
     navStep(

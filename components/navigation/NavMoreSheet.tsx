@@ -240,7 +240,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
         icon: ArrowRightLeft,
         label: t("common.transactions"),
       },
-      { to: "/recurring", icon: Repeat, label: t("common.recurring") },
+      { to: "/subscriptions", icon: Repeat, label: t("common.subscriptions") },
       { to: "/wallets", icon: Wallet, label: t("common.wallets") },
       { to: "/goals", icon: Target, label: t("common.goals") },
       { to: "/budgets", icon: PiggyBank, label: t("common.budgets") },
