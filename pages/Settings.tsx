@@ -14,7 +14,7 @@ import {
   Wallet,
   Globe,
 } from "lucide-react";
-import { CURRENCIES, ACCENT_THEMES } from "../constants";
+import { CURRENCIES, ACCENT_THEMES, APP_VERSION } from "../constants";
 import CustomSelect from "../components/CustomSelect";
 import { ConfirmModal } from "../components/ConfirmModal";
 import WalletModal from "../components/WalletModal";
@@ -467,7 +467,7 @@ const Settings: React.FC = () => {
       </section>
 
       <div className="text-center text-xs text-slate-400 pb-8">
-        Budgeity v1.3.0
+        Budgeity v{APP_VERSION}
       </div>
 
       <AnimatePresence>

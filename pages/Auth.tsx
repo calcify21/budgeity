@@ -614,15 +614,10 @@ const Auth: React.FC = () => {
 
           {(mode === "login" || mode === "signup") && (
             <div className="mt-6">
-              <div className="relative mb-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200 dark:border-zinc-800"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white lg:bg-slate-50 dark:bg-zinc-900 lg:dark:bg-black text-slate-500">
-                    Or continue with
-                  </span>
-                </div>
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 min-w-0 border-t border-slate-200 dark:border-zinc-800"></div>
+                <span className="flex-shrink-0 text-sm text-slate-500 px-2 bg-white lg:bg-slate-50 dark:bg-zinc-900 lg:dark:bg-transparent">Or continue with</span>
+                <div className="flex-1 min-w-0 border-t border-slate-200 dark:border-zinc-800"></div>
               </div>
 
               <div className="grid grid-cols-3 gap-3">

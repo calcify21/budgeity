@@ -5,6 +5,8 @@ import {
   AnalyticsWidgetConfig,
 } from "./types";
 
+export const APP_VERSION = "3.0.0";
+
 export const COLORS = [
   "#ef4444", // Red
   "#f97316", // Orange

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { APP_VERSION } from "../constants";
 import {
   ArrowRight,
   CheckCircle,
@@ -47,7 +48,7 @@ const HeroSection = () => {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
                 </span>
-                v3.0 is now live
+                v{APP_VERSION} is now live
               </div>
               <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-slate-900 dark:text-white mb-6 leading-tight">
                 Take control of <br />
