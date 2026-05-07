@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Dev + Emulators",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev:emu"],
+      "port": 3000
+    },
+    {
+      "name": "Vite Dev Server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "Firebase Emulators",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/emu-start.cjs"],
+      "port": 4000
+    },
+    {
+      "name": "Vite Preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "preview"],
+      "port": 4173
+    }
+  ]
+}

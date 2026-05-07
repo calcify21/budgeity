@@ -619,7 +619,7 @@ const Auth: React.FC = () => {
                   <div className="w-full border-t border-slate-200 dark:border-zinc-800"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-4 bg-white/80 lg:bg-slate-50 dark:bg-zinc-900/80 lg:dark:bg-black backdrop-blur-xl lg:backdrop-blur-none text-slate-500">
+                  <span className="px-4 bg-white lg:bg-slate-50 dark:bg-zinc-900 lg:dark:bg-black text-slate-500">
                     Or continue with
                   </span>
                 </div>
