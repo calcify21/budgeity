@@ -47,6 +47,11 @@ firebase-export-*/
 .agents/
 skills-lock.json
 
+# Claude Code (session-specific, keep launch.json committed)
+.claude/worktrees/
+.claude/plans/
+.claude/scheduled-tasks/
+
 # Vite
 *.tsbuildinfo
 
