@@ -134,6 +134,7 @@ interface DataContextType extends AppState {
   setCurrency: (currency: string) => void;
   toggleTheme: () => void;
   setAccentTheme: (theme: string) => void;
+  setPremiumTheme: (theme: NonNullable<AppState["premiumTheme"]>) => void;
   toggleHideAmounts: () => void;
   setDefaultWallet: (id: string) => void;
   setNumberSystem: (system: "IN" | "INTL" | "AUTO") => void;
@@ -195,6 +196,7 @@ const INITIAL_STATE: AppState = {
   analyticsWidgets: ANALYTICS_WIDGET_DEFAULTS,
   analyticsSectionNames: {},
   accentTheme: "emerald",
+  premiumTheme: "classic",
   language: "en",
 };
 
@@ -219,7 +221,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     "online" | "syncing" | "offline" | "error"
   >("online");
   const { success: toastSuccess, error: toastError } = useToast();
-  const [isRetrying, setIsRetrying] = useState(false);
+  const isRetryingRef = useRef(false);
   const isDeletingAccountRef = useRef(false);
 
   useEffect(() => {
@@ -273,7 +275,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
                 setSystemStatus("offline");
               } else if (docSnap.metadata.hasPendingWrites) {
                 setSystemStatus("syncing");
-              } else if (navigator.onLine && !isRetrying) {
+              } else if (navigator.onLine && !isRetryingRef.current) {
                 setSystemStatus((prev) => {
                   if (prev === "offline") {
                     toastSuccess("Back online. Data synced successfully.");
@@ -350,7 +352,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    setIsRetrying(true);
+    isRetryingRef.current = true;
     setSystemStatus("syncing");
 
     try {
@@ -363,19 +365,23 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       toastError("Failed to reconnect.");
       console.error("Manual retry failed:", e);
     } finally {
-      setIsRetrying(false);
+      isRetryingRef.current = false;
     }
   };
 
   // Handle Theme
   useEffect(() => {
-    if (state.theme === "dark") {
+    const premiumTheme = state.premiumTheme || "classic";
+    const shouldUseDarkSurface = state.theme === "dark" || premiumTheme !== "classic";
+
+    if (shouldUseDarkSurface) {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
     localStorage.setItem(THEME_STORAGE_KEY, state.theme);
-  }, [state.theme]);
+    document.documentElement.setAttribute("data-premium-theme", premiumTheme);
+  }, [state.theme, state.premiumTheme]);
 
   // Handle Accent Theme
   useEffect(() => {
@@ -871,14 +877,36 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     // Calculate balances based on new transactions
     newTransactions.forEach((t) => {
       if (!t.date || isNaN(new Date(t.date).getTime())) return;
-      const fromW = updatedWallets.find((w) => w.id === t.fromWalletId);
-      const toW = updatedWallets.find((w) => w.id === t.toWalletId);
 
-      if (t.type === "income" && toW) toW.balance += t.amount;
-      if (t.type === "expense" && fromW) fromW.balance -= t.amount;
+      if (t.type === "income") {
+        ({ wallets: updatedWallets, goals: updatedGoals } = adjustEntityBalance(
+          updatedWallets,
+          updatedGoals,
+          t.toWalletId,
+          t.amount,
+        ));
+      }
+      if (t.type === "expense") {
+        ({ wallets: updatedWallets, goals: updatedGoals } = adjustEntityBalance(
+          updatedWallets,
+          updatedGoals,
+          t.fromWalletId,
+          -t.amount,
+        ));
+      }
       if (t.type === "transfer") {
-        if (fromW) fromW.balance -= t.amount;
-        if (toW) toW.balance += t.amount;
+        ({ wallets: updatedWallets, goals: updatedGoals } = adjustEntityBalance(
+          updatedWallets,
+          updatedGoals,
+          t.fromWalletId,
+          -t.amount,
+        ));
+        ({ wallets: updatedWallets, goals: updatedGoals } = adjustEntityBalance(
+          updatedWallets,
+          updatedGoals,
+          t.toWalletId,
+          t.amount,
+        ));
       }
     });
 
@@ -1012,13 +1040,52 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const deleteWalletWithTransactions = (id: string) => {
-    // 1. Filter Transactions
+    // 1. Reverse the effect of transactions tied to this wallet
+    let { wallets: w1, goals: g1 } = {
+      wallets: state.wallets,
+      goals: state.goals,
+    };
+    const transactionsToDelete = state.transactions.filter(
+      (t) => t.fromWalletId === id || t.toWalletId === id,
+    );
+
+    transactionsToDelete.forEach((tx) => {
+      if (tx.type === "income") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(
+          w1,
+          g1,
+          tx.toWalletId,
+          -tx.amount,
+        ));
+      } else if (tx.type === "expense") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(
+          w1,
+          g1,
+          tx.fromWalletId,
+          tx.amount,
+        ));
+      } else if (tx.type === "transfer") {
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(
+          w1,
+          g1,
+          tx.fromWalletId,
+          tx.amount,
+        ));
+        ({ wallets: w1, goals: g1 } = adjustEntityBalance(
+          w1,
+          g1,
+          tx.toWalletId,
+          -tx.amount,
+        ));
+      }
+    });
+
     const newTransactions = state.transactions.filter(
       (t) => t.fromWalletId !== id && t.toWalletId !== id,
     );
 
     // 2. Remove Wallet
-    const newWallets = state.wallets.filter((w) => w.id !== id);
+    const newWallets = w1.filter((w) => w.id !== id);
 
     // 3. Update Default Wallet
     let newDefault = state.defaultWalletId;
@@ -1042,6 +1109,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ...state,
       transactions: newTransactions,
       wallets: newWallets,
+      goals: g1,
       budgets: newBudgets,
       recurringTransactions: newRecurring,
       defaultWalletId: newDefault,
@@ -1672,7 +1740,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
     syncState({
       ...state,
-      transactions: [...state.transactions, newTx],
+      transactions: [newTx, ...state.transactions],
       wallets: w1,
       goals: g1,
       recurringTransactions: updatedRules,
@@ -1804,7 +1872,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const setCurrency = (currency: string) => syncState({ ...state, currency });
   const toggleTheme = () => {
     const newTheme = state.theme === "light" ? "dark" : "light";
-    setState((prev) => ({ ...prev, theme: newTheme }));
     // Note: We don't necessarily need to syncState (cloud) immediately if we want
     // it to be a local preference first, but syncing is fine too.
     // However, syncState calls setState again, so let's just use syncState
@@ -1812,6 +1879,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     syncState({ ...state, theme: newTheme });
   };
   const setAccentTheme = (theme: string) => syncState({ ...state, accentTheme: theme });
+  const setPremiumTheme = (premiumTheme: NonNullable<AppState["premiumTheme"]>) => {
+    const nextTheme = premiumTheme === "classic" ? state.theme : "dark";
+    syncState({ ...state, premiumTheme, theme: nextTheme });
+  };
   const toggleHideAmounts = () =>
     syncState({ ...state, hideAmounts: !state.hideAmounts });
   const setDefaultWallet = (id: string) =>
@@ -1915,6 +1986,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         setCurrency,
         toggleTheme,
         setAccentTheme,
+        setPremiumTheme,
         toggleHideAmounts,
         setDefaultWallet,
         setNumberSystem,

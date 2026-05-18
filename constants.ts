@@ -34,6 +34,33 @@ export const ACCENT_THEMES = [
   { id: "slate", name: "Slate", color: "#64748b" },
 ];
 
+export const PREMIUM_THEMES = [
+  {
+    id: "classic",
+    name: "Classic",
+    description: "Clean light and dark mode with your selected accent.",
+    swatches: ["#f8fafc", "#10b981", "#0f172a"],
+  },
+  {
+    id: "midnightGlass",
+    name: "Midnight Glass",
+    description: "A dark glass surface with electric blue highlights.",
+    swatches: ["#020617", "#38bdf8", "#a78bfa"],
+  },
+  {
+    id: "deepForest",
+    name: "Deep Forest",
+    description: "Rich green surfaces with warm gold accents.",
+    swatches: ["#052e16", "#22c55e", "#f59e0b"],
+  },
+  {
+    id: "aura",
+    name: "Aura",
+    description: "Vibrant violet and cyan gradients for a bolder workspace.",
+    swatches: ["#2e1065", "#8b5cf6", "#06b6d4"],
+  },
+] as const;
+
 // Symbols mapped from standard ISO lists
 export const CURRENCIES = [
   { code: "USD", symbol: "$", name: "United States Dollar" },

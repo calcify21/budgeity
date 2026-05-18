@@ -263,6 +263,7 @@ export interface AppState {
   recurringTransactions: RecurringTransaction[];
   currency: string;
   theme: "light" | "dark";
+  premiumTheme?: "classic" | "midnightGlass" | "deepForest" | "aura";
   hideAmounts: boolean;
   defaultWalletId: string | null;
   numberSystem: "IN" | "INTL" | "AUTO";
