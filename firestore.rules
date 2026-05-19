@@ -105,9 +105,9 @@ service cloud.firestore {
     // -- Household Invites ------------------------------------------
     match /householdInvites/{inviteId} {
       allow read: if isSignedIn() && (
-        request.auth.token.email == resource.data.invitedEmail ||
-        request.auth.uid == resource.data.invitedBy ||
-        isHouseholdMember(resource.data.householdId)
+        request.auth.token.email == resource.data.get('invitedEmail', '') ||
+        request.auth.uid == resource.data.get('invitedBy', '') ||
+        (resource.data.get('householdId', '') != '' && isHouseholdMember(resource.data.get('householdId', '')))
       );
 
       // Only household owners/admins can create invites
@@ -120,11 +120,11 @@ service cloud.firestore {
 
       // Allow invited user to accept or decline (status-only)
       allow update: if isSignedIn() && (
-        isHouseholdAdmin(resource.data.householdId) ||
+        isHouseholdAdmin(resource.data.get('householdId', '')) ||
         (
-          request.auth.token.email == resource.data.invitedEmail &&
-          resource.data.status == "pending" &&
-          request.resource.data.status in ["accepted", "declined"] &&
+          request.auth.token.email == resource.data.get('invitedEmail', '') &&
+          resource.data.get('status', '') == "pending" &&
+          request.resource.data.get('status', '') in ["accepted", "declined"] &&
           request.resource.data
             .diff(resource.data)
             .changedKeys()

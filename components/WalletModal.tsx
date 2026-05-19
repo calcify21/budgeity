@@ -5,7 +5,12 @@ import { motion } from "framer-motion";
 import CustomSelect from "./CustomSelect";
 import { cn } from "../utils";
 import { COLORS } from "../constants";
-import { Wallet as WalletIcon, Landmark, Lock, AlertCircle } from "lucide-react";
+import {
+  Wallet as WalletIcon,
+  Landmark,
+  Lock,
+  AlertCircle,
+} from "lucide-react";
 import { useToast } from "../context/ToastContext";
 import IconPicker from "./IconPicker";
 import { useScrollToError } from "../hooks/useScrollToError";
@@ -21,9 +26,24 @@ const WALLET_TYPES: {
   icon: any;
   descKey: string;
 }[] = [
-  { value: "cash", icon: WalletIcon, labelKey: "walletModal.cash", descKey: "walletModal.cashDesc" },
-  { value: "bank", icon: Landmark, labelKey: "walletModal.bank", descKey: "walletModal.bankDesc" },
-  { value: "savings", icon: Lock, labelKey: "walletModal.savings", descKey: "walletModal.savingsDesc" },
+  {
+    value: "cash",
+    icon: WalletIcon,
+    labelKey: "walletModal.cash",
+    descKey: "walletModal.cashDesc",
+  },
+  {
+    value: "bank",
+    icon: Landmark,
+    labelKey: "walletModal.bank",
+    descKey: "walletModal.bankDesc",
+  },
+  {
+    value: "savings",
+    icon: Lock,
+    labelKey: "walletModal.savings",
+    descKey: "walletModal.savingsDesc",
+  },
 ];
 
 interface Props {
@@ -156,7 +176,9 @@ const WalletModal: React.FC<Props> = ({
           className="p-8 overflow-y-auto custom-scrollbar flex-1"
         >
           <h2 className="text-2xl font-bold mb-6">
-            {walletToEdit ? t("walletModal.editWallet") : t("walletModal.addNewWallet")}
+            {walletToEdit
+              ? t("walletModal.editWallet")
+              : t("walletModal.addNewWallet")}
           </h2>
 
           {!walletToEdit && (
@@ -225,15 +247,17 @@ const WalletModal: React.FC<Props> = ({
                   onChange={(v) => handleTypeChange(v as WalletType)}
                   options={WALLET_TYPES.map((wt) => ({
                     value: wt.value,
-                    label: t(wt.labelKey),
+                    label: t(wt.labelKey as any),
                     icon: wt.icon,
-                    subLabel: t(wt.descKey),
+                    subLabel: t(wt.descKey as any),
                   }))}
                 />
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                  {walletToEdit ? t("walletModal.balanceLabel") : t("walletModal.initialLabel")}
+                  {walletToEdit
+                    ? t("walletModal.balanceLabel")
+                    : t("walletModal.initialLabel")}
                 </label>
                 <input
                   type="number"

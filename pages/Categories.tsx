@@ -225,7 +225,7 @@ function CategoryRow({
   onToggleExpand: (id: string) => void;
   onEdit: (cat: Category) => void;
   onDelete: (id: string) => void;
-  t: (key: string) => string;
+  t: any;
 }) {
   const Icon = getCategoryIcon(cat.icon);
   const subCount = cat.subCategories?.length || 0;

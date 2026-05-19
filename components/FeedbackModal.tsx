@@ -145,7 +145,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
                       bug: "feedbackModal.bug",
                       feature: "feedbackModal.feature",
                     };
-                    return t(feedbackTypeMap[ft] || "feedbackModal.general");
+                    return t((feedbackTypeMap[ft] || "feedbackModal.general") as any);
                   })()}
                 </span>
               </button>

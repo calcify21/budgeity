@@ -323,11 +323,25 @@
     "deleteAccountMessage": "Cette action est PERMANENTE. Elle effacera toutes vos données financières. Vous ne pourrez pas annuler cela.",
     "permanentlyDelete": "Supprimer Définitivement"
   },
+  "changeEmailModal": {
+    "title": "Changer l'Email",
+    "currentEmail": "Email Actuel",
+    "newEmailLabel": "Nouvelle Adresse Email",
+    "newEmailPlaceholder": "votre@nouvel.email.com",
+    "infoBanner": "Un lien de vérification sera envoyé à votre nouvelle adresse email. Votre email ne sera mis à jour qu'après avoir cliqué sur ce lien.",
+    "sendLink": "Envoyer le Lien de Vérification",
+    "successTitle": "Vérification Envoyée !",
+    "successBody": "Un lien de vérification a été envoyé à <strong>{{email}}</strong>. Cliquez sur le lien dans cet email pour confirmer votre nouvelle adresse.",
+    "successNote": "Votre email ne changera qu'après avoir vérifié la nouvelle adresse. Votre email actuel reste actif jusque-là.",
+    "done": "Terminé",
+    "errInvalidEmail": "Veuillez entrer une adresse email valide.",
+    "errSameEmail": "La nouvelle adresse email est la même que votre adresse actuelle.",
+    "errDefault": "Échec de l'envoi de l'email de vérification."
+  },
   "settings": {
     "title": "Paramètres",
     "preferences": "Préférences",
     "dark_mode": "Mode Sombre",
-    "accent_theme": "Thème",
     "dark_mode_desc": "Basculer entre les thèmes clair et sombre",
     "currency": "Devise",
     "currency_desc": "Choisissez votre devise préférée",
@@ -339,7 +353,7 @@
     "default_wallet_desc": "Utilisé pour les transactions rapides",
     "danger_zone": "Zone Dangereuse",
     "reset_data": "Réinitialiser les Données",
-    "reset_data_desc": "Efface tous les portefeuilles locaux et les transactions",
+    "reset_data_desc": "Efface définitivement tous les portefeuilles, transactions et préférences",
     "reset_button": "Réinitialiser"
   },
   "transactionModal": {
@@ -650,9 +664,11 @@
     "intlExample": "1,234,567.89",
     "selectDefaultWallet": "Portefeuille par Défaut",
     "selectLanguage": "Sélectionner la Langue",
-    "resetDataTitle": "Réinitialiser les données ?",
-    "resetDataMsg": "Cela effacera vos données locales. Si vous êtes synchronisé sur le cloud, les données pourraient réapparaître.",
-    "resetEverything": "Tout Réinitialiser"
+    "resetDataTitle": "Réinitialiser toutes les données ?",
+    "resetDataMsg": "Cela effacera définitivement tous vos portefeuilles, transactions et préférences de cet appareil et du cloud. Cette action est irréversible.",
+    "resetEverything": "Réinitialiser",
+    "premiumThemes": "Thèmes Premium",
+    "classicAccent": "Accent Classique"
   },
   "appLock": {
     "title": "Verrouillage de l'App",

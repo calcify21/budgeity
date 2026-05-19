@@ -1290,7 +1290,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           onFeedbackClick={() => setIsFeedbackModalOpen(true)}
           onToggleBalances={toggleHideAmounts}
           hideAmounts={hideAmounts}
-          userEmail={user?.email}
+          userEmail={user?.email ?? undefined}
         />
       </main>
 

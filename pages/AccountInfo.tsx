@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ChangePasswordModal from "../components/ChangePasswordModal";
+import ChangeEmailModal from "../components/ChangeEmailModal";
 import EditNameModal from "../components/EditNameModal";
 import { ConfirmModal } from "../components/ConfirmModal";
 import UserAvatar from "../components/ui/UserAvatar";
@@ -85,6 +86,7 @@ const AccountInfo: React.FC = () => {
   const { success, error } = useToast();
   const { t } = useTranslation();
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showChangeEmail, setShowChangeEmail] = useState(false);
   const [showEditName, setShowEditName] = useState(false);
   const [showDeleteAccount, setShowDeleteAccount] = useState(false);
   const [showFinalStepModal, setShowFinalStepModal] = useState(false);
@@ -173,6 +175,15 @@ const AccountInfo: React.FC = () => {
                 </div>
               </div>
             </div>
+            {provider === "password" && (
+              <button
+                onClick={() => setShowChangeEmail(true)}
+                className="p-2 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl hover:bg-slate-50 dark:hover:bg-zinc-700 transition-colors text-slate-500 shrink-0"
+                title="Change Email"
+              >
+                <Pencil size={18} />
+              </button>
+            )}
           </div>
 
           {/* Password */}
@@ -262,6 +273,9 @@ const AccountInfo: React.FC = () => {
 
       {showChangePassword && (
         <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+      )}
+      {showChangeEmail && (
+        <ChangeEmailModal onClose={() => setShowChangeEmail(false)} />
       )}
       {showEditName && <EditNameModal onClose={() => setShowEditName(false)} />}
 

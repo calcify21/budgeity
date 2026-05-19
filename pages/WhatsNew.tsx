@@ -17,6 +17,7 @@ import {
   Smartphone,
   Share2,
   Send,
+  Mail,
   ListTodo,
   Columns,
   Coins,
@@ -107,6 +108,11 @@ const WhatsNew: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <ChangeItem
+          icon={Mail}
+          title="Type-Safe Email Updates"
+          description="Update your email address securely from your Profile card. Budgeity uses Firebase's verifyBeforeUpdateEmail protocol, keeping your old email active and secure until you click the confirmation link sent to your new address. Fully typed and localized."
+        />
         <ChangeItem
           icon={Palette}
           title="Premium Theme Engine"

@@ -14,7 +14,7 @@ i18n
       escapeValue: false,
     },
     backend: {
-      loadPath: `${import.meta.env.VITE_BASE_URL || "/budgeity/"}locales/{{lng}}/{{ns}}.json`,
+      loadPath: `${import.meta.env.BASE_URL}locales/{{lng}}/{{ns}}.json`,
     },
     detection: {
       order: ["localStorage", "cookie", "htmlTag", "path", "subdomain"],

@@ -15,7 +15,12 @@ import {
   Globe,
   Check,
 } from "lucide-react";
-import { CURRENCIES, ACCENT_THEMES, PREMIUM_THEMES, APP_VERSION } from "../constants";
+import {
+  CURRENCIES,
+  ACCENT_THEMES,
+  PREMIUM_THEMES,
+  APP_VERSION,
+} from "../constants";
 import CustomSelect from "../components/CustomSelect";
 import { ConfirmModal } from "../components/ConfirmModal";
 import WalletModal from "../components/WalletModal";
@@ -195,8 +200,16 @@ const Settings: React.FC = () => {
       label: t("settingsPage.autoSystem"),
       subLabel: t("settingsPage.recommended"),
     },
-    { value: "IN", label: t("settingsPage.indianSystem"), subLabel: t("settingsPage.indianExample") },
-    { value: "INTL", label: t("settingsPage.intlSystem"), subLabel: t("settingsPage.intlExample") },
+    {
+      value: "IN",
+      label: t("settingsPage.indianSystem"),
+      subLabel: t("settingsPage.indianExample"),
+    },
+    {
+      value: "INTL",
+      label: t("settingsPage.intlSystem"),
+      subLabel: t("settingsPage.intlExample"),
+    },
   ];
 
   const languageOptions = [
@@ -276,7 +289,7 @@ const Settings: React.FC = () => {
         {/* Premium Themes */}
         <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
           <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
-            Premium Themes
+            {t("settingsPage.premiumThemes", "Premium Themes")}
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {PREMIUM_THEMES.map((preset) => {
@@ -327,31 +340,39 @@ const Settings: React.FC = () => {
 
         {/* Classic Accent Theme */}
         {(premiumTheme || "classic") === "classic" && (
-        <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
-          <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
-            Classic Accent
-          </h4>
-          <div className="flex flex-wrap gap-3">
-            {ACCENT_THEMES.map((accent) => {
-              const isActive = (accentTheme || "emerald") === accent.id;
-              return (
-                <button
-                  key={accent.id}
-                  onClick={() => setAccentTheme(accent.id)}
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? "ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-zinc-900 scale-110" : "hover:scale-110 opacity-70 hover:opacity-100"}`}
-                  style={{ backgroundColor: accent.color }}
-                  title={accent.name}
-                >
-                  {isActive && (
-                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
-                </button>
-              );
-            })}
+          <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
+            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
+              {t("settingsPage.classicAccent", "Classic Accent")}
+            </h4>
+            <div className="flex flex-wrap gap-3">
+              {ACCENT_THEMES.map((accent) => {
+                const isActive = (accentTheme || "emerald") === accent.id;
+                return (
+                  <button
+                    key={accent.id}
+                    onClick={() => setAccentTheme(accent.id)}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? "ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-zinc-900 scale-110" : "hover:scale-110 opacity-70 hover:opacity-100"}`}
+                    style={{ backgroundColor: accent.color }}
+                    title={accent.name}
+                  >
+                    {isActive && (
+                      <svg
+                        className="w-5 h-5 text-white"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
         )}
 
         {/* Hide Balances */}
@@ -361,7 +382,9 @@ const Settings: React.FC = () => {
               <Lock size={24} />
             </div>
             <div>
-              <div className="font-bold text-lg">{t("settingsPage.hideBalances")}</div>
+              <div className="font-bold text-lg">
+                {t("settingsPage.hideBalances")}
+              </div>
               <div className="text-sm text-slate-500">
                 {t("settingsPage.hideBalancesDesc")}
               </div>
@@ -413,7 +436,9 @@ const Settings: React.FC = () => {
                 <Globe size={18} />
               )}
               <span className="hidden sm:inline">
-                {isLoadingLocation ? t("settingsPage.locating") : t("settingsPage.useLocation")}
+                {isLoadingLocation
+                  ? t("settingsPage.locating")
+                  : t("settingsPage.useLocation")}
               </span>
             </button>
           </div>

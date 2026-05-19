@@ -323,11 +323,25 @@
     "deleteAccountMessage": "This action is PERMANENT. It will wipe all your financial data, wallets, and transactions from our servers. You cannot undo this.",
     "permanentlyDelete": "Permanently Delete"
   },
+  "changeEmailModal": {
+    "title": "Change Email",
+    "currentEmail": "Current Email",
+    "newEmailLabel": "New Email Address",
+    "newEmailPlaceholder": "your@newemail.com",
+    "infoBanner": "A verification link will be sent to your new email address. Your email will only be updated after you click that link.",
+    "sendLink": "Send Verification Link",
+    "successTitle": "Verification Sent!",
+    "successBody": "A verification link has been sent to <strong>{{email}}</strong>. Click the link in that email to confirm your new address.",
+    "successNote": "Your email will only change after you verify the new address. Your current email remains active until then.",
+    "done": "Done",
+    "errInvalidEmail": "Please enter a valid email address.",
+    "errSameEmail": "The new email address is the same as your current one.",
+    "errDefault": "Failed to send verification email."
+  },
   "settings": {
     "title": "Settings",
     "preferences": "Preferences",
     "dark_mode": "Dark Mode",
-    "accent_theme": "Accent Theme",
     "dark_mode_desc": "Switch between light and dark themes",
     "currency": "Currency",
     "currency_desc": "Select your preferred currency",
@@ -339,7 +353,7 @@
     "default_wallet_desc": "Used for quick transactions",
     "danger_zone": "Danger Zone",
     "reset_data": "Reset App Data",
-    "reset_data_desc": "Clears all wallets and transactions (Local cache)",
+    "reset_data_desc": "Permanently clears all wallets, transactions, and preferences",
     "reset_button": "Reset Data"
   },
   "transactionModal": {
@@ -650,9 +664,11 @@
     "intlExample": "1,234,567.89",
     "selectDefaultWallet": "Select Default Wallet",
     "selectLanguage": "Select Language",
-    "resetDataTitle": "Reset All Local Data?",
-    "resetDataMsg": "This will wipe your local wallets and transactions. If you are synced to the cloud, data might be restored on refresh.",
-    "resetEverything": "Reset Everything"
+    "resetDataTitle": "Reset All Data?",
+    "resetDataMsg": "This will permanently wipe all your wallets, transactions, and preferences from this device and the cloud. This action cannot be undone.",
+    "resetEverything": "Reset",
+    "premiumThemes": "Premium Themes",
+    "classicAccent": "Classic Accent"
   },
   "appLock": {
     "title": "App Lock",

@@ -77,18 +77,22 @@ const AuthAction: React.FC = () => {
       try {
         if (mode === "resetPassword") {
           // Verify code validity first
-          const email = await verifyResetCode(oobCode);
+          const email = await verifyResetCode(oobCode!);
           setVerifiedEmail(email);
           setIsVerifying(false);
-        } else if (mode === "verifyEmail") {
+        } else if (mode === "verifyEmail" || mode === "verifyAndChangeEmail") {
           // Auto-verify
-          await verifyEmailAddress(oobCode);
-          setSuccessMsg("Your email has been verified successfully!");
+          await verifyEmailAddress(oobCode!);
+          setSuccessMsg(
+            mode === "verifyAndChangeEmail"
+              ? "Your email address has been successfully updated!"
+              : "Your email has been verified successfully!"
+          );
           setError(null); // Clear any potential error
           setActionComplete(true);
           setIsVerifying(false);
         } else if (mode === "recoverEmail") {
-          await recoverEmail(oobCode);
+          await recoverEmail(oobCode!);
           setSuccessMsg(
             "Your email change has been reversed. You can now login with your original email.",
           );
@@ -413,7 +417,7 @@ const AuthAction: React.FC = () => {
           </button>
         </form>
       );
-    } else if (mode === "verifyEmail" || mode === "recoverEmail") {
+    } else if (mode === "verifyEmail" || mode === "verifyAndChangeEmail" || mode === "recoverEmail") {
       // UI for these modes is mostly just the success/error message
       return (
         <div className="mt-8 text-center">
@@ -431,7 +435,7 @@ const AuthAction: React.FC = () => {
 
   const getTitle = () => {
     if (mode === "resetPassword") return "Reset Password";
-    if (mode === "verifyEmail") return "Email Verification";
+    if (mode === "verifyEmail" || mode === "verifyAndChangeEmail") return "Email Verification";
     if (mode === "recoverEmail") return "Recover Account";
     if (mode === "signInWithEmailLink") return "Complete Sign In";
     return "Authentication";
@@ -442,7 +446,7 @@ const AuthAction: React.FC = () => {
       return verifiedEmail
         ? `Set a new password for ${verifiedEmail}`
         : "Create a new secure password.";
-    if (mode === "verifyEmail") return "Verifying your email address...";
+    if (mode === "verifyEmail" || mode === "verifyAndChangeEmail") return "Verifying your email address...";
     if (mode === "recoverEmail")
       return "Restoring your original email address...";
     if (mode === "signInWithEmailLink") return "One last step to sign you in.";
@@ -482,7 +486,7 @@ const AuthAction: React.FC = () => {
               {mode === "resetPassword" && (
                 <Lock size={20} className="text-brand-500" />
               )}
-              {mode === "verifyEmail" && (
+              {(mode === "verifyEmail" || mode === "verifyAndChangeEmail") && (
                 <ShieldCheck size={20} className="text-emerald-500" />
               )}
               {mode === "recoverEmail" && (

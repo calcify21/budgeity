@@ -265,107 +265,113 @@ const ShoppingList: React.FC = () => {
               <div
                 key={item.id}
                 className={cn(
-                  "bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm flex items-center gap-4 group transition-all",
+                  "bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-slate-200 dark:border-zinc-800 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4 group transition-all",
                   item.status === "partial"
                     ? "border-l-4 border-l-amber-500"
                     : "",
                   index === 0 && "tour-shop-item-first",
                 )}
               >
-                {/* Category Icon */}
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-sm relative"
-                  style={{ backgroundColor: cat?.color || "#cbd5e1" }}
-                >
-                  <Icon size={20} />
-                  {item.quantity > 1 && (
-                    <div className="absolute -top-2 -right-2 bg-slate-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-[20px] text-center border-2 border-white dark:border-zinc-900">
-                      x{item.quantity}
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div
-                  className="flex-1 cursor-pointer"
-                  onClick={() => {
-                    setEditingItem(item);
-                    setIsAddModalOpen(true);
-                  }}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-lg leading-tight">
-                      {item.name}
-                    </h3>
-                    {item.priority && item.priority !== "medium" && (
-                      <span
-                        className={cn(
-                          "text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md",
-                          priorityColors[item.priority],
-                        )}
-                      >
-                        {item.priority}
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="text-xs text-slate-500 flex flex-wrap gap-x-2 gap-y-1 font-medium items-center">
-                    <span>{cat?.name}</span>
-                    {item.subCategoryId && (
-                      <span className="flex items-center gap-1">
-                        <span className="opacity-50">/</span>
-                        {
-                          cat?.subCategories?.find(
-                            (s) => s.id === item.subCategoryId,
-                          )?.name
-                        }
-                      </span>
-                    )}
-                    {wallet && (
-                      <span className="flex items-center gap-1 text-slate-400">
-                        <span className="w-1 h-1 bg-slate-400 rounded-full" />
-                        {wallet.name}
-                      </span>
-                    )}
-                    {item.status === "partial" && (
-                      <span className="text-amber-600 dark:text-amber-500 font-bold bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">
-                        {t("shoppingList.partiallyBought")}
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Cost */}
-                <div className="font-bold text-slate-700 dark:text-slate-300 text-base sm:text-lg whitespace-nowrap">
-                  ~{formatAmount(item.estimatedAmount)}
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setBuyingItem(item)}
-                    className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-xl transition-colors tour-shop-check"
-                    title="Mark as Bought"
+                {/* Left: Icon + Content */}
+                <div className="flex items-center gap-4 flex-1 min-w-0">
+                  {/* Category Icon */}
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-sm relative"
+                    style={{ backgroundColor: cat?.color || "#cbd5e1" }}
                   >
-                    <Check size={20} />
-                  </button>
-                  {item.status === "partial" && (
+                    <Icon size={20} />
+                    {item.quantity > 1 && (
+                      <div className="absolute -top-2 -right-2 bg-slate-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md min-w-[20px] text-center border-2 border-white dark:border-zinc-900">
+                        x{item.quantity}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div
+                    className="flex-1 cursor-pointer min-w-0"
+                    onClick={() => {
+                      setEditingItem(item);
+                      setIsAddModalOpen(true);
+                    }}
+                  >
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-bold text-lg leading-tight truncate">
+                        {item.name}
+                      </h3>
+                      {item.priority && item.priority !== "medium" && (
+                        <span
+                          className={cn(
+                            "text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md shrink-0",
+                            priorityColors[item.priority],
+                          )}
+                        >
+                          {item.priority}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="text-xs text-slate-500 flex flex-wrap gap-x-2 gap-y-1 font-medium items-center">
+                      <span>{cat?.name}</span>
+                      {item.subCategoryId && (
+                        <span className="flex items-center gap-1">
+                          <span className="opacity-50">/</span>
+                          {
+                            cat?.subCategories?.find(
+                              (s) => s.id === item.subCategoryId,
+                            )?.name
+                          }
+                        </span>
+                      )}
+                      {wallet && (
+                        <span className="flex items-center gap-1 text-slate-400">
+                          <span className="w-1 h-1 bg-slate-400 rounded-full" />
+                          {wallet.name}
+                        </span>
+                      )}
+                      {item.status === "partial" && (
+                        <span className="text-amber-600 dark:text-amber-500 font-bold bg-amber-50 dark:bg-amber-900/20 px-1.5 rounded">
+                          {t("shoppingList.partiallyBought")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right: Cost + Actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 border-t border-slate-100 dark:border-zinc-800/60 pt-3 sm:pt-0 sm:border-t-0">
+                  {/* Cost */}
+                  <div className="font-bold text-slate-700 dark:text-slate-300 text-base sm:text-lg whitespace-nowrap">
+                    ~{formatAmount(item.estimatedAmount)}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-1.5">
                     <button
-                      onClick={() => setRevertItem(item)}
-                      className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-brand-600 rounded-xl transition-colors"
-                      title="Revert Last Purchase"
+                      onClick={() => setBuyingItem(item)}
+                      className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 rounded-xl transition-colors tour-shop-check"
+                      title="Mark as Bought"
                     >
-                      <RotateCcw size={20} />
+                      <Check size={20} />
                     </button>
-                  )}
-                  {item.status !== "partial" && (
-                    <button
-                      onClick={() => deleteShoppingItem(item.id)}
-                      className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-colors"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  )}
+                    {item.status === "partial" && (
+                      <button
+                        onClick={() => setRevertItem(item)}
+                        className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-500 hover:text-brand-600 rounded-xl transition-colors"
+                        title="Revert Last Purchase"
+                      >
+                        <RotateCcw size={20} />
+                      </button>
+                    )}
+                    {item.status !== "partial" && (
+                      <button
+                        onClick={() => deleteShoppingItem(item.id)}
+                        className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-xl transition-colors"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );

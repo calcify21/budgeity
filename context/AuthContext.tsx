@@ -61,6 +61,7 @@ interface AuthContextType {
   sendPasswordlessLink: (email: string) => Promise<void>;
   completePasswordlessSignIn: (email: string, link: string) => Promise<string | undefined>;
   resendVerification: (email: string) => Promise<void>;
+  changeEmail: (newEmail: string) => Promise<void>;
   error: string | null;
   clearError: () => void;
 }
@@ -463,7 +464,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const actionCodeSettings = {
         // URL you want to redirect back to. The domain (www.example.com) for this
         // URL must be in the authorized domains list in the Firebase Console.
-        url: `${window.location.origin}${import.meta.env.VITE_BASE_URL || "/budgeity/"}#/auth/action?mode=signInWithEmailLink`,
+        url: `${window.location.origin}${import.meta.env.BASE_URL}#/auth/action?mode=signInWithEmailLink`,
         // This must be true.
         handleCodeInApp: true,
       };
@@ -539,6 +540,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const changeEmail = useCallback(async (newEmail: string) => {
+    setError(null);
+    try {
+      if (!auth.currentUser) throw new Error("No user logged in.");
+      await verifyBeforeUpdateEmail(auth.currentUser, newEmail);
+    } catch (err: any) {
+      let msg = "Failed to send email change verification.";
+      if (err.code === "auth/requires-recent-login") {
+        msg = "Security check: Please log out and log back in to change your email.";
+      } else if (err.code === "auth/email-already-in-use") {
+        msg = "This email address is already in use by another account.";
+      } else if (err.code === "auth/invalid-email") {
+        msg = "Please enter a valid email address.";
+      } else if (err.code === "auth/quota-exceeded") {
+        msg = "Too many requests. Please try again later.";
+      }
+      setError(msg);
+      throw new Error(msg);
+    }
+  }, []);
+
   const clearError = () => setError(null);
 
   return (
@@ -563,6 +585,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         sendPasswordlessLink,
         completePasswordlessSignIn,
         resendVerification,
+        changeEmail,
         error,
         clearError,
       }}

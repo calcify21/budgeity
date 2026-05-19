@@ -74,12 +74,12 @@ const MotionDiv = motion.div as any;
 
 type TabId = "performance" | "cashflow" | "budget" | "forecast";
 
-const TABS: { id: TabId; labelKey: string; icon: any; color: string }[] = [
+const TABS = [
   { id: "performance", labelKey: "reports.performance", icon: TrendingUp, color: "from-indigo-500 to-violet-500" },
   { id: "cashflow", labelKey: "reports.cash_flow", icon: Activity, color: "from-emerald-500 to-teal-500" },
   { id: "budget", labelKey: "reports.budget", icon: PiggyBank, color: "from-amber-500 to-orange-500" },
   { id: "forecast", labelKey: "reports.forecast", icon: Target, color: "from-sky-500 to-blue-500" },
-];
+] as const;
 
 // ── Smart Summary Icons ─────────────────────────────────────────────
 

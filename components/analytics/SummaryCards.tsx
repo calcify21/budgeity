@@ -172,7 +172,7 @@ export const SummaryCards: React.FC<Props> = ({ transactions, onDrillDown }) => 
         <Tooltip key={card.label} content={card.tooltip} side="bottom">
           <div 
             onClick={card.action}
-            className={`glass-card rounded-2xl p-4 flex flex-col gap-2 hover:scale-[1.02] transition-transform ${card.action ? 'cursor-pointer' : 'cursor-default'}`}
+            className={`glass-card rounded-2xl p-4 flex flex-col gap-2 hover:scale-[1.02] transition-transform ${onDrillDown ? 'cursor-pointer' : 'cursor-default'}`}
           >
             <div className="flex items-center gap-2">
               <div

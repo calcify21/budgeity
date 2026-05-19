@@ -264,7 +264,7 @@ export const calculateGoalDetailedStatus = (
 ) => {
   const remainingAmount = goal.targetAmount - goal.currentBalance;
   if (remainingAmount <= 0)
-    return { status: "completed", requiredMonthly: 0, avgMonthly: 0 };
+    return { status: "completed", requiredMonthly: 0, avgMonthly: 0, remainingAmount: 0, monthsRemaining: 0 };
 
   const today = new Date();
   const createdDate = new Date(goal.createdAt);

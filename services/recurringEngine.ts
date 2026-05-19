@@ -141,8 +141,8 @@ export const processRecurringTransactions = (
           amount: rule.amount,
           categoryId: rule.categoryId,
           subCategoryId: rule.subcategoryId,
-          fromWalletId: rule.type === "expense" ? rule.walletId : undefined,
-          toWalletId: rule.type === "income" ? rule.walletId : undefined,
+          fromWalletId: rule.type === "expense" ? (rule.walletId || null) : null,
+          toWalletId: rule.type === "income" ? (rule.walletId || null) : null,
           date: `${dateKey}T12:00:00.000Z`, // Record standard mid-day time
           note: `(Auto) ${
             rule.note?.trim() || rule.name?.trim() || `${rule.frequency} recurring`

@@ -206,14 +206,16 @@ const InviteFriendsModal: React.FC<InviteFriendsModalProps> = ({ onClose }) => {
             ))}
           </div>
 
-          {/* Native Share Button (Hidden if not supported, but usually shown for spacing/fallback) */}
-          <button
-            onClick={handleNativeShare}
-            className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:opacity-90 active:scale-[0.98]"
-          >
-            <Share2 size={20} />
-            {t("inviteModal.otherWays")}
-          </button>
+          {/* Native Share Button (Hidden if not supported) */}
+          {!!navigator.share && (
+            <button
+              onClick={handleNativeShare}
+              className="w-full flex items-center justify-center gap-2 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-2xl font-bold shadow-xl transition-all hover:opacity-90 active:scale-[0.98]"
+            >
+              <Share2 size={20} />
+              {t("inviteModal.otherWays")}
+            </button>
+          )}
         </div>
       </MotionDiv>
     </div>

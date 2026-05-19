@@ -215,13 +215,13 @@ const CustomDatePicker: React.FC<Props> = ({
 
   const daysInMonth = getDaysInMonth(viewDate);
   const firstDay = getFirstDayOfMonth(viewDate);
-  const days = [];
+  const days: (number | null)[] = [];
   for (let i = 0; i < firstDay; i++) days.push(null);
   for (let i = 1; i <= daysInMonth; i++) days.push(i);
 
   // Generate Year range (e.g., current view - 100 to +20)
   const currentYear = viewDate.getFullYear();
-  const years = [];
+  const years: number[] = [];
   for (let i = currentYear - 50; i <= currentYear + 50; i++) {
     years.push(i);
   }

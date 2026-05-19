@@ -257,7 +257,7 @@ const ImportWizard: React.FC<Props> = ({ onClose, targetWalletId }) => {
 
         // Determine Wallet Logic
         let finalWalletId = defaultWallet;
-        let finalToWalletId = null;
+        let finalToWalletId: string | null = null;
 
         if (walletNameFromRow) {
           // Check for "From -> To" format for transfers
@@ -331,7 +331,7 @@ const ImportWizard: React.FC<Props> = ({ onClose, targetWalletId }) => {
           subCategoryId: finalSubCategoryId,
         };
       })
-      .filter(Boolean);
+      .filter((row): row is NonNullable<typeof row> => row !== null);
 
     // Extract New Wallets to Create
     const newWallets = new Set<string>();
