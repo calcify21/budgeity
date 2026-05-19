@@ -6,6 +6,7 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
+    "site": "budgeity",
     "public": "dist",
     "ignore": [
       "firebase.json",
