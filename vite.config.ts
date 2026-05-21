@@ -43,6 +43,8 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          // Fixes the build error by raising the cache limit to 4 MB
+          maximumFileSizeToCacheInBytes: 4194304,
           // Cache all static assets (JS, CSS, HTML, fonts, images)
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,ttf,eot}'],
           // Cache translation JSON files at runtime (network first, fallback to cache)
