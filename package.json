@@ -13,7 +13,6 @@
     "tran:clean": "node scripts/i18n-clean.cjs",
     "tran:sync": "node scripts/generate-i18n-types.cjs",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "build": "tsc && vite build",
     "build:f": "tsc && vite build --mode firebase",
     "build:h": "tsc && vite build --mode hostinger",
     "deploy": "npm run build:f && firebase deploy",
