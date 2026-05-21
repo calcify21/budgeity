@@ -6,7 +6,7 @@
   "main": "main.cjs",
   "scripts": {
     "dev": "vite",
-    "dev:emu": "concurrently \"npm run emu\" \"npm run dev\" --kill-others",
+    "dev:emu": "concurrently \"npm run dev\" \"npm run emu\" --kill-others",
     "emu": "node scripts/emu-start.cjs",
     "preview": "vite preview",
     "tran:check": "node scripts/i18n-check.cjs",
@@ -16,7 +16,8 @@
     "build:f": "tsc && vite build --mode firebase",
     "build:h": "tsc && vite build --mode hostinger",
     "deploy": "npm run build:f && firebase deploy",
-    "deploy:r": "npx firebase-tools deploy --only firestore:rules"
+    "deploy:r": "npx firebase-tools deploy --only firestore:rules",
+    "depcheck": "depcheck"
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.13.19",
@@ -49,6 +50,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.18",
     "concurrently": "^9.2.1",
+    "depcheck": "^1.4.7",
     "eslint": "^9.32.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
