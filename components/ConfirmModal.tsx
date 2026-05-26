@@ -64,21 +64,22 @@ export const ConfirmModal: React.FC<Props> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-md"
-            onClick={onClose}
-          />
-          <MotionDiv
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-sm relative z-10 p-6 shadow-2xl border border-slate-100 dark:border-zinc-800"
-          >
+        <div className="fixed inset-0 z-[60] overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md"
+              onClick={onClose}
+            />
+            <MotionDiv
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-[2.5rem] w-full sm:max-w-sm relative z-10 p-6 shadow-2xl border border-slate-100 dark:border-zinc-800 max-h-[90vh] overflow-y-auto"
+            >
             <div className="flex flex-col items-center text-center gap-4">
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center ${isDestructive ? "bg-rose-100 dark:bg-rose-900/20 text-rose-600" : "bg-amber-100 dark:bg-amber-900/20 text-amber-600"}`}
@@ -162,7 +163,8 @@ export const ConfirmModal: React.FC<Props> = ({
                 </button>
               </div>
             </div>
-          </MotionDiv>
+            </MotionDiv>
+          </div>
         </div>
       )}
     </AnimatePresence>

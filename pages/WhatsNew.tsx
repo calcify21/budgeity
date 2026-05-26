@@ -94,14 +94,12 @@ const ChangeItem = ({
 
 const WhatsNew: React.FC = () => {
   return (
-    <div className="space-y-8 pb-12">
-      <div className="flex items-center gap-4 mb-8">
-        <div className="p-4 bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-2xl">
-          <Star size={32} fill="currentColor" className="opacity-80" />
-        </div>
+    <div className="space-y-6 pb-24">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">What's New</h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <h2 className="text-3xl font-bold tracking-tight">What's New</h2>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
             Discover the latest updates and improvements.
           </p>
         </div>

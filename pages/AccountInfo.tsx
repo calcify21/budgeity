@@ -118,8 +118,13 @@ const AccountInfo: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <h2 className="text-2xl font-bold">{t("accountInfo.title")}</h2>
+    <div className="space-y-6 pb-24">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+        <h2 className="text-3xl font-bold tracking-tight">{t("accountInfo.title")}</h2>
+      </div>
+
+      <div className="w-full space-y-8">
 
       {/* Profile Card */}
       <section className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-6">
@@ -368,6 +373,7 @@ const AccountInfo: React.FC = () => {
           }}
         />
       )}
+      </div>
     </div>
   );
 };

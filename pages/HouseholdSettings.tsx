@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useHousehold } from "../context/HouseholdContext";
 import { useAuth } from "../context/AuthContext";
 import { usePermissions } from "../hooks/usePermissions";
@@ -19,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { ICON_MAP } from "../utils";
 
 const HouseholdSettings: React.FC = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const {
@@ -43,13 +45,13 @@ const HouseholdSettings: React.FC = () => {
     return (
       <div className="p-6 text-center">
         <p className="text-slate-500 text-lg">
-          Switch to a household workspace to manage settings.
+          {t("householdSettings.switchWorkspace")}
         </p>
         <button
           onClick={() => navigate("/dashboard")}
           className="mt-4 px-6 py-2 bg-brand-600 text-white rounded-2xl font-semibold"
         >
-          Go to Dashboard
+          {t("householdSettings.goDashboard")}
         </button>
       </div>
     );
@@ -80,9 +82,9 @@ const HouseholdSettings: React.FC = () => {
   const roleBadge = perms.role || "viewer";
 
   return (
-    <div className="p-4 md:p-8 space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 pb-24">
       {/* Header */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-4 py-2">
         <button
           onClick={() => navigate(-1)}
           className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-colors"
@@ -95,7 +97,7 @@ const HouseholdSettings: React.FC = () => {
               <input
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
-                className="text-2xl font-bold bg-transparent border-b-2 border-brand-500 outline-none"
+                className="text-3xl font-bold bg-transparent border-b-2 border-brand-500 outline-none"
                 autoFocus
                 onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
               />
@@ -103,13 +105,13 @@ const HouseholdSettings: React.FC = () => {
                 onClick={handleSaveName}
                 className="px-3 py-1 bg-brand-600 text-white text-sm rounded-xl font-semibold"
               >
-                Save
+                {t("householdSettings.save")}
               </button>
               <button
                 onClick={() => setEditingName(false)}
                 className="px-3 py-1 bg-slate-200 dark:bg-white/10 text-sm rounded-xl font-semibold"
               >
-                Cancel
+                {t("common.cancel")}
               </button>
             </div>
           ) : (
@@ -118,7 +120,7 @@ const HouseholdSettings: React.FC = () => {
                 <span
                   className={`text-3xl flex items-center justify-center w-12 h-12 bg-slate-100 dark:bg-white/5 rounded-2xl ${perms.canManageHousehold ? "cursor-pointer hover:bg-slate-200 dark:hover:bg-white/10 transition-colors" : ""}`}
                   onClick={() => perms.canManageHousehold && setShowIconPicker(!showIconPicker)}
-                  title={perms.canManageHousehold ? "Click to change icon" : undefined}
+                  title={perms.canManageHousehold ? t("householdSettings.clickChangeIcon") : undefined}
                 >
                   {(() => {
                     const IconComp = currentHousehold.icon
@@ -140,7 +142,7 @@ const HouseholdSettings: React.FC = () => {
                   </div>
                 )}
               </div>
-              <h1 className="text-2xl font-bold">{currentHousehold.name}</h1>
+              <h2 className="text-3xl font-bold tracking-tight">{currentHousehold.name}</h2>
               {perms.canManageHousehold && (
                 <button
                   onClick={() => {
@@ -157,11 +159,13 @@ const HouseholdSettings: React.FC = () => {
           <div className="flex items-center gap-2 mt-1">
             <Shield size={14} className="text-brand-500" />
             <span className="text-sm text-slate-500 capitalize font-medium">
-              Your role: {roleBadge}
+              {t("householdSettings.role", { role: roleBadge })}
             </span>
           </div>
         </div>
       </div>
+
+      <div className="max-w-4xl mx-auto space-y-6">
 
       {/* Tabs */}
       <div className="flex gap-2">
@@ -174,7 +178,7 @@ const HouseholdSettings: React.FC = () => {
           }`}
         >
           <Users size={16} />
-          Members
+          {t("householdSettings.members")}
         </button>
         <button
           onClick={() => setActiveTab("activity")}
@@ -185,7 +189,7 @@ const HouseholdSettings: React.FC = () => {
           }`}
         >
           <Activity size={16} />
-          Activity
+          {t("householdSettings.activity")}
         </button>
       </div>
 
@@ -202,16 +206,16 @@ const HouseholdSettings: React.FC = () => {
 
       {/* Danger Zone */}
       <div className="p-6 bg-rose-50 dark:bg-rose-500/5 rounded-[2rem] border border-rose-200 dark:border-rose-500/20 space-y-4">
-        <h3 className="text-lg font-bold text-rose-600">Danger Zone</h3>
+        <h3 className="text-lg font-bold text-rose-600">{t("householdSettings.dangerZone")}</h3>
 
         {perms.canDeleteHousehold ? (
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-slate-800 dark:text-slate-200">
-                Delete Household
+                {t("householdSettings.deleteHousehold")}
               </p>
               <p className="text-sm text-slate-500">
-                Permanently delete this household and all its data
+                {t("householdSettings.deleteDesc")}
               </p>
             </div>
             {showDeleteConfirm ? (
@@ -220,13 +224,13 @@ const HouseholdSettings: React.FC = () => {
                   onClick={handleDelete}
                   className="px-4 py-2 bg-rose-600 text-white rounded-xl text-sm font-semibold"
                 >
-                  Confirm Delete
+                  {t("common.yes")}
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
                   className="px-4 py-2 bg-slate-200 dark:bg-white/10 rounded-xl text-sm font-semibold"
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               </div>
             ) : (
@@ -235,7 +239,7 @@ const HouseholdSettings: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-rose-100 dark:bg-rose-500/10 text-rose-600 rounded-xl text-sm font-semibold hover:bg-rose-200"
               >
                 <Trash2 size={14} />
-                Delete
+                {t("common.delete")}
               </button>
             )}
           </div>
@@ -243,10 +247,10 @@ const HouseholdSettings: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-semibold text-slate-800 dark:text-slate-200">
-                Leave Household
+                {t("householdSettings.leaveHousehold")}
               </p>
               <p className="text-sm text-slate-500">
-                Remove yourself from this household
+                {t("householdSettings.leaveDesc")}
               </p>
             </div>
             {showLeaveConfirm ? (
@@ -255,13 +259,13 @@ const HouseholdSettings: React.FC = () => {
                   onClick={handleLeave}
                   className="px-4 py-2 bg-rose-600 text-white rounded-xl text-sm font-semibold"
                 >
-                  Confirm Leave
+                  {t("common.yes")}
                 </button>
                 <button
                   onClick={() => setShowLeaveConfirm(false)}
                   className="px-4 py-2 bg-slate-200 dark:bg-white/10 rounded-xl text-sm font-semibold"
                 >
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               </div>
             ) : (
@@ -270,11 +274,12 @@ const HouseholdSettings: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-rose-100 dark:bg-rose-500/10 text-rose-600 rounded-xl text-sm font-semibold hover:bg-rose-200 group"
               >
                 <LogOutIconAnimated size={14} />
-                Leave
+                {t("householdSettings.leaveHousehold").split(" ")[0]}
               </button>
             )}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

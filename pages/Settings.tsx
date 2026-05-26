@@ -18,7 +18,6 @@ import {
 import {
   CURRENCIES,
   ACCENT_THEMES,
-  PREMIUM_THEMES,
   APP_VERSION,
 } from "../constants";
 import CustomSelect from "../components/CustomSelect";
@@ -35,8 +34,6 @@ const Settings: React.FC = () => {
     toggleTheme,
     accentTheme,
     setAccentTheme,
-    premiumTheme,
-    setPremiumTheme,
     resetData,
     currency,
     setCurrency,
@@ -219,8 +216,13 @@ const Settings: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <h2 className="text-2xl font-bold">{t("settings.title")}</h2>
+    <div className="space-y-6 pb-24">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+        <h2 className="text-3xl font-bold tracking-tight">{t("settings.title")}</h2>
+      </div>
+
+      <div className="w-full space-y-8">
 
       {/* App Tour */}
       <section className="bg-white dark:bg-zinc-900 rounded-[2rem] p-8 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-4">
@@ -286,94 +288,40 @@ const Settings: React.FC = () => {
           </button>
         </div>
 
-        {/* Premium Themes */}
+        {/* Accent Theme */}
         <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
           <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
-            {t("settingsPage.premiumThemes", "Premium Themes")}
+            {t("settingsPage.classicAccent", "Accent Theme")}
           </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {PREMIUM_THEMES.map((preset) => {
-              const isActive = (premiumTheme || "classic") === preset.id;
+          <div className="flex flex-wrap gap-3">
+            {ACCENT_THEMES.map((accent) => {
+              const isActive = (accentTheme || "emerald") === accent.id;
               return (
                 <button
-                  key={preset.id}
-                  onClick={() => setPremiumTheme(preset.id)}
-                  className={`group relative overflow-hidden rounded-2xl border p-4 text-left transition-all ${
-                    isActive
-                      ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10 ring-1 ring-brand-500"
-                      : "border-slate-200 dark:border-zinc-800 bg-slate-50 dark:bg-black/20 hover:border-brand-300 dark:hover:border-brand-500/50"
-                  }`}
+                  key={accent.id}
+                  onClick={() => setAccentTheme(accent.id)}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? "ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-zinc-900 scale-110" : "hover:scale-110 opacity-70 hover:opacity-100"}`}
+                  style={{ backgroundColor: accent.color }}
+                  title={accent.name}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="font-bold text-slate-900 dark:text-white">
-                        {preset.name}
-                      </div>
-                      <div className="mt-1 text-xs font-medium leading-relaxed text-slate-500 dark:text-zinc-400">
-                        {preset.description}
-                      </div>
-                    </div>
-                    <span
-                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border ${
-                        isActive
-                          ? "border-brand-500 bg-brand-500 text-white"
-                          : "border-slate-300 dark:border-zinc-700 text-transparent"
-                      }`}
+                  {isActive && (
+                    <svg
+                      className="w-5 h-5 text-white"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <Check size={14} strokeWidth={3} />
-                    </span>
-                  </div>
-                  <div className="mt-4 flex gap-2">
-                    {preset.swatches.map((color) => (
-                      <span
-                        key={color}
-                        className="h-6 flex-1 rounded-full border border-white/50 shadow-sm"
-                        style={{ backgroundColor: color }}
-                      />
-                    ))}
-                  </div>
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
                 </button>
               );
             })}
           </div>
         </div>
-
-        {/* Classic Accent Theme */}
-        {(premiumTheme || "classic") === "classic" && (
-          <div className="pt-4 border-t border-slate-100 dark:border-zinc-800">
-            <h4 className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-3">
-              {t("settingsPage.classicAccent", "Classic Accent")}
-            </h4>
-            <div className="flex flex-wrap gap-3">
-              {ACCENT_THEMES.map((accent) => {
-                const isActive = (accentTheme || "emerald") === accent.id;
-                return (
-                  <button
-                    key={accent.id}
-                    onClick={() => setAccentTheme(accent.id)}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${isActive ? "ring-2 ring-offset-2 ring-slate-900 dark:ring-white dark:ring-offset-zinc-900 scale-110" : "hover:scale-110 opacity-70 hover:opacity-100"}`}
-                    style={{ backgroundColor: accent.color }}
-                    title={accent.name}
-                  >
-                    {isActive && (
-                      <svg
-                        className="w-5 h-5 text-white"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         {/* Hide Balances */}
         <div className="pt-6 border-t border-slate-100 dark:border-zinc-800 flex items-center justify-between">
@@ -572,6 +520,7 @@ const Settings: React.FC = () => {
         confirmText={t("settingsPage.resetEverything")}
         isDestructive
       />
+      </div>
     </div>
   );
 };

@@ -156,21 +156,22 @@ const WalletModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm tour-modal-overlay"
-        onClick={onClose}
-      />
-      <MotionDiv
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-md relative z-10 shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col max-h-[90vh]"
-      >
+    <div className="fixed inset-0 z-50 overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        <MotionDiv
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm tour-modal-overlay"
+          onClick={onClose}
+        />
+        <MotionDiv
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 300 }}
+          className="bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] w-full sm:max-w-md relative z-10 shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col max-h-[90vh]"
+        >
         <div
           ref={scrollRef}
           className="p-8 overflow-y-auto custom-scrollbar flex-1"
@@ -301,7 +302,7 @@ const WalletModal: React.FC<Props> = ({
             </div>
             <button
               type="submit"
-              className="w-full py-4 bg-slate-900 dark:bg-white text-white dark:text-black rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl tour-wallet-save"
+              className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-brand-500/20 tour-wallet-save"
             >
               {mode === "import"
                 ? t("walletModal.createAndImport")
@@ -311,7 +312,8 @@ const WalletModal: React.FC<Props> = ({
             </button>
           </form>
         </div>
-      </MotionDiv>
+        </MotionDiv>
+      </div>
     </div>
   );
 };

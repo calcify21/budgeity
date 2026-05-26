@@ -134,7 +134,6 @@ interface DataContextType extends AppState {
   setCurrency: (currency: string) => void;
   toggleTheme: () => void;
   setAccentTheme: (theme: string) => void;
-  setPremiumTheme: (theme: NonNullable<AppState["premiumTheme"]>) => void;
   toggleHideAmounts: () => void;
   setDefaultWallet: (id: string) => void;
   setNumberSystem: (system: "IN" | "INTL" | "AUTO") => void;
@@ -196,7 +195,6 @@ const INITIAL_STATE: AppState = {
   analyticsWidgets: ANALYTICS_WIDGET_DEFAULTS,
   analyticsSectionNames: {},
   accentTheme: "emerald",
-  premiumTheme: "classic",
   language: "en",
 };
 
@@ -371,17 +369,13 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // Handle Theme
   useEffect(() => {
-    const premiumTheme = state.premiumTheme || "classic";
-    const shouldUseDarkSurface = state.theme === "dark" || premiumTheme !== "classic";
-
-    if (shouldUseDarkSurface) {
+    if (state.theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
       document.documentElement.classList.remove("dark");
     }
     localStorage.setItem(THEME_STORAGE_KEY, state.theme);
-    document.documentElement.setAttribute("data-premium-theme", premiumTheme);
-  }, [state.theme, state.premiumTheme]);
+  }, [state.theme]);
 
   // Handle Accent Theme
   useEffect(() => {
@@ -1879,10 +1873,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     syncState({ ...state, theme: newTheme });
   };
   const setAccentTheme = (theme: string) => syncState({ ...state, accentTheme: theme });
-  const setPremiumTheme = (premiumTheme: NonNullable<AppState["premiumTheme"]>) => {
-    const nextTheme = premiumTheme === "classic" ? state.theme : "dark";
-    syncState({ ...state, premiumTheme, theme: nextTheme });
-  };
   const toggleHideAmounts = () =>
     syncState({ ...state, hideAmounts: !state.hideAmounts });
   const setDefaultWallet = (id: string) =>
@@ -1986,7 +1976,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         setCurrency,
         toggleTheme,
         setAccentTheme,
-        setPremiumTheme,
         toggleHideAmounts,
         setDefaultWallet,
         setNumberSystem,

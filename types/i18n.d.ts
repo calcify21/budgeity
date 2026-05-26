@@ -26,6 +26,7 @@ type TranslationKeys =
   | "common.cancel"
   | "common.delete"
   | "common.edit"
+  | "common.yes"
   | "common.search"
   | "common.loading"
   | "common.reset"
@@ -160,9 +161,6 @@ type TranslationKeys =
   | "wallets.transactionHistory"
   | "wallets.noTransactionsYet"
   | "wallets.importTransactions"
-  | "wallets.in"
-  | "wallets.out"
-  | "wallets.netFlow"
   | "budgets.createBudget"
   | "budgets.exceededBudget"
   | "budgets.closeToBudget"
@@ -619,7 +617,6 @@ type TranslationKeys =
   | "settingsPage.resetDataTitle"
   | "settingsPage.resetDataMsg"
   | "settingsPage.resetEverything"
-  | "settingsPage.premiumThemes"
   | "settingsPage.classicAccent"
   | "appLock.title"
   | "appLock.enable"
@@ -687,7 +684,19 @@ type TranslationKeys =
   | "appLock.resetWarningTitle"
   | "appLock.resetWarning"
   | "appLock.resetConfirm"
-  | "appLock.goBack";
+  | "appLock.goBack"
+  | "householdSettings.members"
+  | "householdSettings.activity"
+  | "householdSettings.dangerZone"
+  | "householdSettings.deleteHousehold"
+  | "householdSettings.deleteDesc"
+  | "householdSettings.leaveHousehold"
+  | "householdSettings.leaveDesc"
+  | "householdSettings.role"
+  | "householdSettings.switchWorkspace"
+  | "householdSettings.goDashboard"
+  | "householdSettings.clickChangeIcon"
+  | "householdSettings.save";
 
 declare module "i18next" {
   interface CustomTypeOptions {
@@ -713,6 +722,7 @@ declare module "i18next" {
           cancel: string;
           delete: string;
           edit: string;
+          yes: string;
           search: string;
           loading: string;
           reset: string;
@@ -855,9 +865,6 @@ declare module "i18next" {
           transactionHistory: string;
           noTransactionsYet: string;
           importTransactions: string;
-          in: string;
-          out: string;
-          netFlow: string;
         };
         budgets: {
           createBudget: string;
@@ -1362,7 +1369,6 @@ declare module "i18next" {
           resetDataTitle: string;
           resetDataMsg: string;
           resetEverything: string;
-          premiumThemes: string;
           classicAccent: string;
         };
         appLock: {
@@ -1433,6 +1439,20 @@ declare module "i18next" {
           resetWarning: string;
           resetConfirm: string;
           goBack: string;
+        };
+        householdSettings: {
+          members: string;
+          activity: string;
+          dangerZone: string;
+          deleteHousehold: string;
+          deleteDesc: string;
+          leaveHousehold: string;
+          leaveDesc: string;
+          role: string;
+          switchWorkspace: string;
+          goDashboard: string;
+          clickChangeIcon: string;
+          save: string;
         };
       };
     };

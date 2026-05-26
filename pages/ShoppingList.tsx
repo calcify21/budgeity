@@ -187,14 +187,14 @@ const ShoppingList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto pb-24">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 pb-24">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
         <div>
-          <h2 className="text-2xl font-bold flex items-center gap-2">
-            <ShoppingCart className="text-brand-600" />{" "}
+          <h2 className="text-3xl font-bold tracking-tight">
             {t("common.shopping_list")}
           </h2>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
             {t("shoppingList.planPurchases")}
           </p>
         </div>
@@ -225,6 +225,8 @@ const ShoppingList: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <div className="max-w-4xl mx-auto space-y-6">
 
       {/* Active Items */}
       <div className="space-y-3">
@@ -460,6 +462,7 @@ const ShoppingList: React.FC = () => {
         confirmText={t("shoppingList.yesRevert")}
         variant="danger"
       />
+      </div>
     </div>
   );
 };

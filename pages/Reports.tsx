@@ -398,63 +398,61 @@ const Reports: React.FC = () => {
 
   return (
     <div className="space-y-6 pb-24 no-scrollbar">
-      {/* ── Sticky Header ─────────────────────────────────────── */}
-      <div className="sticky top-0 z-20 -mx-4 lg:-mx-8 px-4 lg:px-8 pt-3 pb-3">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-2xl rounded-[1.5rem] border border-slate-200/60 dark:border-white/5 shadow-lg shadow-black/[0.03] dark:shadow-black/20 px-5 lg:px-6 py-3.5">
-          <div className="min-w-0">
-            <h2 className="text-2xl font-bold tracking-tight">
-              {t("reports.title")}
-            </h2>
-            <p className="text-slate-500 dark:text-zinc-400 font-medium text-xs mt-0.5">
-              {t("reports.subtitle")}
-            </p>
-          </div>
+      {/* Header */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 py-2">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {t("reports.title")}
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
+            {t("reports.subtitle")}
+          </p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <MonthNavigator
-              year={selectedYear}
-              month={selectedMonth}
-              onPrev={handlePrevMonth}
-              onNext={handleNextMonth}
-              onChange={(y, m) => {
-                setSelectedYear(y);
-                setSelectedMonth(m);
-              }}
-              label={range.label}
-              canGoNext={canGoNext}
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <MonthNavigator
+            year={selectedYear}
+            month={selectedMonth}
+            onPrev={handlePrevMonth}
+            onNext={handleNextMonth}
+            onChange={(y, m) => {
+              setSelectedYear(y);
+              setSelectedMonth(m);
+            }}
+            label={range.label}
+            canGoNext={canGoNext}
+          />
+
+          <div className="w-44">
+            <CustomSelect
+              value={walletFilter}
+              onChange={setWalletFilter}
+              options={walletOptions}
             />
-
-            <div className="w-44">
-              <CustomSelect
-                value={walletFilter}
-                onChange={setWalletFilter}
-                options={walletOptions}
-              />
-            </div>
-
-            <button
-              onClick={handleGeneratePdf}
-              disabled={isGeneratingPdf || !hasData}
-              className={cn(
-                "flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm shadow-lg transition-all",
-                hasData
-                  ? "bg-slate-900 dark:bg-white text-white dark:text-black hover:scale-105 active:scale-95 shadow-slate-900/25 dark:shadow-white/25"
-                  : "bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-600 cursor-not-allowed",
-              )}
-            >
-              {isGeneratingPdf ? (
-                <Loader2 size={18} className="animate-spin" />
-              ) : (
-                <FileText size={18} />
-              )}
-              <span className="hidden sm:inline">
-                {isGeneratingPdf ? t("reports.generating") : t("reports.generate_report")}
-              </span>
-              <span className="sm:hidden">
-                {isGeneratingPdf ? "..." : "PDF"}
-              </span>
-            </button>
           </div>
+
+          <button
+            onClick={handleGeneratePdf}
+            disabled={isGeneratingPdf || !hasData}
+            className={cn(
+              "flex items-center gap-2 px-5 py-3 rounded-2xl font-bold text-sm shadow-lg transition-all",
+              hasData
+                ? "bg-brand-600 hover:bg-brand-700 text-white hover:scale-105 active:scale-95 shadow-brand-500/25"
+                : "bg-slate-200 dark:bg-zinc-800 text-slate-400 dark:text-zinc-600 cursor-not-allowed",
+            )}
+          >
+            {isGeneratingPdf ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <FileText size={18} />
+            )}
+            <span className="hidden sm:inline">
+              {isGeneratingPdf ? t("reports.generating") : t("reports.generate_report")}
+            </span>
+            <span className="sm:hidden">
+              {isGeneratingPdf ? "..." : "PDF"}
+            </span>
+          </button>
         </div>
       </div>
 

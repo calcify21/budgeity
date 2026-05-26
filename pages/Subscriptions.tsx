@@ -22,11 +22,10 @@ import {
   Activity,
 } from "lucide-react";
 import { useToast } from "../context/ToastContext";
-import CustomDatePicker from "../components/CustomDatePicker";
-import CustomSelect from "../components/CustomSelect";
 import { ConfirmModal } from "../components/ConfirmModal";
 import WalletModal from "../components/WalletModal";
 import CategoryModal from "../components/CategoryModal";
+import { SubscriptionModal } from "../components/SubscriptionModal";
 
 const MotionDiv = motion.div as any;
 
@@ -53,21 +52,6 @@ const Subscriptions: React.FC = () => {
   );
   const [subToDelete, setSubToDelete] = useState<string | null>(null);
 
-  // Form State
-  const [type, setType] = useState<"expense" | "income">("expense");
-  const [amount, setAmount] = useState("");
-  const [name, setName] = useState("");
-  const [note, setNote] = useState("");
-  const [frequency, setFrequency] = useState<
-    "daily" | "weekly" | "monthly" | "yearly"
-  >("monthly");
-  const [startDate, setStartDate] = useState(
-    new Date().toISOString().split("T")[0],
-  );
-  const [walletId, setWalletId] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [subcategoryId, setSubcategoryId] = useState("");
-  const [autoAdd, setAutoAdd] = useState(true);
   const [pendingHistoryUpdate, setPendingHistoryUpdate] = useState<{
     payload: any;
     linkedCount: number;
@@ -79,30 +63,8 @@ const Subscriptions: React.FC = () => {
   const openModal = (sub?: RecurringTransaction) => {
     if (sub) {
       setEditingSub(sub);
-      setType(sub.type as "income" | "expense");
-      setAmount(sub.amount.toString());
-      setFrequency(sub.frequency as any);
-      setStartDate(sub.startDate.split("T")[0]);
-      setWalletId(sub.walletId || "");
-      setCategoryId(sub.categoryId);
-      setName(sub.name || "");
-      setNote(sub.note || "");
-      setSubcategoryId(sub.subcategoryId || "");
-      setAutoAdd(sub.autoAdd);
     } else {
       setEditingSub(null);
-      setType("expense");
-      setAmount("");
-      setFrequency("monthly");
-      setStartDate(new Date().toISOString().split("T")[0]);
-      setWalletId(wallets[0]?.id || "");
-      setCategoryId(
-        categories.filter((c) => c.type === "expense")[0]?.id || "",
-      );
-      setName("");
-      setNote("");
-      setSubcategoryId("");
-      setAutoAdd(true);
     }
     setIsModalOpen(true);
   };
@@ -166,25 +128,7 @@ const Subscriptions: React.FC = () => {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amount || !startDate || !walletId || !categoryId) return;
-
-    const payload = {
-      type: type as "income" | "expense",
-      amount: parseFloat(amount),
-      name: name.trim() || undefined,
-      note: note.trim() || undefined,
-      walletId,
-      categoryId,
-      subcategoryId: subcategoryId || undefined,
-      frequency,
-      startDate: new Date(startDate + "T12:00:00").toISOString(),
-      nextDueDate: new Date(startDate + "T12:00:00").toISOString(),
-      isActive: true,
-      autoAdd,
-    };
-
+  const onSubmitModal = (payload: any) => {
     if (editingSub) {
       const linkedCount = transactions.filter(
         (tx) => tx.recurringId === editingSub.id,
@@ -579,224 +523,17 @@ const Subscriptions: React.FC = () => {
       </div>
 
       <AnimatePresence>
-        {isModalOpen && (
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm"
-          >
-            <MotionDiv
-              initial={{ scale: 0.95, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 20 }}
-              className="bg-white dark:bg-zinc-900 w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-slate-100 dark:border-zinc-800"
-            >
-              <div className="px-6 py-4 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center bg-slate-50/50 dark:bg-zinc-900/50">
-                <h3 className="text-xl font-extrabold text-slate-800 dark:text-white">
-                  {editingSub
-                    ? t("subscriptions.editSubscription")
-                    : t("subscriptions.newSubscription")}
-                </h3>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="p-2 rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-300 transition-colors"
-                >
-                  <XCircle size={24} />
-                </button>
-              </div>
-
-              <div className="p-6 overflow-y-auto custom-scrollbar">
-                <form
-                  id="subForm"
-                  onSubmit={handleSubmit}
-                  className="space-y-5"
-                >
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                        {t("common.amount")}
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        className="w-full bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand-500 font-medium"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                        {t("subscriptions.billingCycle")}
-                      </label>
-                      <CustomSelect
-                        value={frequency}
-                        onChange={(v: any) => setFrequency(v)}
-                        options={[
-                          { value: "daily", label: t("common.daily") },
-                          { value: "weekly", label: t("common.weekly") },
-                          { value: "monthly", label: t("common.monthly") },
-                          { value: "yearly", label: t("common.yearly") },
-                        ]}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                      {t("subscriptions.serviceName")}
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder={t("subscriptions.serviceNamePlaceholder")}
-                      className="w-full bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand-500 font-medium"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-1.5 text-sm font-bold text-slate-700 dark:text-zinc-300">
-                      <FileText size={14} /> {t("transactionModal.noteLabel")}
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
-                      placeholder={t("transactionModal.notePlaceholder")}
-                      className="w-full bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-white px-4 py-3 rounded-xl focus:ring-2 focus:ring-brand-500 font-medium resize-none"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                      {t("common.category")}
-                    </label>
-                    <CustomSelect
-                      value={categoryId}
-                      onChange={(val: any) => {
-                        if (val === "NEW") {
-                          setShowAddCategory(true);
-                        } else {
-                          setCategoryId(val);
-                          setSubcategoryId("");
-                        }
-                      }}
-                      options={[
-                        ...categories
-                          .filter((c) => c.type === type)
-                          .map((c) => ({
-                            value: c.id,
-                            label: c.name,
-                            icon: c.icon,
-                            color: c.color,
-                          })),
-                        {
-                          value: "NEW",
-                          label: `+ ${t("transactionModal.newCategory")}`,
-                        },
-                      ]}
-                    />
-                  </div>
-
-                  {categories.find((c) => c.id === categoryId)
-                    ?.subCategories && (
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                        {t("subscriptions.subcategoryOptional")}
-                      </label>
-                      <CustomSelect
-                        value={subcategoryId}
-                        onChange={(val: any) => setSubcategoryId(val)}
-                        options={[
-                          { value: "", label: t("subscriptions.none") },
-                          ...(categories
-                            .find((c) => c.id === categoryId)
-                            ?.subCategories?.map((s) => ({
-                              value: s.id,
-                              label: s.name,
-                            })) || []),
-                        ]}
-                      />
-                    </div>
-                  )}
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                      {t("subscriptions.startDate")}
-                    </label>
-                    <CustomDatePicker
-                      value={startDate}
-                      onChange={setStartDate}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-slate-700 dark:text-zinc-300">
-                      {t("common.wallet")}
-                    </label>
-                    <CustomSelect
-                      value={walletId}
-                      onChange={(val: any) => {
-                        if (val === "NEW") setShowAddWallet(true);
-                        else setWalletId(val);
-                      }}
-                      options={[
-                        ...wallets.map((w) => ({
-                          value: w.id,
-                          label: w.name,
-                          icon: w.icon,
-                          color: w.color,
-                          subtitle: formatAmount(w.balance),
-                        })),
-                        {
-                          value: "NEW",
-                          label: `+ ${t("walletModal.addNewWallet")}`,
-                        },
-                      ]}
-                    />
-                  </div>
-
-                  <div className="bg-slate-100 dark:bg-zinc-800 p-4 rounded-xl flex items-start gap-4">
-                    <div className="pt-0.5">
-                      <input
-                        type="checkbox"
-                        checked={autoAdd}
-                        onChange={(e) => setAutoAdd(e.target.checked)}
-                        className="w-5 h-5 rounded text-brand-500 focus:ring-brand-500 dark:bg-zinc-900 border-slate-300 dark:border-zinc-700"
-                        id="autoPay"
-                      />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="autoPay"
-                        className="text-sm font-bold text-slate-800 dark:text-white cursor-pointer block"
-                      >
-                        {t("subscriptions.autoPay")}
-                      </label>
-                      <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                        {t("subscriptions.autoPayDesc")}
-                      </p>
-                    </div>
-                  </div>
-                </form>
-              </div>
-
-              <div className="px-6 py-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-900/50">
-                <button
-                  type="submit"
-                  form="subForm"
-                  className="w-full bg-brand-600 hover:bg-brand-700 text-white py-3.5 rounded-xl font-bold shadow-lg shadow-brand-500/20 transition-all text-lg"
-                >
-                  {t("subscriptions.save")}
-                </button>
-              </div>
-            </MotionDiv>
-          </MotionDiv>
-        )}
+      <SubscriptionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        editingSub={editingSub}
+        onSubmit={onSubmitModal}
+        wallets={wallets}
+        categories={categories}
+        formatAmount={formatAmount}
+        onAddWalletRequested={() => setShowAddWallet(true)}
+        onAddCategoryRequested={() => setShowAddCategory(true)}
+      />
       </AnimatePresence>
 
       <ConfirmModal

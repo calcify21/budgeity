@@ -18,6 +18,7 @@
     "cancel": "Annuler",
     "delete": "Supprimer",
     "edit": "Modifier",
+    "yes": "Oui",
     "search": "Rechercher",
     "loading": "Chargement...",
     "reset": "Réinitialiser",
@@ -159,10 +160,7 @@
     "analytics": "Analyses",
     "transactionHistory": "Historique",
     "noTransactionsYet": "Aucune transaction pour le moment.",
-    "importTransactions": "Importer des Transactions",
-    "in": "Entrée",
-    "out": "Sortie",
-    "netFlow": "Flux Net"
+    "importTransactions": "Importer des Transactions"
   },
   "budgets": {
     "createBudget": "Créer un Budget",
@@ -667,7 +665,6 @@
     "resetDataTitle": "Réinitialiser toutes les données ?",
     "resetDataMsg": "Cela effacera définitivement tous vos portefeuilles, transactions et préférences de cet appareil et du cloud. Cette action est irréversible.",
     "resetEverything": "Réinitialiser",
-    "premiumThemes": "Thèmes Premium",
     "classicAccent": "Accent Classique"
   },
   "appLock": {
@@ -738,5 +735,21 @@
     "resetWarning": "Un lien de connexion sécurisé sera envoyé à votre email. Vous serez déconnecté et toutes les données de verrouillage seront effacées.",
     "resetConfirm": "Réinitialiser et Déconnecter",
     "goBack": "Retour"
+  },
+  "householdSettings": {
+    "members": "Membres",
+    "activity": "Activité",
+    "dangerZone": "Zone de Danger",
+    "deleteHousehold": "Supprimer le Foyer",
+    "deleteDesc": "Supprimer définitivement ce foyer et toutes ses données",
+    "confirmDelete": "Êtes-vous sûr de vouloir supprimer ce foyer ?",
+    "leaveHousehold": "Quitter le Foyer",
+    "leaveDesc": "Vous retirer de ce foyer",
+    "confirmLeave": "Êtes-vous sûr de vouloir quitter ce foyer ?",
+    "role": "Votre rôle : {{role}}",
+    "switchWorkspace": "Basculez vers un espace de travail de foyer pour gérer les paramètres.",
+    "goDashboard": "Aller au Tableau de Bord",
+    "clickChangeIcon": "Cliquez pour changer l'icône",
+    "save": "Enregistrer"
   }
 }

@@ -247,24 +247,40 @@ const CustomDatePicker: React.FC<Props> = ({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "w-full px-4 py-2.5 bg-slate-50 dark:bg-black border rounded-xl font-bold text-sm text-center transition-all flex items-center justify-between",
+          "w-full px-3.5 py-2 bg-slate-50 dark:bg-zinc-900/50 border rounded-xl font-semibold text-sm transition-all flex items-center gap-2.5",
           isOpen
-            ? "border-brand-500 ring-2 ring-brand-500/20"
-            : "border-slate-200 dark:border-zinc-800 hover:bg-slate-100 dark:hover:bg-zinc-900",
+            ? "border-brand-500 ring-2 ring-brand-500/20 bg-white dark:bg-zinc-900"
+            : "border-slate-200 dark:border-zinc-800 hover:bg-slate-100/70 dark:hover:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700",
           className,
         )}
       >
+        <CalendarIcon size={16} className="text-brand-500 dark:text-brand-400 shrink-0" />
         <span
           className={cn(
-            mode === "date" ? "text-lg" : "text-sm",
+            "flex-1 text-left truncate",
+            mode === "date" ? "text-sm" : "text-xs",
             value
-              ? "text-slate-900 dark:text-white"
-              : "text-slate-400 font-medium",
-            "mx-auto",
+              ? "text-slate-800 dark:text-zinc-100 font-bold"
+              : "text-slate-400 dark:text-zinc-500 font-medium",
           )}
         >
           {formatDateDisplay(value)}
         </span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+          className={cn(
+            "w-4 h-4 text-slate-400 dark:text-zinc-500 transition-transform duration-200 shrink-0",
+            isOpen && "rotate-180 text-brand-500 dark:text-brand-400"
+          )}
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
       </button>
 
       {portalRoot &&

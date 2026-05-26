@@ -102,7 +102,7 @@ const Categories: React.FC = () => {
               setEditingCategory(undefined);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-2 bg-slate-900 dark:bg-white text-white dark:text-black px-5 py-2.5 rounded-2xl font-bold hover:scale-105 transition-transform shadow-lg tour-categories-add"
+            className="flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-2xl font-bold shadow-lg shadow-brand-500/20 hover:scale-[1.02] active:scale-95 transition-all tour-categories-add"
           >
             <Plus size={20} /> {t("categories.addCategory")}
           </button>

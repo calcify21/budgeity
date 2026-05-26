@@ -32,6 +32,7 @@ import TransactionDetailsModal from "../components/TransactionDetailsModal";
 import CustomSelect from "../components/CustomSelect";
 import BulkEditModal from "../components/BulkEditModal";
 import { ConfirmModal } from "../components/ConfirmModal";
+import { TransactionFiltersModal } from "../components/TransactionFiltersModal";
 import { motion, AnimatePresence } from "framer-motion";
 import Tooltip from "../components/Tooltip";
 import { useSearchParams } from "react-router-dom";
@@ -182,6 +183,28 @@ const Transactions: React.FC = () => {
     setMaxAmount(maxTxAmount.toString());
     setIsRangeManual(false);
   };
+
+  const hasActiveFilters = useMemo(() => {
+    return (
+      typeFilter !== "all" ||
+      walletFilter !== "all" ||
+      categoryFilter !== "all" ||
+      !!dateFrom ||
+      !!dateTo ||
+      (minAmount !== null && parseFloat(minAmount) > minTxAmount) ||
+      (maxAmount !== null && parseFloat(maxAmount) < maxTxAmount)
+    );
+  }, [
+    typeFilter,
+    walletFilter,
+    categoryFilter,
+    dateFrom,
+    dateTo,
+    minAmount,
+    maxAmount,
+    minTxAmount,
+    maxTxAmount,
+  ]);
 
   const getWalletName = (id: string | null) => {
     const wallet = wallets.find((w) => w.id === id);
@@ -346,15 +369,19 @@ const Transactions: React.FC = () => {
 
           <div className="flex items-center justify-end gap-3 shrink-0 w-full sm:w-auto">
             <button
-              onClick={() => setShowFilters(!showFilters)}
+              onClick={() => setShowFilters(true)}
               className={cn(
-                "tour-transaction-filters flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm shrink-0",
-                showFilters
-                  ? "bg-brand-500 text-white border-brand-500 shadow-brand-500/30"
-                  : "bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50",
+                "tour-transaction-filters flex items-center gap-2 px-4 py-2.5 rounded-xl border text-sm font-bold transition-all shadow-sm shrink-0 relative",
+                hasActiveFilters
+                  ? "bg-brand-50 border-brand-200 dark:bg-brand-950/20 dark:border-brand-500/20 text-brand-600 dark:text-brand-400"
+                  : "bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-zinc-800",
               )}
             >
               <Filter size={18} />
+              <span>{t("transactions.filters")}</span>
+              {hasActiveFilters && (
+                <span className="w-2 h-2 rounded-full bg-brand-500 absolute top-2.5 right-2.5 animate-pulse" />
+              )}
             </button>
 
             {filtered.length > 0 && !isSelectionMode && (
@@ -381,100 +408,32 @@ const Transactions: React.FC = () => {
         </div>
       </div>
 
-      <AnimatePresence>
-        {showFilters && (
-          <MotionDiv
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="bg-white dark:bg-zinc-900 p-6 rounded-[2rem] border border-slate-200 dark:border-zinc-800 shadow-xl mb-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-sm uppercase tracking-wider text-slate-500">
-                  {t("transactions.filters")}
-                </h3>
-                <button
-                  onClick={clearFilters}
-                  className="text-xs font-bold text-brand-600 hover:text-brand-700"
-                >
-                  {t("transactions.clearAll")}
-                </button>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <CustomSelect
-                  value={typeFilter}
-                  onChange={(v) => setTypeFilter(v as any)}
-                  options={[
-                    { value: "all", label: t("transactions.allTypes") },
-                    { value: "income", label: t("common.income") },
-                    { value: "expense", label: t("common.expense") },
-                    { value: "transfer", label: t("common.transfer") },
-                  ]}
-                />
-
-                <CustomSelect
-                  value={walletFilter}
-                  onChange={setWalletFilter}
-                  options={[
-                    { value: "all", label: t("transactions.allWallets") },
-                    ...wallets.map((w) => ({ value: w.id, label: w.name })),
-                  ]}
-                />
-                <div className="flex-1 min-w-[200px]">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    {t("common.category")}
-                  </label>
-                  <CustomSelect
-                    value={categoryFilter}
-                    onChange={setCategoryFilter}
-                    options={categoryOptions}
-                    searchable
-                    placeholder={t("transactions.filterByCategory")}
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-                    {t("transactions.amountRange")}
-                  </label>
-                  <div className="px-1 pt-1">
-                    <MultiRangeSlider
-                      min={minTxAmount}
-                      max={maxTxAmount}
-                      minVal={minAmount ? parseFloat(minAmount) : minTxAmount}
-                      maxVal={maxAmount ? parseFloat(maxAmount) : maxTxAmount}
-                      onChange={(min, max) => {
-                        setMinAmount(min.toString());
-                        setMaxAmount(max.toString());
-                        setIsRangeManual(true);
-                      }}
-                      formatValue={(val) => formatAmount(val)}
-                    />
-                  </div>
-                </div>
-                <div className="md:col-span-4 flex gap-2">
-                  <div className="w-1/2">
-                    <CustomDatePicker
-                      value={dateFrom}
-                      onChange={setDateFrom}
-                      label={t("common.from")}
-                      className="bg-slate-50 dark:bg-black border-none"
-                    />
-                  </div>
-                  <div className="w-1/2">
-                    <CustomDatePicker
-                      value={dateTo}
-                      onChange={setDateTo}
-                      label={t("common.to")}
-                      className="bg-slate-50 dark:bg-black border-none"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </MotionDiv>
-        )}
-      </AnimatePresence>
+      <TransactionFiltersModal
+        isOpen={showFilters}
+        onClose={() => setShowFilters(false)}
+        typeFilter={typeFilter}
+        setTypeFilter={setTypeFilter}
+        walletFilter={walletFilter}
+        setWalletFilter={setWalletFilter}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
+        dateFrom={dateFrom}
+        setDateFrom={setDateFrom}
+        dateTo={dateTo}
+        setDateTo={setDateTo}
+        minAmount={minAmount}
+        setMinAmount={setMinAmount}
+        maxAmount={maxAmount}
+        setMaxAmount={setMaxAmount}
+        setIsRangeManual={setIsRangeManual}
+        clearFilters={clearFilters}
+        wallets={wallets}
+        categories={categories}
+        categoryOptions={categoryOptions}
+        minTxAmount={minTxAmount}
+        maxTxAmount={maxTxAmount}
+        formatAmount={formatAmount}
+      />
 
       {filtered.length > 0 && (
         <MotionDiv

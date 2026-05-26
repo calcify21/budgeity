@@ -696,12 +696,14 @@ const AddTransactionModal: React.FC<Props> = ({
           {/* Header */}
           <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-black/20 shrink-0">
             <div className="flex items-center gap-3">
-              <button
-                onClick={handleBack}
-                className="p-2 -ml-2 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-full transition-colors"
-              >
-                {step === 1 ? <X size={20} /> : <ArrowLeft size={20} />}
-              </button>
+              {step > 1 && (
+                <button
+                  onClick={handleBack}
+                  className="p-2 -ml-2 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+              )}
               <div>
                 <h2 className="text-xl font-bold">
                   {transactionToEdit ? t("transactionModal.editTransaction") : t("transactionModal.newTransaction")}
@@ -747,14 +749,23 @@ const AddTransactionModal: React.FC<Props> = ({
               </div>
             </div>
 
-            {transactionToEdit && step === 1 && (
+            <div className="flex items-center gap-1">
+              {transactionToEdit && step === 1 && (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-full transition-colors"
+                >
+                  <Trash2 size={20} />
+                </button>
+              )}
               <button
-                onClick={() => setConfirmDelete(true)}
-                className="p-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-full transition-colors"
+                onClick={onClose}
+                className="p-2 hover:bg-slate-200 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                title="Close"
               >
-                <Trash2 size={20} />
+                <X size={20} />
               </button>
-            )}
+            </div>
           </div>
 
           {/* Validation Error Banner */}
@@ -791,14 +802,14 @@ const AddTransactionModal: React.FC<Props> = ({
             {step < 3 ? (
               <button
                 onClick={handleNext}
-                className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-brand-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 tour-trans-next"
+                className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-brand-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 tour-trans-next"
               >
                 {t("transactionModal.next")} <ArrowRight size={20} />
               </button>
             ) : (
               <button
                 onClick={handleFinish}
-                className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-emerald-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2 tour-trans-save"
+                className="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg rounded-2xl shadow-xl shadow-brand-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 tour-trans-save"
               >
                 <Check size={20} />{" "}
                 {transactionToEdit ? t("transactionModal.saveChanges") : t("transactionModal.confirmTransaction")}

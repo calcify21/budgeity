@@ -18,6 +18,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
+    "yes": "Yes",
     "search": "Search",
     "loading": "Loading...",
     "reset": "Reset",
@@ -159,10 +160,7 @@
     "analytics": "Analytics",
     "transactionHistory": "Transaction History",
     "noTransactionsYet": "No transactions yet.",
-    "importTransactions": "Import Transactions",
-    "in": "In",
-    "out": "Out",
-    "netFlow": "Net Flow"
+    "importTransactions": "Import Transactions"
   },
   "budgets": {
     "createBudget": "Create Budget",
@@ -213,7 +211,7 @@
     "targetDeadline": "Target Deadline (Optional)",
     "identityAesthetic": "Identity & Aesthetic",
     "updateGoal": "Update Goal",
-    "createGoalWallet": "Create Hidden Goal Wallet",
+    "createGoalWallet": "Create Goal",
     "moveFunds": "Move Funds",
     "withdrawFunds": "Withdraw Funds",
     "target": "Target",
@@ -224,7 +222,7 @@
     "confirmTransfer": "Confirm Transfer",
     "destroyGoalSystem": "Destroy Goal System",
     "returnPortfolioTo": "Return Portfolio To",
-    "confirmDeletion": "Confirm Deletion"
+    "confirmDeletion": "Delete"
   },
   "subscriptions": {
     "title": "Subscriptions",
@@ -667,7 +665,6 @@
     "resetDataTitle": "Reset All Data?",
     "resetDataMsg": "This will permanently wipe all your wallets, transactions, and preferences from this device and the cloud. This action cannot be undone.",
     "resetEverything": "Reset",
-    "premiumThemes": "Premium Themes",
     "classicAccent": "Classic Accent"
   },
   "appLock": {
@@ -738,5 +735,19 @@
     "resetWarning": "A secure sign-in link will be sent to your email. You will be logged out and all lock data will be cleared.",
     "resetConfirm": "Reset & Logout",
     "goBack": "Go back"
+  },
+  "householdSettings": {
+    "members": "Members",
+    "activity": "Activity",
+    "dangerZone": "Danger Zone",
+    "deleteHousehold": "Delete Household",
+    "deleteDesc": "Permanently delete this household and all its data",
+    "leaveHousehold": "Leave Household",
+    "leaveDesc": "Remove yourself from this household",
+    "role": "Your role: {{role}}",
+    "switchWorkspace": "Switch to a household workspace to manage settings.",
+    "goDashboard": "Go to Dashboard",
+    "clickChangeIcon": "Click to change icon",
+    "save": "Save"
   }
 }

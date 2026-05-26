@@ -188,8 +188,7 @@ const Export: React.FC = () => {
         Amount: r.RawAmount,
       };
     });
-    const ws = XLSX.utils.aoa_to_sheet([["Budgeity - Transaction Report"]]);
-    XLSX.utils.sheet_add_json(ws, rows, { origin: "A2" });
+    const ws = XLSX.utils.json_to_sheet(rows);
 
     // Auto-size columns for better look
     const max_width = rows.reduce(
@@ -225,8 +224,7 @@ const Export: React.FC = () => {
         Amount: r.RawAmount,
       };
     });
-    const ws = XLSX.utils.aoa_to_sheet([["Budgeity - Transaction Report"]]);
-    XLSX.utils.sheet_add_json(ws, rows, { origin: "A2" });
+    const ws = XLSX.utils.json_to_sheet(rows);
     const csv = XLSX.utils.sheet_to_csv(ws);
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const link = document.createElement("a");
@@ -239,8 +237,13 @@ const Export: React.FC = () => {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <h2 className="text-2xl font-bold">{t("export.title")}</h2>
+    <div className="space-y-6 pb-24">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-2">
+        <h2 className="text-3xl font-bold tracking-tight">{t("export.title")}</h2>
+      </div>
+
+
 
       <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-slate-200 dark:border-zinc-800 shadow-sm space-y-6">
         <h3 className="font-semibold text-lg tour-export-config">

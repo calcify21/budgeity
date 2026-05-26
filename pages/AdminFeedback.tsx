@@ -129,13 +129,14 @@ const AdminFeedback: React.FC = () => {
       : feedback.filter((item) => item.type === filter);
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="space-y-6 pb-24">
+      {/* Header */}
+      <div className="flex items-center justify-between py-2">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h2 className="text-3xl font-bold tracking-tight">
             User Feedback
-          </h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
             View what users are saying about the app
           </p>
         </div>
@@ -147,6 +148,8 @@ const AdminFeedback: React.FC = () => {
           <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
         </button>
       </div>
+
+      <div className="max-w-5xl mx-auto space-y-8">
 
       <div className="flex gap-2 pb-2 overflow-x-auto">
         {(["all", "bug", "feature", "general"] as const).map((f) => (
@@ -290,6 +293,7 @@ const AdminFeedback: React.FC = () => {
         confirmText="Delete"
         isDestructive
       />
+      </div>
     </div>
   );
 };
