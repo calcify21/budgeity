@@ -401,14 +401,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await setPersistence(auth, browserLocalPersistence);
 
-      const inIframe = window.self !== window.top;
-      const isMobileDevice = isMobile();
-
-      if (inIframe || isMobileDevice) {
-        await signInWithRedirect(auth, provider);
-        return;
-      }
-
       const result = await signInWithPopup(auth, provider);
 
       // Sync photoURL if missing or invalid but available in providerData

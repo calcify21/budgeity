@@ -91,23 +91,25 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[9998] flex items-center justify-center">
-      {/* Backdrop */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[9998] overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/50 backdrop-blur-md"
+          onClick={onClose}
+        />
 
-      {/* Modal */}
-      <motion.div
-        initial={{ opacity: 0, y: 30, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 30, scale: 0.95 }}
-        className="relative z-10 w-full max-w-sm mx-4 bg-white dark:bg-zinc-900 rounded-[2rem] border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden"
-      >
+        {/* Modal */}
+        <motion.div
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="relative z-10 w-full max-w-sm mx-4 sm:mx-auto bg-white dark:bg-zinc-900 sm:rounded-[2rem] rounded-t-[2rem] border border-slate-200 dark:border-zinc-800 shadow-2xl overflow-hidden"
+        >
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <div className="flex items-center gap-3">
@@ -247,6 +249,7 @@ const PinSetupModal: React.FC<PinSetupModalProps> = ({
           </div>
         )}
       </motion.div>
+      </div>
     </div>
   );
 };

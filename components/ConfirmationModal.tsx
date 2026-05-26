@@ -32,7 +32,7 @@ const ConfirmationModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-[55] overflow-y-auto">
       <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
         <MotionDiv
           initial={{ opacity: 0 }}

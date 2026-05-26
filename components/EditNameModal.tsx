@@ -51,18 +51,24 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[60] overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        <AnimatePresence>
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md"
+            onClick={onClose}
+          />
 
-      <MotionDiv
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-md relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col max-h-[90vh]"
-      >
+          <MotionDiv
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] w-full sm:max-w-md relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col max-h-[90vh] overflow-hidden"
+          >
         <div
           ref={scrollRef}
           className="overflow-y-auto custom-scrollbar flex-1"
@@ -115,7 +121,7 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder={t("editNameModal.namePlaceholder")}
-                  className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500 transition-all font-medium"
+                  className="w-full p-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl outline-none focus:ring-2 focus:ring-brand-500/20 transition-all font-medium"
                   autoFocus
                 />
               </div>
@@ -137,7 +143,9 @@ const EditNameModal: React.FC<Props> = ({ onClose }) => {
           )}
         </div>
       </MotionDiv>
-    </div>
+    </AnimatePresence>
+  </div>
+</div>
   );
 };
 

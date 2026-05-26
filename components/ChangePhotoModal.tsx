@@ -58,22 +58,20 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[60]"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-[60]"
             onClick={onClose}
           />
 
           {/* Modal */}
-          <MotionDiv
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[61] flex items-center justify-center p-4"
-            onClick={(e: React.MouseEvent) =>
-              e.target === e.currentTarget && onClose()
-            }
-          >
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-zinc-800 w-full max-w-sm overflow-hidden">
+          <div className="fixed inset-0 z-[61] overflow-y-auto">
+            <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+              <MotionDiv
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="relative w-full sm:max-w-sm bg-white dark:bg-zinc-900 sm:rounded-3xl rounded-t-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-zinc-800 flex flex-col max-h-[90vh]"
+              >
               {/* Header */}
               <div className="flex items-center justify-between p-5 pb-2">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -198,8 +196,9 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({
                 className="hidden"
                 onChange={handleFileChange}
               />
-            </div>
-          </MotionDiv>
+            </MotionDiv>
+          </div>
+        </div>
         </>
       )}
     </AnimatePresence>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
 import { useData } from "../context/DataContext";
 import { getCategoryIcon, cn } from "../utils";
 import {
@@ -427,31 +428,34 @@ const ShoppingList: React.FC = () => {
       )}
 
       {/* Modals */}
-      <ShoppingItemModal
-        isOpen={isAddModalOpen}
-        onClose={() => {
-          setIsAddModalOpen(false);
-          setEditingItem(null);
-        }}
-        onSave={handleSaveItem}
-        initialItem={editingItem || undefined}
-        categories={categories}
-        wallets={wallets}
-        defaultWalletId={defaultWalletId}
-      />
-
-      {buyingItem && (
-        <PurchaseConfirmationModal
-          isOpen={!!buyingItem}
-          onClose={() => setBuyingItem(null)}
-          onConfirm={handleBuyConfirm}
-          item={buyingItem}
-          wallets={wallets}
-          defaultWalletId={defaultWalletId}
-          formatAmount={formatAmount}
-          currency={currency}
-        />
-      )}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <ShoppingItemModal
+            isOpen={isAddModalOpen}
+            onClose={() => {
+              setIsAddModalOpen(false);
+              setEditingItem(null);
+            }}
+            onSave={handleSaveItem}
+            initialItem={editingItem || undefined}
+            categories={categories}
+            wallets={wallets}
+            defaultWalletId={defaultWalletId}
+          />
+        )}
+        {buyingItem && (
+          <PurchaseConfirmationModal
+            isOpen={!!buyingItem}
+            onClose={() => setBuyingItem(null)}
+            onConfirm={handleBuyConfirm}
+            item={buyingItem}
+            wallets={wallets}
+            defaultWalletId={defaultWalletId}
+            formatAmount={formatAmount}
+            currency={currency}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmationModal
         isOpen={!!revertItem}

@@ -480,7 +480,7 @@ const ImportWizard: React.FC<Props> = ({ onClose, targetWalletId }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-[55] overflow-y-auto">
       <div className="flex min-h-full items-center justify-center p-4">
         <div
           className="absolute inset-0 bg-black/60 backdrop-blur-sm"

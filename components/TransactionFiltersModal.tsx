@@ -76,21 +76,22 @@ export const TransactionFiltersModal: React.FC<TransactionFiltersModalProps> = (
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-          />
-          <MotionDiv
-            initial={{ scale: 0.95, opacity: 0, y: 15 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 15 }}
-            transition={{ type: "spring", duration: 0.3 }}
-            className="bg-white dark:bg-zinc-900 rounded-[2.5rem] border border-slate-100 dark:border-zinc-800 shadow-2xl w-full max-w-lg relative z-10 flex flex-col max-h-[90vh] overflow-hidden"
-          >
+        <div className="fixed inset-0 z-[9999] overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={onClose}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <MotionDiv
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] border border-slate-100 dark:border-zinc-800 shadow-2xl w-full max-w-lg relative z-10 flex flex-col max-h-[90vh] overflow-hidden"
+            >
             {/* Header */}
             <div className="p-8 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-black/50">
               <div className="flex items-center gap-3">
@@ -225,6 +226,7 @@ export const TransactionFiltersModal: React.FC<TransactionFiltersModalProps> = (
             </div>
           </MotionDiv>
         </div>
+      </div>
       )}
     </AnimatePresence>
   );

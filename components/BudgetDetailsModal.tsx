@@ -3,7 +3,7 @@ import { useData } from "../context/DataContext";
 import { Budget } from "../types";
 import { cn, isDateInPeriod, getCategoryIcon, formatDate } from "../utils";
 import { X, Pencil, Trash2, ArrowRightLeft, HelpCircle } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useEscapeKey } from "../hooks/useEscapeKey";
 
@@ -59,18 +59,24 @@ const BudgetDetailsModal: React.FC<Props> = ({
     .slice(0, 3);
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-md"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[60] overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        <AnimatePresence>
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md"
+            onClick={onClose}
+          />
 
-      <MotionDiv
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-lg relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10"
-      >
+          <MotionDiv
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] w-full max-w-lg relative z-10 p-8 shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col max-h-[90vh]"
+          >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <div
@@ -201,7 +207,9 @@ const BudgetDetailsModal: React.FC<Props> = ({
           </button>
         </div>
       </MotionDiv>
-    </div>
+    </AnimatePresence>
+  </div>
+</div>
   );
 };
 

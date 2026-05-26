@@ -610,11 +610,15 @@ const Subscriptions: React.FC = () => {
         confirmSecondaryText={t("subscriptions.updateExisting", "Update Existing")}
       />
 
-      {showAddWallet && <WalletModal onClose={() => setShowAddWallet(false)} />}
+      <AnimatePresence>
+        {showAddWallet && <WalletModal onClose={() => setShowAddWallet(false)} />}
+      </AnimatePresence>
 
-      {showAddCategory && (
-        <CategoryModal onClose={() => setShowAddCategory(false)} />
-      )}
+      <AnimatePresence>
+        {showAddCategory && (
+          <CategoryModal onClose={() => setShowAddCategory(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

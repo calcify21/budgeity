@@ -143,20 +143,23 @@ const BulkEditModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center px-4 py-8">
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <MotionDiv
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        className="relative w-full max-w-sm bg-white dark:bg-zinc-900 rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col"
-      >
+    <div className="fixed inset-0 z-[200] overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        <AnimatePresence>
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md"
+            onClick={onClose}
+          />
+          <MotionDiv
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="relative w-full sm:max-w-sm bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col max-h-[90vh]"
+          >
         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-black/20 shrink-0">
           <h2 className="text-xl font-bold dark:text-white">Bulk Edit</h2>
           <button
@@ -225,7 +228,9 @@ const BulkEditModal: React.FC<Props> = ({
           </button>
         </div>
       </MotionDiv>
-    </div>
+    </AnimatePresence>
+  </div>
+</div>
   );
 };
 

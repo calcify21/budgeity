@@ -8,7 +8,7 @@ import {
   Star,
   AlertCircle,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { db } from "../firebase";
@@ -89,22 +89,24 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[55] overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        <AnimatePresence>
+          <MotionDiv
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-md"
+            onClick={onClose}
+          />
 
-      <MotionDiv
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10"
-      >
+          <MotionDiv
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="relative w-full sm:max-w-md bg-white dark:bg-zinc-900 sm:rounded-[2rem] rounded-t-[2rem] shadow-2xl overflow-hidden border border-slate-200 dark:border-white/10 flex flex-col max-h-[90vh]"
+          >
         {/* Header */}
         <div className="p-6 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-black/20">
           <h2 className="text-xl font-bold flex items-center gap-2">
@@ -168,7 +170,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
                     : t("feedbackModal.generalPlaceholder")
               }
               rows={4}
-              className="w-full p-4 bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none resize-none transition-all placeholder:text-slate-400"
+              className="w-full p-4 bg-slate-50 dark:bg-black/50 border border-slate-200 dark:border-zinc-800 rounded-2xl focus:ring-2 focus:ring-brand-500/20 outline-none resize-none transition-all placeholder:text-slate-400"
               required
             />
           </div>
@@ -225,7 +227,9 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
           </div>
         </form>
       </MotionDiv>
-    </div>
+    </AnimatePresence>
+  </div>
+</div>
   );
 };
 

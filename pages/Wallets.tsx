@@ -405,6 +405,7 @@ const Wallets: React.FC = () => {
       <AnimatePresence>
         {walletToDelete && (
           <WalletActionModal
+            isOpen={!!walletToDelete}
             walletId={walletToDelete}
             onClose={() => setWalletToDelete(null)}
           />

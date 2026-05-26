@@ -4,7 +4,7 @@ import { useData } from "../context/DataContext";
 import { Budget } from "../types";
 import { X, Calendar, AlertCircle } from "lucide-react";
 import { useToast } from "../context/ToastContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import CustomSelect from "./CustomSelect";
 import { cn } from "../utils";
 import WalletModal from "./WalletModal";
@@ -148,7 +148,7 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
   ];
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-[55] overflow-y-auto">
       <div className="flex min-h-full items-end justify-center p-4 sm:items-center">
         <MotionDiv
           initial={{ opacity: 0 }}
@@ -328,15 +328,19 @@ const BudgetModal: React.FC<Props> = ({ onClose, budgetToEdit }) => {
           </div>
         </MotionDiv>
 
-        {showAddWallet && (
-          <WalletModal onClose={() => setShowAddWallet(false)} />
-        )}
-        {showAddCategory && (
-          <CategoryModal
-            onClose={() => setShowAddCategory(false)}
-            initialType="expense"
-          />
-        )}
+        <AnimatePresence>
+          {showAddWallet && (
+            <WalletModal onClose={() => setShowAddWallet(false)} />
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {showAddCategory && (
+            <CategoryModal
+              onClose={() => setShowAddCategory(false)}
+              initialType="expense"
+            />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

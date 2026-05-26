@@ -9,7 +9,7 @@ import IconPicker from "./IconPicker";
 import { useScrollToError } from "../hooks/useScrollToError";
 import { useEscapeKey } from "../hooks/useEscapeKey";
 import { useTranslation } from "react-i18next";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const MotionDiv = motion.div as any;
 
@@ -106,24 +106,23 @@ const CategoryModal: React.FC<Props> = ({
   const IconComponent = getCategoryIcon(selectedIcon);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <MotionDiv
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      />
+    <div className="fixed inset-0 z-[55] overflow-y-auto">
+      <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+        <MotionDiv
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-md"
+          onClick={onClose}
+        />
 
-      {/* Modal Card */}
-      <MotionDiv
-        initial={{ scale: 0.95, opacity: 0, y: 20 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-        className="relative scale-100 rounded-3xl bg-white dark:bg-zinc-900 text-left shadow-2xl transition-all sm:w-full sm:max-w-md w-full border border-slate-100 dark:border-zinc-800 flex flex-col max-h-[90vh] overflow-hidden"
-      >
+        <MotionDiv
+          initial={{ y: "100%" }}
+          animate={{ y: 0 }}
+          exit={{ y: "100%" }}
+          transition={{ type: "spring", damping: 25, stiffness: 200 }}
+          className="relative scale-100 sm:rounded-3xl rounded-t-[2.5rem] bg-white dark:bg-zinc-900 text-left shadow-2xl sm:w-full sm:max-w-md w-full border border-slate-100 dark:border-zinc-800 flex flex-col max-h-[90vh] overflow-hidden"
+        >
         <div className="p-5 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between bg-slate-50/80 dark:bg-zinc-800/50 backdrop-blur-sm z-10 shrink-0">
           <h2 className="text-lg font-bold">
             {categoryToEdit
@@ -312,6 +311,7 @@ const CategoryModal: React.FC<Props> = ({
         </div>
       </MotionDiv>
     </div>
+  </div>
   );
 };
 

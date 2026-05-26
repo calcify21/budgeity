@@ -47,22 +47,23 @@ export const GoalDetailsModal: React.FC<GoalDetailsModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <MotionDiv
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={onClose}
-          />
+        <div className="fixed inset-0 z-[55] overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md"
+              onClick={onClose}
+            />
 
-          <MotionDiv
-            initial={{ scale: 0.95, opacity: 0, y: 15 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.95, opacity: 0, y: 15 }}
-            transition={{ type: "spring", duration: 0.3 }}
-            className="bg-white dark:bg-zinc-900 rounded-[2.5rem] w-full max-w-lg relative z-10 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-100 dark:border-zinc-800"
-          >
+            <MotionDiv
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] w-full max-w-lg relative z-10 shadow-2xl flex flex-col max-h-[90vh] overflow-hidden border border-slate-100 dark:border-zinc-800"
+            >
             <div className="p-8 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50 dark:bg-black/50">
               <div className="flex items-center gap-4">
                 <div
@@ -308,6 +309,7 @@ export const GoalDetailsModal: React.FC<GoalDetailsModalProps> = ({
             </div>
           </MotionDiv>
         </div>
+      </div>
       )}
     </AnimatePresence>
   );

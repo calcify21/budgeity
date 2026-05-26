@@ -40,20 +40,22 @@ const FullPhotoViewModal: React.FC<FullPhotoViewModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/95 backdrop-blur-2xl"
-            onClick={onClose}
-          />
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative flex items-center justify-center pointer-events-none"
-          >
+        <div className="fixed inset-0 z-[200] overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-md"
+              onClick={onClose}
+            />
+            <motion.div
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative flex items-center justify-center pointer-events-none"
+            >
             {photoURL ? (
               <img
                 src={getHighResPhotoURL(photoURL)}
@@ -77,8 +79,9 @@ const FullPhotoViewModal: React.FC<FullPhotoViewModalProps> = ({
             </button>
           </motion.div>
         </div>
-      )}
-    </AnimatePresence>
+      </div>
+    )}
+  </AnimatePresence>
   );
 };
 

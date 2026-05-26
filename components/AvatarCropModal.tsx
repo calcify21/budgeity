@@ -101,25 +101,25 @@ const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-[70] overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+            {/* Backdrop */}
             <MotionDiv
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[70]"
+              className="fixed inset-0 bg-black/70 backdrop-blur-md"
               onClick={onClose}
             />
 
-          {/* Modal */}
-          <MotionDiv
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed inset-0 z-[71] flex items-center justify-center p-4"
-          >
-            <div className="bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-zinc-800 w-full max-w-md overflow-hidden">
+            {/* Modal */}
+            <MotionDiv
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative z-10 w-full sm:max-w-md bg-white dark:bg-zinc-900 sm:rounded-3xl rounded-t-[2.5rem] shadow-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden"
+            >
               {/* Header */}
               <div className="flex items-center justify-between p-5 pb-3">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
@@ -208,9 +208,9 @@ const AvatarCropModal: React.FC<AvatarCropModalProps> = ({
                   </button>
                 </div>
               </div>
-            </div>
-          </MotionDiv>
-        </>
+            </MotionDiv>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );

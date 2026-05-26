@@ -13,6 +13,10 @@ import { cn } from "../utils";
 import { useTranslation } from "react-i18next";
 import { useEscapeKey } from "../hooks/useEscapeKey";
 
+import { motion, AnimatePresence } from "framer-motion";
+
+const MotionDiv = motion.div as any;
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -77,104 +81,124 @@ const PurchaseConfirmationModal: React.FC<Props> = ({
   const isPartial = parseInt(quantity) < maxQty;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-[2rem] shadow-2xl overflow-hidden flex flex-col relative z-10">
-        <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Check className="text-emerald-500" />
-            Mark as Bought
-          </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
-          >
-            <X size={20} />
-          </button>
-        </div>
-
-        <div className="p-6 space-y-4">
-          <div className="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
-            <div className="text-sm text-slate-500 mb-1">{t("purchaseModal.item")}</div>
-            <div className="font-bold text-lg">{item.name}</div>
-            <div className="text-sm text-slate-400">
-              {t("purchaseModal.estimated", { amount: formatAmount(item.estimatedAmount) })}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-              {t("purchaseModal.finalAmountSpent")}
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">
-                {currency}
-              </span>
-              <input
-                type="number"
-                step="0.01"
-                value={finalAmount}
-                onChange={(e) => setFinalAmount(e.target.value)}
-                className="w-full pl-12 p-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-lg tour-shop-confirm-amount"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                {t("purchaseModal.quantityBought")}
-              </label>
-              <input
-                type="number"
-                min="1"
-                max={maxQty}
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                className="w-full p-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
-              />
-              <div className="text-xs text-slate-400 mt-1">
-                {t("purchaseModal.maxQty", { qty: maxQty })} {isPartial && t("purchaseModal.partialBuy")}
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-[55] overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
+            <MotionDiv
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 backdrop-blur-md"
+              onClick={onClose}
+            />
+            <MotionDiv
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative bg-white dark:bg-zinc-900 w-full sm:max-w-md sm:rounded-[2rem] rounded-t-[2rem] shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+            >
+              <div className="p-6 border-b border-slate-100 dark:border-zinc-800 flex justify-between items-center">
+                <h2 className="text-xl font-bold flex items-center gap-2">
+                  <Check className="text-emerald-500" />
+                  Mark as Bought
+                </h2>
+                <button
+                  onClick={onClose}
+                  className="p-2 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+                >
+                  <X size={20} />
+                </button>
               </div>
-            </div>
-            <div>
-              <CustomDatePicker
-                label={t("purchaseModal.date")}
-                value={date}
-                onChange={setDate}
-                maxDate={new Date().toISOString().split("T")[0]}
-              />
-            </div>
+
+              <div className="p-6 space-y-4 overflow-y-auto">
+                <div className="bg-slate-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-slate-100 dark:border-zinc-800">
+                  <div className="text-sm text-slate-500 mb-1">
+                    {t("purchaseModal.item")}
+                  </div>
+                  <div className="font-bold text-lg">{item.name}</div>
+                  <div className="text-sm text-slate-400">
+                    {t("purchaseModal.estimated", {
+                      amount: formatAmount(item.estimatedAmount),
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
+                    {t("purchaseModal.finalAmountSpent")}
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold text-sm">
+                      {currency}
+                    </span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={finalAmount}
+                      onChange={(e) => setFinalAmount(e.target.value)}
+                      className="w-full pl-12 p-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500 font-bold text-lg tour-shop-confirm-amount"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
+                      {t("purchaseModal.quantityBought")}
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max={maxQty}
+                      value={quantity}
+                      onChange={(e) => setQuantity(e.target.value)}
+                      className="w-full p-3 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    <div className="text-xs text-slate-400 mt-1">
+                      {t("purchaseModal.maxQty", { qty: maxQty })}{" "}
+                      {isPartial && t("purchaseModal.partialBuy")}
+                    </div>
+                  </div>
+                  <div>
+                    <CustomDatePicker
+                      label={t("purchaseModal.date")}
+                      value={date}
+                      onChange={setDate}
+                      maxDate={new Date().toISOString().split("T")[0]}
+                    />
+                  </div>
+                </div>
+
+                <CustomSelect
+                  label={t("purchaseModal.paidFromWallet")}
+                  value={walletId}
+                  onChange={setWalletId}
+                  options={wallets.map((w) => ({ value: w.id, label: w.name }))}
+                  placeholder={t("purchaseModal.selectWallet")}
+                />
+              </div>
+
+              <div className="p-6 border-t border-slate-100 dark:border-zinc-800 flex gap-3">
+                <button
+                  onClick={onClose}
+                  className="flex-1 py-3 px-4 rounded-xl font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  {t("purchaseModal.cancel")}
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  className="flex-1 py-3 px-4 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20 tour-shop-confirm-btn"
+                >
+                  {t("purchaseModal.confirmPurchase")}
+                </button>
+              </div>
+            </MotionDiv>
           </div>
-
-          <CustomSelect
-            label={t("purchaseModal.paidFromWallet")}
-            value={walletId}
-            onChange={setWalletId}
-            options={wallets.map((w) => ({ value: w.id, label: w.name }))}
-            placeholder={t("purchaseModal.selectWallet")}
-          />
         </div>
-
-        <div className="p-6 border-t border-slate-100 dark:border-zinc-800 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 px-4 rounded-xl font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-zinc-700 transition-colors"
-          >
-            {t("purchaseModal.cancel")}
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="flex-1 py-3 px-4 rounded-xl font-bold bg-emerald-600 text-white hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-500/20 tour-shop-confirm-btn"
-          >
-            {t("purchaseModal.confirmPurchase")}
-          </button>
-        </div>
-      </div>
-    </div>
+      )}
+    </AnimatePresence>
   );
 };
 
