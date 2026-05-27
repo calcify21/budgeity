@@ -30,6 +30,8 @@ import {
   Search,
   GripVertical,
   Home,
+  Users,
+  ChevronDown,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../utils";
@@ -116,7 +118,6 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
                 className="cursor-grab active:cursor-grabbing text-slate-300 dark:text-zinc-700 p-2 touch-none select-none hover:text-slate-500 dark:hover:text-slate-400 transition-colors"
                 style={{ touchAction: "none" }}
                 onPointerDown={(e) => {
-                  e.preventDefault();
                   controls.start(e);
                 }}
               >
@@ -212,73 +213,109 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 }) => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { navPreferences, updateNavPreferences } = useData();
+  const { navPreferences, updateNavPreferences, isAdmin } = useData();
   const { error } = useToast();
   const [isCustomizing, setIsCustomizing] = React.useState(false);
   const [localPinnedIds, setLocalPinnedIds] = React.useState<string[]>([]);
   const [searchQuery, setSearchQuery] = React.useState("");
   const sheetRef = useRef<HTMLDivElement>(null);
 
-  useEscapeKey(isOpen, onClose);
-  useClickOutside(sheetRef, onClose);
+  // Collapsible sections state
+  const [expandedSections, setExpandedSections] = React.useState<
+    Record<string, boolean>
+  >({
+    overview: true,
+    cashflow: true,
+    analytics: true,
+    planning: true,
+    management: true,
+    account: true,
+    admin: true,
+  });
 
-  // Close on route change
-  useEffect(() => {
-    onClose();
-  }, [location.pathname]);
+  const toggleSection = (section: string) => {
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
+  };
 
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
 
   const { activeWorkspace } = useHousehold();
-  const navLinks = React.useMemo(() => {
-    const links = [
-      { to: "/dashboard", icon: LayoutDashboard, label: t("common.dashboard") },
-      { to: "/analytics", icon: BarChart3, label: t("common.analytics") },
-      { to: "/analytics-v2", icon: BarChart3, label: t("common.analytics_v2") },
+
+  const navItems = React.useMemo(() => {
+    const items = [
       {
-        to: "/transactions",
-        icon: ArrowRightLeft,
-        label: t("common.transactions"),
+        section: "overview",
+        title: t("common.overview", "Overview"),
+        items: [
+          { to: "/dashboard", icon: LayoutDashboard, label: t("common.dashboard") },
+        ],
       },
-      { to: "/subscriptions", icon: Repeat, label: t("common.subscriptions") },
-      { to: "/wallets", icon: Wallet, label: t("common.wallets") },
-      { to: "/goals", icon: Target, label: t("common.goals") },
-      { to: "/budgets", icon: PiggyBank, label: t("common.budgets") },
       {
-        to: "/shopping-list",
-        icon: ShoppingCart,
-        label: t("common.shopping_list"),
+        section: "cashflow",
+        title: t("common.cashflow", "Cashflow"),
+        items: [
+          { to: "/transactions", icon: ArrowRightLeft, label: t("common.transactions") },
+          { to: "/subscriptions", icon: Repeat, label: t("common.subscriptions") },
+          { to: "/wallets", icon: Wallet, label: t("common.wallets") },
+        ],
       },
-      { to: "/categories", icon: Tags, label: t("common.categories") },
-      { to: "/export", icon: Download, label: t("common.export") },
-      { to: "/reports", icon: FileBarChart2, label: "Reports" },
-      { to: "/settings", icon: Settings, label: t("common.settings") },
       {
-        to: "/account-info",
-        icon: UserCircle,
-        label: t("common.account_info"),
+        section: "analytics",
+        title: t("common.analytics", "Analytics"),
+        items: [
+          { to: "/analytics", icon: BarChart3, label: t("common.analytics") },
+          { to: "/analytics-v2", icon: BarChart3, label: t("common.analytics_v2") },
+          { to: "/reports", icon: FileBarChart2, label: "Reports" },
+        ],
       },
-      { to: "/whats-new", icon: Sparkles, label: t("common.whats_new") },
+      {
+        section: "planning",
+        title: t("common.planning", "Planning"),
+        items: [
+          { to: "/budgets", icon: PiggyBank, label: t("common.budgets") },
+          { to: "/goals", icon: Target, label: t("common.goals") },
+          { to: "/shopping-list", icon: ShoppingCart, label: t("common.shopping_list") },
+        ],
+      },
+      {
+        section: "management",
+        title: t("common.management", "Management"),
+        items: [
+          { to: "/categories", icon: Tags, label: t("common.categories") },
+          { to: "/export", icon: Download, label: t("common.export") },
+          ...(activeWorkspace.type === "household"
+            ? [{ to: "/household-settings", icon: Home, label: "Household Settings" }]
+            : []),
+        ],
+      },
+      {
+        section: "account",
+        title: t("common.account", "Account"),
+        items: [
+          { to: "/settings", icon: Settings, label: t("common.settings") },
+          { to: "/account-info", icon: UserCircle, label: t("common.account_info") },
+          { to: "/whats-new", icon: Sparkles, label: t("common.whats_new") },
+        ],
+      },
     ];
 
-    if (activeWorkspace.type === "household") {
-      links.push({
-        to: "/household-settings",
-        icon: Home,
-        label: "Household Settings",
+    if (isAdmin) {
+      items.push({
+        section: "admin",
+        title: t("common.admin", "Admin"),
+        items: [
+          { to: "/admin/feedback", icon: Shield, label: t("common.user_feedback") },
+          { to: "/admin/referrals", icon: Users, label: "Referrals" },
+        ],
       });
     }
 
-    if (userEmail === "jainshr21@gmail.com") {
-      links.push({
-        to: "/admin/feedback",
-        icon: Shield,
-        label: t("common.user_feedback"),
-      });
-    }
+    return items;
+  }, [t, activeWorkspace.type, isAdmin]);
 
-    return links;
-  }, [t, userEmail, activeWorkspace.type]);
+  const navLinks = React.useMemo(() => {
+    return navItems.flatMap((s) => s.items);
+  }, [navItems]);
 
   const rawPinnedIds = isTablet
     ? navPreferences?.tabletPinned || [
@@ -332,7 +369,6 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
 
   const handleToggleCustomize = () => {
     if (isCustomizing) {
-      // Save changes when exiting edit mode
       const currentMobile = navPreferences?.mobilePinned || [
         "/dashboard",
         "/transactions",
@@ -347,17 +383,10 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
         "/analytics",
       ];
 
-      if (isTablet) {
-        updateNavPreferences({
-          mobilePinned: currentMobile,
-          tabletPinned: localPinnedIds,
-        });
-      } else {
-        updateNavPreferences({
-          mobilePinned: localPinnedIds,
-          tabletPinned: currentTablet,
-        });
-      }
+      const payload = isTablet
+        ? { mobilePinned: currentMobile, tabletPinned: localPinnedIds }
+        : { mobilePinned: localPinnedIds, tabletPinned: currentTablet };
+      updateNavPreferences(payload);
     }
     setIsCustomizing(!isCustomizing);
   };
@@ -440,7 +469,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/40 z-[60]" // Removed backdrop-blur-md from backdrop
+            className="fixed inset-0 bg-black/40 z-[60]"
             onClick={onClose}
           />
 
@@ -612,13 +641,53 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                       animate="show"
                       className="space-y-1"
                     >
-                      {visibleLinks.map((item) => (
-                        <ReorderItemPin
-                          key={item.to}
-                          item={item}
-                          itemVariants={itemVariants}
-                        />
-                      ))}
+                      {navItems.map(({ title, section, items }) => {
+                        const hasVisibleItems = items.some(item => 
+                          visibleLinks.some(vl => vl.to === item.to)
+                        );
+                        if (!hasVisibleItems) return null;
+
+                        const sectionItems = items.filter(item => 
+                          visibleLinks.some(vl => vl.to === item.to)
+                        );
+
+                        return (
+                          <React.Fragment key={section}>
+                            <button
+                              onClick={() => toggleSection(section)}
+                              className="w-full flex items-center justify-between px-3 py-2 mt-3 mb-1 text-[11px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-500 hover:text-slate-600 dark:hover:text-zinc-300 transition-colors"
+                            >
+                              <span>{title}</span>
+                              <ChevronDown
+                                size={14}
+                                className={cn(
+                                  "transition-transform duration-300",
+                                  expandedSections[section] ? "rotate-180" : ""
+                                )}
+                              />
+                            </button>
+                            <AnimatePresence>
+                              {expandedSections[section] && (
+                                <MotionDiv
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                                  className="overflow-hidden space-y-1"
+                                >
+                                  {sectionItems.map((item) => (
+                                    <ReorderItemPin
+                                      key={item.to}
+                                      item={item}
+                                      itemVariants={itemVariants}
+                                    />
+                                  ))}
+                                </MotionDiv>
+                              )}
+                            </AnimatePresence>
+                          </React.Fragment>
+                        );
+                      })}
                     </motion.div>
                   )}
                 </div>

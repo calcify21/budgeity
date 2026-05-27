@@ -251,6 +251,7 @@ export interface OnboardingMeta {
   trackingMode?: "solo" | "shared";
   inviteEmail?: string;
   completedAt?: string;
+  hearAboutUs?: string;
 }
 
 export interface AppState {

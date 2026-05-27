@@ -12,6 +12,7 @@ import {
 import { db } from "../firebase";
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router-dom";
+import { useData } from "../context/DataContext";
 import {
   AlertTriangle,
   Lightbulb,
@@ -36,10 +37,9 @@ interface FeedbackItem {
   status: string;
 }
 
-const ADMIN_EMAIL = "jainshr21@gmail.com";
-
 const AdminFeedback: React.FC = () => {
   const { user } = useAuth();
+  const { isAdmin } = useData();
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "bug" | "feature" | "general">(
@@ -103,12 +103,12 @@ const AdminFeedback: React.FC = () => {
   };
 
   useEffect(() => {
-    if (user?.email === ADMIN_EMAIL) {
+    if (isAdmin) {
       fetchFeedback();
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
-  if (!user || user.email !== ADMIN_EMAIL) {
+  if (!user || !isAdmin) {
     return <Navigate to="/dashboard" replace />;
   }
 

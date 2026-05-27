@@ -248,7 +248,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isWorkspaceSwitcherOpen, setIsWorkspaceSwitcherOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [showInviteBanner, setShowInviteBanner] = useState(true);
-  const { hideAmounts, toggleHideAmounts, theme, toggleTheme } = useData();
+  const { hideAmounts, toggleHideAmounts, theme, toggleTheme, isAdmin } = useData();
   const { user, logout } = useAuth();
   const { isLockEnabled, lockApp } = useAppLock();
   const {
@@ -491,7 +491,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       },
     ];
 
-    if (user?.email === "jainshr21@gmail.com") {
+    if (isAdmin) {
       items.push({
         section: "admin",
         title: t("common.admin", "Admin"),
@@ -505,6 +505,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               location.pathname === "/admin/feedback"
                 ? "shadow-none"
                 : "text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/30 font-bold",
+          },
+          {
+            to: "/admin/referrals",
+            icon: Users,
+            label: "Referrals",
+            onClick: handleNavClick,
+            className:
+              location.pathname === "/admin/referrals"
+                ? "shadow-none"
+                : "text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30 font-bold",
           },
         ],
       });

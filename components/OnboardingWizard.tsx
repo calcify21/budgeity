@@ -1,4 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { db } from "../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { useData } from "../context/DataContext";
 import { useAuth } from "../context/AuthContext";
 import { useHousehold } from "../context/HouseholdContext";
@@ -7,13 +10,13 @@ import { useAvatar } from "../hooks/useAvatar";
 import { useToast } from "../context/ToastContext";
 import { OnboardingWizardPayload } from "../context/DataContext";
 import { PrimaryGoal, WalletType } from "../types";
-import { CURRENCIES } from "../constants";
+import { CURRENCIES, ONBOARDING_REFERRAL_OPTIONS } from "../constants";
 import CustomSelect from "./CustomSelect";
 import AppLockSettings from "./applock/AppLockSettings";
 import AvatarCropModal from "./AvatarCropModal";
 import UserAvatar from "./ui/UserAvatar";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "../utils";
+import { cn, ICON_MAP } from "../utils";
 import { useTranslation } from "react-i18next";
 import logo from "../assets/logo-927x1024.png";
 import {
@@ -41,6 +44,16 @@ import {
   Plus,
   X,
   TrendingUp,
+  Smartphone,
+  BookOpen,
+  HelpCircle,
+  Play,
+  MessageSquare,
+  GraduationCap,
+  Briefcase,
+  Bot,
+  Home,
+  Share2,
 } from "lucide-react";
 
 const MotionDiv = motion.div as any;
@@ -57,17 +70,14 @@ interface WalletEntry {
 }
 
 interface WizardState {
-  // Step 1
   primaryGoal: PrimaryGoal | null;
-  // Step 2
+  hearAboutUs: string | null;
+  displayName: string;
   currency: string;
   numberSystem: "IN" | "INTL" | "AUTO";
-  // Step 3
   wallets: WalletEntry[];
-  // Step 4
   theme: "light" | "dark";
   hideAmounts: boolean;
-  // Step 5
   trackingMode: "solo" | "shared";
   householdName: string;
   inviteEmails: { id: string; email: string }[];
@@ -75,7 +85,7 @@ interface WizardState {
   language: string;
 }
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 8;
 
 // ── Goal Options ─────────────────────────────────────────────────────
 
@@ -234,7 +244,7 @@ const FireworksCanvas: React.FC = () => {
 
 const OnboardingWizard: React.FC = () => {
   const { completeOnboarding, theme: currentTheme } = useData();
-  const { user } = useAuth();
+  const { user, updateName } = useAuth();
   const { createHousehold, inviteMember, switchWorkspace } = useHousehold();
   const { setupPin } = useAppLock();
   const { saveAvatar } = useAvatar();
@@ -252,11 +262,14 @@ const OnboardingWizard: React.FC = () => {
   const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
   const [showFireworks, setShowFireworks] = useState(false);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [otherReferralText, setOtherReferralText] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [wizard, setWizard] = useState<WizardState>({
-    primaryGoal: null,
+    primaryGoal: "track_spending",
+    hearAboutUs: null,
+    displayName: user?.displayName || user?.email?.split("@")[0] || "",
     currency: "INR",
     numberSystem: "AUTO",
     wallets: [
@@ -271,6 +284,12 @@ const OnboardingWizard: React.FC = () => {
     wantsPin: false,
     language: i18n.language,
   });
+
+  useEffect(() => {
+    if (user && !wizard.displayName) {
+      update("displayName", user.displayName || user.email?.split("@")[0] || "");
+    }
+  }, [user]);
 
   const update = <K extends keyof WizardState>(key: K, value: WizardState[K]) => {
     setWizard((prev) => ({ ...prev, [key]: value }));
@@ -291,16 +310,20 @@ const OnboardingWizard: React.FC = () => {
   const canProceed = (): boolean => {
     switch (step) {
       case 1:
-        return wizard.primaryGoal !== null;
+        return true;
       case 2:
-        return !!wizard.currency;
+        return wizard.displayName.trim().length > 0;
       case 3:
-        return wizard.wallets.some((w) => w.enabled);
+        return wizard.hearAboutUs !== null;
       case 4:
-        return true;
+        return !!wizard.currency;
       case 5:
-        return true;
+        return wizard.wallets.some((w) => w.enabled);
       case 6:
+        return true;
+      case 7:
+        return true;
+      case 8:
         return true;
       default:
         return true;
@@ -402,6 +425,32 @@ const OnboardingWizard: React.FC = () => {
   const handleFinish = async () => {
     setIsSubmitting(true);
     try {
+      // 0. Update display name if user customized it
+      if (wizard.displayName && wizard.displayName.trim() !== user?.displayName) {
+        try {
+          await updateName(wizard.displayName.trim());
+        } catch (err) {
+          console.warn("Failed to update display name on auth profile:", err);
+        }
+      }
+
+      // 0.1 Save referral response to Firestore
+      try {
+        let finalSource = wizard.hearAboutUs || "Not specified";
+        if (finalSource === "other" && otherReferralText.trim()) {
+          finalSource = `other: ${otherReferralText.trim()}`;
+        }
+        await addDoc(collection(db, "referrals"), {
+          name: wizard.displayName.trim() || user?.displayName || "Anonymous User",
+          email: user?.email || "No Email",
+          uid: user?.uid || "",
+          source: finalSource,
+          createdAt: serverTimestamp(),
+        });
+      } catch (err) {
+        console.error("Failed to save referral data to Firestore:", err);
+      }
+
       // 1. Prepare wallet data
       const walletsPayload = wizard.wallets
         .filter((w) => w.enabled)
@@ -427,6 +476,13 @@ const OnboardingWizard: React.FC = () => {
         onboardingMeta: {
           trackingMode: wizard.trackingMode,
           inviteEmail: wizard.trackingMode === "shared" ? wizard.inviteEmails.map(e => e.email).filter(e => e.trim()).join(",") : undefined,
+          hearAboutUs: (() => {
+            let finalSource = wizard.hearAboutUs || undefined;
+            if (finalSource === "other" && otherReferralText.trim()) {
+              return `other: ${otherReferralText.trim()}`;
+            }
+            return finalSource;
+          })(),
         },
         language: wizard.language,
       };
@@ -553,61 +609,223 @@ const OnboardingWizard: React.FC = () => {
   // ── Step Content Renderers ─────────────────────────────────────────
 
   const renderStep1 = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <div className="w-20 h-20 mx-auto mb-5">
-          <img src={logo} alt="Budgeity" className="w-full h-full object-contain" />
-        </div>
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Welcome to Budgeity!
-        </h2>
-        <p className="text-slate-500 dark:text-zinc-400 mt-2">
-          What brings you here today?
-        </p>
+    <div className="space-y-8 flex flex-col items-center justify-center text-center py-6">
+      {/* Magical Scaling Logo */}
+      <motion.div
+        initial={{ scale: 0, rotate: -45, filter: "blur(10px)" }}
+        animate={{ scale: 1, rotate: 0, filter: "blur(0px)" }}
+        transition={{
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          delay: 0.2,
+        }}
+        className="relative w-32 h-32 flex items-center justify-center"
+      >
+        {/* Glowing halo behind logo */}
+        <div className="absolute inset-0 bg-brand-500/20 dark:bg-brand-500/30 rounded-full blur-2xl animate-pulse" />
+        <div className="absolute inset-[-8px] bg-gradient-to-tr from-brand-400 to-indigo-500 rounded-[2rem] opacity-20 blur-md animate-[ping_4s_cubic-bezier(0,0,0.2,1)_infinite]" />
+        
+        <img
+          src={logo}
+          alt="Budgeity"
+          className="relative w-28 h-28 object-contain drop-shadow-[0_10px_20px_rgba(99,102,241,0.3)] animate-float"
+        />
+      </motion.div>
+
+      {/* Magical Brand Title */}
+      <div className="space-y-3">
+        <motion.h1
+          initial={{ opacity: 0, y: 30, filter: "blur(5px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+          className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white"
+        >
+          Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-indigo-600 dark:from-brand-400 dark:to-indigo-400">Budgeity</span>
+        </motion.h1>
+        
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.7 }}
+          className="text-base sm:text-lg text-slate-500 dark:text-zinc-400 max-w-sm mx-auto font-medium"
+        >
+          Your premium, secure, and beautiful financial command center. Take control of your money with style.
+        </motion.p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        {GOAL_OPTIONS.map((goal) => {
-          const Icon = goal.icon;
-          const isActive = wizard.primaryGoal === goal.value;
-          return (
-            <button
-              key={goal.value}
-              onClick={() => update("primaryGoal", goal.value)}
-              className={cn(
-                "relative p-4 rounded-2xl border-2 text-left transition-all duration-200 group",
-                isActive
-                  ? "border-brand-500 bg-brand-50 dark:bg-brand-500/10 shadow-lg shadow-brand-500/10"
-                  : "border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-slate-300 dark:hover:border-zinc-700"
-              )}
-            >
-              <div
-                className={cn(
-                  "w-10 h-10 rounded-xl flex items-center justify-center mb-3 bg-gradient-to-br text-white transition-transform group-hover:scale-110",
-                  goal.gradient
-                )}
-              >
-                <Icon size={20} />
-              </div>
-              <div className="font-bold text-sm text-slate-900 dark:text-white">
-                {goal.label}
-              </div>
-              <div className="text-[11px] text-slate-500 dark:text-zinc-400 mt-0.5">
-                {goal.description}
-              </div>
-              {isActive && (
-                <div className="absolute top-3 right-3 w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center">
-                  <Check size={12} className="text-white stroke-[3]" />
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {/* Interactive Micro-animations element */}
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.6 }}
+        className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-brand-500/5 border border-brand-500/10 rounded-full max-w-xs text-xs font-bold text-brand-600 dark:text-brand-400"
+      >
+        <Sparkles size={14} className="animate-spin-slow" />
+        <span>Magical setup wizard starting...</span>
+      </motion.div>
+
+      {/* Legal Links */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.1, duration: 0.5 }}
+        className="flex items-center gap-3 text-xs text-slate-400 dark:text-zinc-500 font-bold mt-4"
+      >
+        <Link
+          to="/privacy-policy"
+          target="_blank"
+          className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors underline underline-offset-4"
+        >
+          Privacy Policy
+        </Link>
+        <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-800" />
+        <Link
+          to="/terms-of-service"
+          target="_blank"
+          className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors underline underline-offset-4"
+        >
+          Terms of Service
+        </Link>
+      </motion.div>
     </div>
   );
 
   const renderStep2 = () => (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+          <UserCircle size={28} className="text-white" />
+        </div>
+        <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          Your Profile
+        </h2>
+        <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
+          Please confirm your display name and email address
+        </p>
+      </div>
+
+      <div className="space-y-5">
+        {/* Email Address - Read only */}
+        <div>
+          <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+            Registered Email Address
+          </label>
+          <div className="relative flex items-center">
+            <Mail className="absolute left-4 text-slate-400" size={18} />
+            <input
+              type="text"
+              readOnly
+              disabled
+              value={user?.email || "No Email Registered"}
+              className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-2xl text-sm font-medium outline-none text-slate-400 cursor-not-allowed select-none"
+            />
+          </div>
+        </div>
+
+        {/* Display Name - Editable */}
+        <div>
+          <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+            What should we call you? (Display Name)
+          </label>
+          <div className="relative flex items-center">
+            <UserCircle className="absolute left-4 text-brand-500" size={18} />
+            <input
+              type="text"
+              value={wizard.displayName}
+              onChange={(e) => update("displayName", e.target.value)}
+              placeholder="e.g. Shruti Jain"
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:border-brand-500 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-950 dark:text-white transition-all"
+            />
+          </div>
+          {wizard.displayName.trim().length === 0 && (
+            <p className="text-xs text-rose-500 font-bold ml-4 mt-1">
+              Please enter your name to proceed.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStep3 = () => {
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-brand-500 via-brand-600 to-indigo-600 rounded-[1.5rem] flex items-center justify-center shadow-xl shadow-brand-500/20 ring-4 ring-brand-500/10">
+            <Sparkles size={30} className="text-white animate-pulse" />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            How did you hear about us?
+          </h2>
+          <p className="text-slate-500 dark:text-zinc-400 mt-2 text-sm font-medium">
+            Help us understand how you found Budgeity
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[300px] overflow-y-auto pr-3.5 custom-scrollbar py-1">
+          {ONBOARDING_REFERRAL_OPTIONS.map((opt) => {
+            const isSelected = wizard.hearAboutUs === opt.id;
+            const Icon = ICON_MAP[opt.iconName] || HelpCircle;
+            return (
+              <button
+                key={opt.id}
+                onClick={() => update("hearAboutUs", opt.id)}
+                className={cn(
+                  "relative p-4 rounded-[1.25rem] border text-left transition-all duration-300 group flex items-center gap-4 hover:-translate-y-0.5 shadow-sm min-h-[72px]",
+                  isSelected
+                    ? "border-brand-500 dark:border-brand-400 bg-brand-50/40 dark:bg-brand-500/10 shadow-md shadow-brand-500/5"
+                    : "border-slate-200/80 dark:border-zinc-800/80 bg-white/90 dark:bg-zinc-900/90 hover:border-brand-500/30 dark:hover:border-brand-500/20 hover:bg-slate-50/50 dark:hover:bg-zinc-800/50"
+                )}
+              >
+                {/* Vibrant Colored Icon Container */}
+                <div className={cn(
+                  "w-11 h-11 rounded-2xl shrink-0 flex items-center justify-center transition-all duration-300 shadow-sm",
+                  isSelected
+                    ? "bg-gradient-to-tr from-brand-500 to-indigo-600 text-white shadow-md shadow-brand-500/25 scale-105"
+                    : opt.colorClass
+                )}>
+                  <Icon size={20} className={cn("transition-transform duration-300 group-hover:scale-110", isSelected ? "text-white" : "")} />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className={cn(
+                    "text-sm tracking-normal transition-colors duration-200",
+                    isSelected
+                      ? "font-bold text-brand-600 dark:text-brand-400"
+                      : "font-semibold text-slate-700 dark:text-zinc-300 group-hover:text-slate-900 dark:group-hover:text-white"
+                  )}>
+                    {opt.text}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {wizard.hearAboutUs === "other" && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-2"
+          >
+            <label className="block text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
+              Where did you hear about us? (Optional)
+            </label>
+            <input
+              type="text"
+              value={otherReferralText}
+              onChange={(e) => setOtherReferralText(e.target.value)}
+              placeholder="e.g. A specific blog post, podcast, or website..."
+              className="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:border-brand-500 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-950 dark:text-white transition-all shadow-sm"
+            />
+          </motion.div>
+        )}
+      </div>
+    );
+  };
+
+  const renderStep4 = () => (
     <div className="space-y-6">
       <div className="text-center">
         <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-brand-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-brand-500/20">
@@ -683,7 +901,7 @@ const OnboardingWizard: React.FC = () => {
     </div>
   );
 
-  const renderStep3 = () => (
+  const renderStep5 = () => (
     <div className="space-y-6">
       <div className="text-center">
         <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
@@ -802,7 +1020,7 @@ const OnboardingWizard: React.FC = () => {
     </div>
   );
 
-  const renderStep4 = () => (
+  const renderStep6 = () => (
     <div className="space-y-6">
       <div className="text-center">
         <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-violet-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/20">
@@ -886,7 +1104,7 @@ const OnboardingWizard: React.FC = () => {
     </div>
   );
 
-  const renderStep5 = () => (
+  const renderStep7 = () => (
     <div className="space-y-6">
       <div className="text-center">
         <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/20">
@@ -1061,7 +1279,7 @@ const OnboardingWizard: React.FC = () => {
     </div>
   );
 
-  const renderStep6 = () => (
+  const renderStep8 = () => (
     <div className="space-y-6 flex flex-col h-full -mx-4 -mb-4">
       <div className="text-center mb-2 px-4">
         <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
@@ -1083,7 +1301,16 @@ const OnboardingWizard: React.FC = () => {
 
   // ── Render ─────────────────────────────────────────────────────────
 
-  const stepRenderers = [renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6];
+  const stepRenderers = [
+    renderStep1,
+    renderStep2,
+    renderStep3,
+    renderStep4,
+    renderStep5,
+    renderStep6,
+    renderStep7,
+    renderStep8,
+  ];
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-50 dark:bg-black overflow-hidden">
@@ -1152,7 +1379,7 @@ const OnboardingWizard: React.FC = () => {
 
             {step < TOTAL_STEPS ? (
               <div className="flex items-center gap-2">
-                {step > 2 && (
+                {step > 4 && (
                   <button
                     onClick={goNext}
                     className="px-4 py-2.5 text-sm font-medium text-slate-400 hover:text-slate-600 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"

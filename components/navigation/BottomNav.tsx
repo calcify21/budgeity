@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
@@ -20,6 +20,7 @@ import {
   UserCircle,
   Sparkles,
   Shield,
+  Users,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../utils";
@@ -54,7 +55,11 @@ const BottomNav: React.FC<BottomNavProps> = ({
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
+
+
   if (isDesktop) return null;
+
+
 
   // Full catalog of possible items with outline and solid icons
   const allItems: Record<string, { icon: any; label: string }> = {
@@ -73,6 +78,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
     "/account-info": { icon: UserCircle, label: t("common.account_info") },
     "/whats-new": { icon: Sparkles, label: t("common.whats_new") },
     "/admin/feedback": { icon: Shield, label: t("common.user_feedback") },
+    "/admin/referrals": { icon: Users, label: "Referrals" },
   };
 
   // Get current pinned items based on preferences or defaults

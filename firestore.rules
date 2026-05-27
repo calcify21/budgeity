@@ -7,6 +7,7 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+
     function isHouseholdMember(householdId) {
       return isSignedIn() &&
         get(/databases/$(database)/documents/households/$(householdId)).data.memberRoles != null &&
@@ -136,8 +137,19 @@ service cloud.firestore {
     // -- Feedback --------------------------------------------------
     match /feedback/{docId} {
       allow read, create: if isSignedIn();
-      allow update, delete: if isSignedIn() &&
-        request.auth.token.email == "jainshr21@gmail.com";
+      allow update, delete: if isSignedIn() && (
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get(['_meta', 'role'], 'user') == 'admin'
+      );
+    }
+
+    // -- Referrals --------------------------------------------------
+    match /referrals/{docId} {
+      allow create: if isSignedIn();
+      allow read, update, delete: if isSignedIn() && (
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get(['_meta', 'role'], 'user') == 'admin'
+      );
     }
   }
 }

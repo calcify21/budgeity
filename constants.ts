@@ -3,6 +3,7 @@ import {
   Wallet,
   SpendingNature,
   AnalyticsWidgetConfig,
+  DashboardWidgetConfig,
 } from "./types";
 
 export const APP_VERSION = "3.0.0";
@@ -538,4 +539,160 @@ export const ANALYTICS_WIDGET_DEFAULTS: AnalyticsWidgetConfig[] = [
   { id: "subscriptionOverview", enabled: true, order: 19 },
   { id: "spendingPersonality", enabled: true, order: 20 },
   { id: "smartInsights", enabled: true, order: 21 },
+];
+
+// ── Global Onboarding Referral Options ────────────────────────────────
+export interface ReferralOption {
+  id: string;
+  text: string;
+  iconName: string; // The string name of the Lucide icon
+  colorClass: string; // Dynamic background + text color class for onboarding wizard
+  chartColor: string; // Solid Tailwind background color class (e.g. bg-blue-500) for charts
+  chartBg: string; // Dynamic background color class for badges (e.g. bg-blue-50 dark:bg-blue-950/20)
+  chartText: string; // Dynamic text color class for badges (e.g. text-blue-700 dark:text-blue-400)
+}
+
+export const ONBOARDING_REFERRAL_OPTIONS: ReferralOption[] = [
+  {
+    id: "search_engine",
+    text: "Search",
+    iconName: "Globe",
+    colorClass: "text-blue-600 bg-blue-50 dark:bg-blue-950/30",
+    chartColor: "bg-blue-500",
+    chartBg: "bg-blue-50 dark:bg-blue-950/20",
+    chartText: "text-blue-700 dark:text-blue-400"
+  },
+  {
+    id: "friend_family",
+    text: "Friend / Family",
+    iconName: "Users",
+    colorClass: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30",
+    chartColor: "bg-emerald-500",
+    chartBg: "bg-emerald-50 dark:bg-emerald-950/20",
+    chartText: "text-emerald-700 dark:text-emerald-400"
+  },
+  {
+    id: "social_media",
+    text: "Social media",
+    iconName: "Smartphone",
+    colorClass: "text-purple-600 bg-purple-50 dark:bg-purple-950/30",
+    chartColor: "bg-purple-500",
+    chartBg: "bg-purple-50 dark:bg-purple-950/20",
+    chartText: "text-purple-700 dark:text-purple-400"
+  },
+  {
+    id: "youtube",
+    text: "YouTube",
+    iconName: "Play",
+    colorClass: "text-rose-600 bg-rose-50 dark:bg-rose-950/30",
+    chartColor: "bg-rose-500",
+    chartBg: "bg-rose-50 dark:bg-rose-950/20",
+    chartText: "text-rose-700 dark:text-rose-400"
+  },
+  {
+    id: "online_community",
+    text: "Community / Forum",
+    iconName: "MessageSquare",
+    colorClass: "text-indigo-600 bg-indigo-50 dark:bg-indigo-950/30",
+    chartColor: "bg-indigo-500",
+    chartBg: "bg-indigo-50 dark:bg-indigo-950/20",
+    chartText: "text-indigo-700 dark:text-indigo-400"
+  },
+  {
+    id: "blog_review",
+    text: "Blog / Article",
+    iconName: "BookOpen",
+    colorClass: "text-amber-600 bg-amber-50 dark:bg-amber-950/30",
+    chartColor: "bg-amber-500",
+    chartBg: "bg-amber-50 dark:bg-amber-950/20",
+    chartText: "text-amber-700 dark:text-amber-400"
+  },
+  {
+    id: "educational",
+    text: "School / Project",
+    iconName: "GraduationCap",
+    colorClass: "text-cyan-600 bg-cyan-50 dark:bg-cyan-950/30",
+    chartColor: "bg-cyan-500",
+    chartBg: "bg-cyan-50 dark:bg-cyan-950/20",
+    chartText: "text-cyan-700 dark:text-cyan-400"
+  },
+  {
+    id: "work_productivity",
+    text: "Work",
+    iconName: "Briefcase",
+    colorClass: "text-teal-600 bg-teal-50 dark:bg-teal-950/30",
+    chartColor: "bg-teal-500",
+    chartBg: "bg-teal-50 dark:bg-teal-950/20",
+    chartText: "text-teal-700 dark:text-teal-400"
+  },
+  {
+    id: "app_directory",
+    text: "App Directory",
+    iconName: "Smartphone",
+    colorClass: "text-sky-600 bg-sky-50 dark:bg-sky-950/30",
+    chartColor: "bg-sky-500",
+    chartBg: "bg-sky-50 dark:bg-sky-950/20",
+    chartText: "text-sky-700 dark:text-sky-400"
+  },
+  {
+    id: "ai_assistant",
+    text: "AI Assistant",
+    iconName: "Bot",
+    colorClass: "text-violet-600 bg-violet-50 dark:bg-violet-950/30",
+    chartColor: "bg-violet-500",
+    chartBg: "bg-violet-50 dark:bg-violet-950/20",
+    chartText: "text-violet-700 dark:text-violet-400"
+  },
+  {
+    id: "household_invite",
+    text: "Household member invited me",
+    iconName: "Home",
+    colorClass: "text-pink-600 bg-pink-50 dark:bg-pink-950/30",
+    chartColor: "bg-pink-500",
+    chartBg: "bg-pink-50 dark:bg-pink-950/20",
+    chartText: "text-pink-700 dark:text-pink-400"
+  },
+  {
+    id: "shared_budgeity",
+    text: "Shared using Budgeity",
+    iconName: "Share2",
+    colorClass: "text-lime-600 bg-lime-50 dark:bg-lime-950/30",
+    chartColor: "bg-lime-500",
+    chartBg: "bg-lime-50 dark:bg-lime-950/20",
+    chartText: "text-lime-700 dark:text-lime-400"
+  },
+  {
+    id: "just_exploring",
+    text: "Just exploring budgeting apps",
+    iconName: "Sparkles",
+    colorClass: "text-fuchsia-600 bg-fuchsia-50 dark:bg-fuchsia-950/30",
+    chartColor: "bg-fuchsia-500",
+    chartBg: "bg-fuchsia-50 dark:bg-fuchsia-950/20",
+    chartText: "text-fuchsia-700 dark:text-fuchsia-400"
+  },
+  {
+    id: "other",
+    text: "Other",
+    iconName: "HelpCircle",
+    colorClass: "text-slate-600 bg-slate-100 dark:bg-zinc-800/40",
+    chartColor: "bg-slate-500",
+    chartBg: "bg-slate-100 dark:bg-zinc-800",
+    chartText: "text-slate-700 dark:text-zinc-400"
+  }
+];
+
+export const DASHBOARD_WIDGET_DEFAULTS: DashboardWidgetConfig[] = [
+  { id: "networth", enabled: true, order: 1 },
+  { id: "income_expense", enabled: true, order: 2 },
+  { id: "snapshot", enabled: true, order: 3 },
+  { id: "wallets", enabled: true, order: 4 },
+  { id: "trend", enabled: true, order: 5 },
+  { id: "goals", enabled: true, order: 6 },
+  { id: "transactions", enabled: true, order: 7 },
+  { id: "spending", enabled: false, order: 8 },
+  { id: "budgets", enabled: false, order: 9 },
+  { id: "actions", enabled: false, order: 10 },
+  { id: "planned", enabled: false, order: 11 },
+  { id: "subscriptions", enabled: true, order: 12 },
+  { id: "forecast", enabled: false, order: 13 },
 ];

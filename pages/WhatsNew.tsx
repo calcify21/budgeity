@@ -107,6 +107,16 @@ const WhatsNew: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <ChangeItem
+          icon={UserPlus}
+          title="Premium Referral Onboarding"
+          description="Help us grow! A gorgeous new onboarding card flow gathers user acquisition channels with elegant click micro-animations, vibrant color-coded category cards, and responsive custom input fields."
+        />
+        <ChangeItem
+          icon={BarChart3}
+          title="Admin Referrals Dashboard"
+          description="Real-time growth analytics! Administrators can now track acquisition metrics, examine detailed channel distribution bars, and filter or search registration details dynamically on a premium dashboard."
+        />
+        <ChangeItem
           icon={Mail}
           title="Type-Safe Email Updates"
           description="Update your email address securely from your Profile card. Budgeity uses Firebase's verifyBeforeUpdateEmail protocol, keeping your old email active and secure until you click the confirmation link sent to your new address. Fully typed and localized."

@@ -20,6 +20,7 @@ import { useHousehold } from "../context/HouseholdContext";
 import { DashboardWidgetConfig, TimeRange } from "../types";
 import { PeriodPicker } from "../components/PeriodPicker";
 import { cn } from "../utils";
+import { DASHBOARD_WIDGET_DEFAULTS } from "../constants";
 
 // Import Widgets
 import { NetWorthWidget } from "../components/dashboard/NetWorthWidget";
@@ -121,21 +122,6 @@ const Dashboard: React.FC = () => {
     "subscriptions",
   ];
 
-  const DASHBOARD_WIDGET_DEFAULTS: DashboardWidgetConfig[] = [
-    { id: "networth", enabled: true, order: 1 },
-    { id: "income_expense", enabled: true, order: 2 },
-    { id: "snapshot", enabled: true, order: 3 },
-    { id: "forecast", enabled: true, order: 4 },
-    { id: "wallets", enabled: true, order: 5 },
-    { id: "trend", enabled: true, order: 6 },
-    { id: "goals", enabled: true, order: 7 },
-    { id: "transactions", enabled: true, order: 8 },
-    { id: "spending", enabled: false, order: 9 },
-    { id: "budgets", enabled: false, order: 10 },
-    { id: "actions", enabled: false, order: 11 },
-    { id: "planned", enabled: false, order: 12 },
-    { id: "subscriptions", enabled: true, order: 13 },
-  ];
 
   // Sync local state when not editing
   useEffect(() => {

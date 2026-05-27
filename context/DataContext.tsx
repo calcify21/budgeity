@@ -20,6 +20,7 @@ import {
   DEFAULT_CATEGORIES,
   INITIAL_WALLETS,
   ANALYTICS_WIDGET_DEFAULTS,
+  DASHBOARD_WIDGET_DEFAULTS,
 } from "../constants";
 import { useAuth } from "./AuthContext";
 import { useHousehold } from "./HouseholdContext";
@@ -56,6 +57,7 @@ interface DataContextType extends AppState {
   isLoadingData: boolean;
   isOnboarding: boolean;
   tourCompleted?: boolean;
+  isAdmin: boolean;
   completeTour: () => void;
   completeOnboarding: (data: OnboardingWizardPayload) => Promise<void>;
   addTransaction: (transaction: Omit<Transaction, "id">) => void;
@@ -178,20 +180,7 @@ const INITIAL_STATE: AppState = {
       "/analytics",
     ],
   },
-  dashboardWidgets: [
-    { id: "networth", enabled: true, order: 1 },
-    { id: "income_expense", enabled: true, order: 2 },
-    { id: "snapshot", enabled: true, order: 3 },
-    { id: "wallets", enabled: true, order: 4 },
-    { id: "trend", enabled: true, order: 5 },
-    { id: "goals", enabled: true, order: 6 },
-    { id: "transactions", enabled: true, order: 7 },
-    { id: "spending", enabled: false, order: 8 },
-    { id: "budgets", enabled: false, order: 9 },
-    { id: "actions", enabled: false, order: 10 },
-    { id: "planned", enabled: false, order: 11 },
-    { id: "subscriptions", enabled: true, order: 12 },
-  ],
+  dashboardWidgets: DASHBOARD_WIDGET_DEFAULTS,
   analyticsWidgets: ANALYTICS_WIDGET_DEFAULTS,
   analyticsSectionNames: {},
   accentTheme: "emerald",
@@ -459,69 +448,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       ownerId: user?.uid,
     }));
 
-    let customDashboardWidgets = INITIAL_STATE.dashboardWidgets;
-
-    if (data.primaryGoal === "debt_free") {
-      customDashboardWidgets = [
-        { id: "goals", enabled: true, order: 1 },
-        { id: "networth", enabled: true, order: 2 },
-        { id: "income_expense", enabled: true, order: 3 },
-        { id: "snapshot", enabled: true, order: 4 },
-        { id: "wallets", enabled: true, order: 5 },
-        { id: "transactions", enabled: true, order: 6 },
-        { id: "trend", enabled: true, order: 7 },
-        { id: "spending", enabled: false, order: 8 },
-        { id: "budgets", enabled: false, order: 9 },
-        { id: "actions", enabled: false, order: 10 },
-        { id: "planned", enabled: false, order: 11 },
-        { id: "subscriptions", enabled: true, order: 12 },
-      ];
-    } else if (data.primaryGoal === "build_wealth") {
-      customDashboardWidgets = [
-        { id: "networth", enabled: true, order: 1 },
-        { id: "trend", enabled: true, order: 2 },
-        { id: "wallets", enabled: true, order: 3 },
-        { id: "income_expense", enabled: true, order: 4 },
-        { id: "snapshot", enabled: true, order: 5 },
-        { id: "goals", enabled: true, order: 6 },
-        { id: "transactions", enabled: true, order: 7 },
-        { id: "spending", enabled: false, order: 8 },
-        { id: "budgets", enabled: false, order: 9 },
-        { id: "actions", enabled: false, order: 10 },
-        { id: "planned", enabled: false, order: 11 },
-        { id: "subscriptions", enabled: true, order: 12 },
-      ];
-    } else if (data.primaryGoal === "track_spending") {
-      customDashboardWidgets = [
-        { id: "spending", enabled: true, order: 1 },
-        { id: "budgets", enabled: true, order: 2 },
-        { id: "income_expense", enabled: true, order: 3 },
-        { id: "transactions", enabled: true, order: 4 },
-        { id: "trend", enabled: true, order: 5 },
-        { id: "snapshot", enabled: true, order: 6 },
-        { id: "networth", enabled: true, order: 7 },
-        { id: "wallets", enabled: true, order: 8 },
-        { id: "goals", enabled: false, order: 9 },
-        { id: "actions", enabled: false, order: 10 },
-        { id: "planned", enabled: false, order: 11 },
-        { id: "subscriptions", enabled: true, order: 12 },
-      ];
-    } else if (data.primaryGoal === "save_goal") {
-      customDashboardWidgets = [
-        { id: "goals", enabled: true, order: 1 },
-        { id: "budgets", enabled: true, order: 2 },
-        { id: "snapshot", enabled: true, order: 3 },
-        { id: "income_expense", enabled: true, order: 4 },
-        { id: "networth", enabled: true, order: 5 },
-        { id: "wallets", enabled: true, order: 6 },
-        { id: "transactions", enabled: true, order: 7 },
-        { id: "trend", enabled: true, order: 8 },
-        { id: "spending", enabled: false, order: 9 },
-        { id: "actions", enabled: false, order: 10 },
-        { id: "planned", enabled: false, order: 11 },
-        { id: "subscriptions", enabled: true, order: 12 },
-      ];
-    }
+    let customDashboardWidgets = DASHBOARD_WIDGET_DEFAULTS;
 
     const newState: AppState = {
       ...INITIAL_STATE,
@@ -1929,6 +1856,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
     syncState({ ...state, analyticsSectionNames: names });
   };
 
+  const isAdmin = (state as any)._meta?.role === "admin";
+
   return (
     <DataContext.Provider
       value={{
@@ -1937,6 +1866,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
         retryConnection,
         isLoadingData,
         isOnboarding,
+        isAdmin,
         completeOnboarding,
         completeTour,
         addTransaction,

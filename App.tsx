@@ -31,6 +31,7 @@ const AccountInfo = React.lazy(() => import("./pages/AccountInfo"));
 const HouseholdSettings = React.lazy(() => import("./pages/HouseholdSettings"));
 const WhatsNew = React.lazy(() => import("./pages/WhatsNew"));
 const AdminFeedback = React.lazy(() => import("./pages/AdminFeedback"));
+const AdminReferrals = React.lazy(() => import("./pages/AdminReferrals"));
 
 const LandingPage = React.lazy(() => import("./pages/LandingPage"));
 const Auth = React.lazy(() => import("./pages/Auth"));
@@ -264,6 +265,7 @@ const AppContent: React.FC = () => {
 
               <Route path="/whats-new" element={<WhatsNew />} />
               <Route path="/admin/feedback" element={<AdminFeedback />} />
+              <Route path="/admin/referrals" element={<AdminReferrals />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
           </React.Suspense>
