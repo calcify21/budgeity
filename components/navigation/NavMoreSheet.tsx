@@ -704,7 +704,6 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                                     <ReorderItemPin
                                       key={item.to}
                                       item={item}
-                                      itemVariants={itemVariants}
                                       onClose={onClose}
                                     />
                                   ))}
