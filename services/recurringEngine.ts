@@ -140,7 +140,7 @@ export const processRecurringTransactions = (
           type: rule.type,
           amount: rule.amount,
           categoryId: rule.categoryId,
-          subCategoryId: rule.subcategoryId,
+          subCategoryId: rule.subCategoryId,
           fromWalletId: rule.type === "expense" ? (rule.walletId || null) : null,
           toWalletId: rule.type === "income" ? (rule.walletId || null) : null,
           date: `${dateKey}T12:00:00.000Z`, // Record standard mid-day time

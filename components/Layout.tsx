@@ -166,6 +166,20 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   );
 };
 
+interface LayoutNavItem {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+  className?: string;
+  onClick?: () => void;
+}
+
+interface LayoutNavSection {
+  section: string;
+  title: string;
+  items: LayoutNavItem[];
+}
+
 interface LayoutProps {
   children: React.ReactNode;
 }
@@ -331,7 +345,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [location.pathname]);
 
   const navItems = React.useMemo(() => {
-    const items = [
+    const items: LayoutNavSection[] = [
       {
         section: "overview",
         title: t("common.overview", "Overview"),

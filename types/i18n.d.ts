@@ -21,7 +21,6 @@ type TranslationKeys =
   | "common.export"
   | "common.settings"
   | "common.account_info"
-  | "common.whats_new"
   | "common.logout"
   | "common.cancel"
   | "common.delete"
@@ -717,7 +716,6 @@ declare module "i18next" {
           export: string;
           settings: string;
           account_info: string;
-          whats_new: string;
           logout: string;
           cancel: string;
           delete: string;
