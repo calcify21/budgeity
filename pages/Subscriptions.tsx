@@ -122,7 +122,7 @@ const Subscriptions: React.FC = () => {
     return (
       (editingSub.name || "") !== (payload.name || "") ||
       editingSub.categoryId !== payload.categoryId ||
-      (editingSub.subcategoryId || "") !== (payload.subcategoryId || "") ||
+      (editingSub.subCategoryId || "") !== (payload.subCategoryId || "") ||
       editingSub.walletId !== payload.walletId ||
       getDefaultNote(editingSub) !== getDefaultNote(payload)
     );

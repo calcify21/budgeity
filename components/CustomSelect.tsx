@@ -25,6 +25,7 @@ interface CustomSelectProps {
   label?: string;
   icon?: any;
   onAddNew?: () => void;
+  preventScrollIntoView?: boolean;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -37,6 +38,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   label,
   icon: Icon,
   onAddNew,
+  preventScrollIntoView = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -49,7 +51,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   // Scroll dropdown into view when opened
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !preventScrollIntoView) {
       setTimeout(() => {
         if (dropdownRef.current) {
           dropdownRef.current.scrollIntoView({
@@ -60,7 +62,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         }
       }, 100);
     }
-  }, [isOpen]);
+  }, [isOpen, preventScrollIntoView]);
 
   const selectedOption = options.find((opt) => opt && opt.value === value);
 

@@ -63,7 +63,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         setCategoryId(editingSub.categoryId || "");
         setName(editingSub.name || "");
         setNote(editingSub.note || "");
-        setSubcategoryId(editingSub.subcategoryId || "");
+        setSubcategoryId(editingSub.subCategoryId || "");
         setAutoAdd(editingSub.autoAdd);
       } else {
         setType("expense");
@@ -96,7 +96,7 @@ export const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
       note: note.trim() || undefined,
       walletId,
       categoryId,
-      subcategoryId: subcategoryId || undefined,
+      subCategoryId: subcategoryId || undefined,
       frequency,
       startDate: new Date(startDate + "T12:00:00").toISOString(),
       nextDueDate: new Date(startDate + "T12:00:00").toISOString(),

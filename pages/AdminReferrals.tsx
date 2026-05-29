@@ -20,24 +20,17 @@ import {
   Trash2,
   TrendingUp,
   Mail,
-  Globe,
-  Smartphone,
-  Users,
-  BookOpen,
-  HelpCircle,
-  Play,
-  MessageSquare,
-  GraduationCap,
-  Briefcase,
-  Bot,
-  Home,
-  Share2,
-  Sparkles,
 } from "lucide-react";
 import { ConfirmModal } from "../components/ConfirmModal";
 import CustomSelect from "../components/CustomSelect";
 import { ONBOARDING_REFERRAL_OPTIONS } from "../constants";
 import { ICON_MAP } from "../utils";
+import { useToast } from "../context/ToastContext";
+
+interface FirestoreTimestamp {
+  seconds: number;
+  nanoseconds: number;
+}
 
 interface ReferralItem {
   id: string;
@@ -45,13 +38,14 @@ interface ReferralItem {
   email: string;
   uid: string;
   source: string;
-  createdAt: any;
+  createdAt: FirestoreTimestamp | null;
 }
 
 
 const AdminReferrals: React.FC = () => {
   const { user } = useAuth();
   const { isAdmin } = useData();
+  const { error: toastError } = useToast();
   const [referrals, setReferrals] = useState<ReferralItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -91,7 +85,7 @@ const AdminReferrals: React.FC = () => {
       setDeleteId(null);
     } catch (err) {
       console.error("Error deleting referral record:", err);
-      alert("Failed to delete record. Check permissions.");
+      toastError("Failed to delete record. Check permissions.");
     }
   };
 
@@ -105,107 +99,21 @@ const AdminReferrals: React.FC = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Channel definitions with colors and icons mapped strictly by minimal IDs
-  const CHANNELS: Record<string, { label: string; icon: any; color: string; bg: string; text: string }> = {
-    search_engine: {
-      label: "Search Engine",
-      icon: Globe,
-      color: "bg-blue-500",
-      bg: "bg-blue-50 dark:bg-blue-950/20",
-      text: "text-blue-700 dark:text-blue-400",
-    },
-    friend_family: {
-      label: "Friend or Family",
-      icon: Users,
-      color: "bg-emerald-500",
-      bg: "bg-emerald-50 dark:bg-emerald-950/20",
-      text: "text-emerald-700 dark:text-emerald-400",
-    },
-    social_media: {
-      label: "Social Media",
-      icon: Smartphone,
-      color: "bg-purple-500",
-      bg: "bg-purple-50 dark:bg-purple-950/20",
-      text: "text-purple-700 dark:text-purple-400",
-    },
-    youtube: {
-      label: "YouTube",
-      icon: Play,
-      color: "bg-rose-500",
-      bg: "bg-rose-50 dark:bg-rose-950/20",
-      text: "text-rose-700 dark:text-rose-400",
-    },
-    online_community: {
-      label: "Online Community",
-      icon: MessageSquare,
-      color: "bg-indigo-500",
-      bg: "bg-indigo-50 dark:bg-indigo-950/20",
-      text: "text-indigo-700 dark:text-indigo-400",
-    },
-    blog_review: {
-      label: "Blog or Article",
-      icon: BookOpen,
-      color: "bg-amber-500",
-      bg: "bg-amber-50 dark:bg-amber-950/20",
-      text: "text-amber-700 dark:text-amber-400",
-    },
-    educational: {
-      label: "School / Educational",
-      icon: GraduationCap,
-      color: "bg-cyan-500",
-      bg: "bg-cyan-50 dark:bg-cyan-950/20",
-      text: "text-cyan-700 dark:text-cyan-400",
-    },
-    work_productivity: {
-      label: "Work / Productivity",
-      icon: Briefcase,
-      color: "bg-teal-500",
-      bg: "bg-teal-50 dark:bg-teal-950/20",
-      text: "text-teal-700 dark:text-teal-400",
-    },
-    app_directory: {
-      label: "App Directory",
-      icon: Smartphone,
-      color: "bg-sky-500",
-      bg: "bg-sky-50 dark:bg-sky-950/20",
-      text: "text-sky-700 dark:text-sky-400",
-    },
-    ai_assistant: {
-      label: "AI Assistant",
-      icon: Bot,
-      color: "bg-violet-500",
-      bg: "bg-violet-50 dark:bg-violet-950/20",
-      text: "text-violet-700 dark:text-violet-400",
-    },
-    household_invite: {
-      label: "Household Invite",
-      icon: Home,
-      color: "bg-pink-500",
-      bg: "bg-pink-50 dark:bg-pink-950/20",
-      text: "text-pink-700 dark:text-pink-400",
-    },
-    shared_budgeity: {
-      label: "Shared Budgeity",
-      icon: Share2,
-      color: "bg-lime-500",
-      bg: "bg-lime-50 dark:bg-lime-950/20",
-      text: "text-lime-700 dark:text-lime-400",
-    },
-    just_exploring: {
-      label: "Just Exploring",
-      icon: Sparkles,
-      color: "bg-fuchsia-500",
-      bg: "bg-fuchsia-50 dark:bg-fuchsia-950/20",
-      text: "text-fuchsia-700 dark:text-fuchsia-400",
-    },
-    other: {
-      label: "Other",
-      icon: HelpCircle,
-      color: "bg-slate-500",
-      bg: "bg-slate-100 dark:bg-zinc-800",
-      text: "text-slate-700 dark:text-zinc-400",
-    },
-  };
+  // Derive channel display data directly from ONBOARDING_REFERRAL_OPTIONS so
+  // any new channel added there automatically appears here too.
+  type ChannelStyle = { label: string; icon: React.ElementType; color: string; bg: string; text: string };
+  const CHANNELS: Record<string, ChannelStyle> = Object.fromEntries(
+    ONBOARDING_REFERRAL_OPTIONS.map((opt) => [
+      opt.id,
+      {
+        label: opt.text,
+        icon: ICON_MAP[opt.iconName] as React.ElementType,
+        color: opt.chartColor,
+        bg: opt.chartBg,
+        text: opt.chartText,
+      },
+    ]),
+  );
 
   const getChannelStyle = (source: string) => {
     const key = Object.keys(CHANNELS).find(

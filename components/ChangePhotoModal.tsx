@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const MotionDiv = motion.div as any;
 
+import { GoogleIcon } from "../constants";
+
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
@@ -115,8 +117,8 @@ const ChangePhotoModal: React.FC<ChangePhotoModalProps> = ({
                     }}
                     className="w-full flex items-center gap-4 px-4 py-3.5 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 transition-colors text-left group"
                   >
-                    <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                      <Image size={20} />
+                    <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-zinc-800/80 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <GoogleIcon />
                     </div>
                     <div>
                       <p className="font-semibold text-slate-900 dark:text-white text-sm">

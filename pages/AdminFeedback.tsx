@@ -27,13 +27,18 @@ import {
 } from "lucide-react";
 import { ConfirmModal } from "../components/ConfirmModal";
 
+interface FirestoreTimestamp {
+  seconds: number;
+  nanoseconds: number;
+}
+
 interface FeedbackItem {
   id: string;
   type: "general" | "bug" | "feature";
   message: string;
   rating?: number;
   userEmail: string;
-  createdAt: any;
+  createdAt: FirestoreTimestamp | null;
   status: string;
 }
 

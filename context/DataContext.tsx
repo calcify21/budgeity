@@ -49,6 +49,7 @@ export interface OnboardingWizardPayload {
   wallets: Array<{ name: string; type: WalletType; balance: number; color: string }>;
   onboardingMeta: OnboardingMeta;
   language?: string;
+  accentTheme?: string;
 }
 
 interface DataContextType extends AppState {
@@ -458,6 +459,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       hideAmounts: data.hideAmounts,
       primaryGoal: data.primaryGoal,
       language: data.language,
+      accentTheme: data.accentTheme || "emerald",
       onboardingMeta: {
         ...data.onboardingMeta,
         completedAt: now,
@@ -1579,7 +1581,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       const updatedTx: Transaction = {
         ...oldTx,
         categoryId: mergedRule.categoryId,
-        subCategoryId: mergedRule.subcategoryId,
+        subCategoryId: mergedRule.subCategoryId,
         note: resolvedNote || oldTx.note,
         fromWalletId:
           mergedRule.type === "expense"
@@ -1616,7 +1618,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
       type: sub.type as TransactionType,
       amount: sub.amount,
       categoryId: sub.categoryId,
-      subCategoryId: sub.subcategoryId,
+      subCategoryId: sub.subCategoryId,
       fromWalletId: sub.type === "expense" ? sub.walletId : null,
       toWalletId: sub.type === "income" ? sub.walletId : null,
       date: new Date().toISOString(),

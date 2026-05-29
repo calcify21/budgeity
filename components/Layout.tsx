@@ -42,6 +42,7 @@ import {
   ChevronRight,
   ChevronLeft,
   Database,
+  type LucideIcon,
 } from "lucide-react";
 import LogOutIconAnimated from "./ui/LogOutIconAnimated";
 import { useData } from "../context/DataContext";
@@ -66,10 +67,6 @@ import { useAvatar } from "../hooks/useAvatar";
 import ChangePhotoModal from "./ChangePhotoModal";
 import AvatarCropModal from "./AvatarCropModal";
 import FullPhotoViewModal from "./FullPhotoViewModal";
-
-// Fix: Cast motion components to any to resolve type errors
-const MotionDiv = motion.div as any;
-const MotionButton = motion.button as any;
 
 // Custom Logout Icon for Specific Animation
 const CustomLogoutIcon = ({ size = 20 }: { size?: number }) => (
@@ -96,10 +93,10 @@ const CustomLogoutIcon = ({ size = 20 }: { size?: number }) => (
 
 interface SidebarItemProps {
   to: string;
-  icon: any;
+  icon: LucideIcon;
   label: string;
   onClick?: () => void;
-  location: any;
+  location: ReturnType<typeof useLocation>;
   className?: string;
   isCollapsed?: boolean;
 }
@@ -131,7 +128,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       )}
     >
       {isActive && (
-        <MotionDiv
+        <motion.div
           layoutId="sidebarActive"
           className="absolute inset-0 bg-brand-600 dark:bg-brand-600 rounded-xl"
           initial={false}
@@ -205,7 +202,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       setSearchParams(newParams, { replace: true });
     }
   }, [searchParams, setSearchParams]);
-  const [_isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+  const [sidebarCollapsedPref, setIsSidebarCollapsed] = useState(() => {
     const saved = localStorage.getItem("budgeity_sidebar_collapsed");
     return saved === "true";
   });
@@ -218,7 +215,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isSidebarCollapsed = _isSidebarCollapsed && isDesktop;
+  const isSidebarCollapsed = sidebarCollapsedPref && isDesktop;
   const [expandedSections, setExpandedSections] = useState<
     Record<string, boolean>
   >({
@@ -237,7 +234,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const toggleSidebar = () => {
-    const newVal = !_isSidebarCollapsed;
+    const newVal = !sidebarCollapsedPref;
     setIsSidebarCollapsed(newVal);
     localStorage.setItem("budgeity_sidebar_collapsed", String(newVal));
   };
@@ -298,9 +295,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsInviteModalOpen(true);
   };
 
-  const handleNavClick = () => {
-    // setIsMobileNavSheetOpen(false); // Handled explicitly by the sheet via location change
-  };
 
   // Dismissal logic
   const profileDropdownRef = useRef<HTMLDivElement>(null);
@@ -346,7 +340,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/dashboard",
             icon: LayoutDashboard,
             label: t("common.dashboard"),
-            onClick: handleNavClick,
+
             className: "tour-nav-dashboard",
           },
         ],
@@ -359,21 +353,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/transactions",
             icon: ArrowRightLeft,
             label: t("common.transactions"),
-            onClick: handleNavClick,
+
             className: "tour-nav-transactions",
           },
           {
             to: "/subscriptions",
             icon: Repeat,
             label: t("common.subscriptions"),
-            onClick: handleNavClick,
+
             className: "tour-nav-subscriptions",
           },
           {
             to: "/wallets",
             icon: Wallet,
             label: t("common.wallets"),
-            onClick: handleNavClick,
+
             className: "tour-nav-wallets",
           },
         ],
@@ -386,21 +380,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/analytics",
             icon: BarChart3,
             label: t("common.analytics"),
-            onClick: handleNavClick,
+
             className: "tour-nav-analytics",
           },
           {
             to: "/analytics-v2",
             icon: BarChart3,
             label: t("common.analytics_v2"),
-            onClick: handleNavClick,
+
             className: "tour-nav-analytics-v2",
           },
           {
             to: "/reports",
             icon: FileBarChart2,
             label: t("common.reports"),
-            onClick: handleNavClick,
+
             className: "tour-nav-reports",
           },
         ],
@@ -413,21 +407,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/budgets",
             icon: PiggyBank,
             label: t("common.budgets"),
-            onClick: handleNavClick,
+
             className: "tour-nav-budgets",
           },
           {
             to: "/goals",
             icon: Target,
             label: t("common.goals"),
-            onClick: handleNavClick,
+
             className: "tour-nav-goals",
           },
           {
             to: "/shopping-list",
             icon: ShoppingCart,
             label: t("common.shopping_list"),
-            onClick: handleNavClick,
+
             className: "tour-nav-shopping",
           },
         ],
@@ -440,14 +434,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/categories",
             icon: Tags,
             label: t("common.categories"),
-            onClick: handleNavClick,
+
             className: "tour-nav-categories",
           },
           {
             to: "/export",
             icon: Download,
             label: t("common.export"),
-            onClick: handleNavClick,
+
             className: "tour-nav-export",
           },
           ...(activeWorkspace.type === "household"
@@ -456,7 +450,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   to: "/household-settings",
                   icon: Home,
                   label: "Household Settings",
-                  onClick: handleNavClick,
+      
                 },
               ]
             : []),
@@ -470,22 +464,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/settings",
             icon: Settings,
             label: t("common.settings"),
-            onClick: handleNavClick,
+
             className: "tour-nav-settings",
           },
           {
             to: "/account-info",
             icon: UserCircle,
             label: t("common.account_info"),
-            onClick: handleNavClick,
+
             className: "tour-nav-account",
-          },
-          {
-            to: "/whats-new",
-            icon: Sparkles,
-            label: t("common.whats_new"),
-            onClick: handleNavClick,
-            className: "tour-nav-whats-new",
           },
         ],
       },
@@ -500,7 +487,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/admin/feedback",
             icon: Shield,
             label: t("common.user_feedback"),
-            onClick: handleNavClick,
+
             className:
               location.pathname === "/admin/feedback"
                 ? "shadow-none"
@@ -510,7 +497,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             to: "/admin/referrals",
             icon: Users,
             label: "Referrals",
-            onClick: handleNavClick,
+
             className:
               location.pathname === "/admin/referrals"
                 ? "shadow-none"
@@ -521,7 +508,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
 
     return items;
-  }, [t, activeWorkspace, user, location.pathname]);
+  }, [t, activeWorkspace, isAdmin, location.pathname]);
 
   const filteredNavItems = navItems
     .map((section) => ({
@@ -673,7 +660,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   {(isSidebarCollapsed ||
                     expandedSections[section] ||
                     searchQuery) && (
-                    <MotionDiv
+                    <motion.div
                       initial={
                         isSidebarCollapsed ? false : { height: 0, opacity: 0 }
                       }
@@ -694,7 +681,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                           isCollapsed={isSidebarCollapsed && !searchQuery}
                         />
                       ))}
-                    </MotionDiv>
+                    </motion.div>
                   )}
                 </AnimatePresence>
               </React.Fragment>
@@ -915,7 +902,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             <AnimatePresence>
               {isWorkspaceSwitcherOpen && (
-                <MotionDiv
+                <motion.div
                   initial={{ opacity: 0, scale: 0.95, y: -10, x: "-50%" }}
                   animate={{ opacity: 1, scale: 1, y: 0, x: "-50%" }}
                   exit={{ opacity: 0, scale: 0.95, y: -10, x: "-50%" }}
@@ -1087,7 +1074,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </button>
                     </div>
                   )}
-                </MotionDiv>
+                </motion.div>
               )}
             </AnimatePresence>
           </div>
@@ -1143,7 +1130,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
               <AnimatePresence>
                 {isProfileDropdownOpen && (
-                  <MotionDiv
+                  <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: -10 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -1244,7 +1231,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         Terms of Service
                       </Link>
                     </div>
-                  </MotionDiv>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -1262,7 +1249,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
         {/* Desktop Floating FAB - Bottom Right */}
         <div className="fixed bottom-8 right-8 z-[45] hidden lg:block">
-          <MotionButton
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsTxModalOpen(true)}
@@ -1280,16 +1267,16 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               {/* Internal diagonal shimmer */}
               <div className="absolute inset-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.4)_50%,transparent_75%,transparent_100%)] bg-[length:250%_250%,100%_100%] bg-no-repeat [background-position:-100%_0,0_0] group-hover:[transition:background-position_2s_ease_infinite] group-hover:animate-[shimmer_2s_infinite]" />
 
-              <MotionDiv
+              <motion.div
                 className="relative z-10 text-white drop-shadow-md"
                 initial={{ rotate: 0 }}
                 whileHover={{ rotate: 180 }}
                 transition={{ type: "spring", stiffness: 200, damping: 10 }}
               >
                 <Plus size={28} strokeWidth={3} />
-              </MotionDiv>
+              </motion.div>
             </div>
-          </MotionButton>
+          </motion.button>
         </div>
 
         <BottomNav

@@ -48,6 +48,13 @@ const ConfirmationModal: React.FC<Props> = ({
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           className="bg-white dark:bg-zinc-900 w-full sm:max-w-sm sm:rounded-[2rem] rounded-t-[2.5rem] shadow-2xl overflow-hidden flex flex-col relative z-10 max-h-[90vh] overflow-y-auto"
         >
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+          aria-label="Close"
+        >
+          <X size={18} />
+        </button>
         <div className="p-6 text-center">
           <div
             className={cn(

@@ -38,24 +38,26 @@ import { SpendingForecastWidget } from "../components/dashboard/SpendingForecast
 import { UpcomingSubscriptionsWidget } from "../components/dashboard/UpcomingSubscriptionsWidget";
 import { WidgetSkeleton } from "../components/dashboard/WidgetSkeleton";
 
-const widgetComponents: Record<string, React.FC<{ 
+type WidgetProps = {
   timeRange: TimeRange;
   customStartDate?: string;
   customEndDate?: string;
-}>> = {
-  networth: NetWorthWidget as any,
-  wallets: WalletOverviewWidget as any,
-  goals: ActiveGoalsWidget as any,
-  transactions: RecentTransactionsWidget as any,
-  spending: MonthlySpendingWidget as any,
-  budgets: BudgetProgressWidget as any,
-  actions: QuickActionsWidget as any,
-  income_expense: IncomeExpenseWidget as any,
-  snapshot: SnapshotWidget as any,
-  planned: PlannedSpendingWidget as any,
-  trend: BalanceTrendWidget as any,
-  forecast: SpendingForecastWidget as any,
-  subscriptions: UpcomingSubscriptionsWidget as any,
+};
+
+const widgetComponents: Record<string, React.ComponentType<WidgetProps>> = {
+  networth: NetWorthWidget as React.ComponentType<WidgetProps>,
+  wallets: WalletOverviewWidget as React.ComponentType<WidgetProps>,
+  goals: ActiveGoalsWidget as React.ComponentType<WidgetProps>,
+  transactions: RecentTransactionsWidget as React.ComponentType<WidgetProps>,
+  spending: MonthlySpendingWidget as React.ComponentType<WidgetProps>,
+  budgets: BudgetProgressWidget as React.ComponentType<WidgetProps>,
+  actions: QuickActionsWidget as React.ComponentType<WidgetProps>,
+  income_expense: IncomeExpenseWidget as React.ComponentType<WidgetProps>,
+  snapshot: SnapshotWidget as React.ComponentType<WidgetProps>,
+  planned: PlannedSpendingWidget as React.ComponentType<WidgetProps>,
+  trend: BalanceTrendWidget as React.ComponentType<WidgetProps>,
+  forecast: SpendingForecastWidget as React.ComponentType<WidgetProps>,
+  subscriptions: UpcomingSubscriptionsWidget as React.ComponentType<WidgetProps>,
 };
 
 const widgetLabels: Record<string, string> = {

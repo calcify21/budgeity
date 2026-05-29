@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import CustomCheckbox from "./CustomCheckbox";
 import { useTranslation } from "react-i18next";
@@ -80,6 +80,13 @@ export const ConfirmModal: React.FC<Props> = ({
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className="bg-white dark:bg-zinc-900 sm:rounded-2xl rounded-t-[2.5rem] w-full sm:max-w-sm relative z-10 p-6 shadow-2xl border border-slate-100 dark:border-zinc-800 max-h-[90vh] overflow-y-auto"
             >
+            <button
+              onClick={onClose}
+              className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
             <div className="flex flex-col items-center text-center gap-4">
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center ${isDestructive ? "bg-rose-100 dark:bg-rose-900/20 text-rose-600" : "bg-amber-100 dark:bg-amber-900/20 text-amber-600"}`}

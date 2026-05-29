@@ -21,9 +21,6 @@ interface Props {
   onClose: () => void;
 }
 
-// Fix: Cast motion components to any to resolve type errors
-const MotionDiv = motion.div as any;
-
 const FeedbackModal: React.FC<Props> = ({ onClose }) => {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
@@ -92,7 +89,8 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
     <div className="fixed inset-0 z-[55] overflow-y-auto">
       <div className="flex min-h-full items-end justify-center p-0 sm:items-center sm:p-4">
         <AnimatePresence>
-          <MotionDiv
+          <motion.div
+            key="feedback-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -100,7 +98,8 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
             onClick={onClose}
           />
 
-          <MotionDiv
+          <motion.div
+            key="feedback-modal"
             initial={{ y: "100%" }}
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
@@ -226,7 +225,7 @@ const FeedbackModal: React.FC<Props> = ({ onClose }) => {
             </button>
           </div>
         </form>
-      </MotionDiv>
+      </motion.div>
     </AnimatePresence>
   </div>
 </div>

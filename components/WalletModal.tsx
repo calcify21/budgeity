@@ -10,6 +10,7 @@ import {
   Landmark,
   Lock,
   AlertCircle,
+  X,
 } from "lucide-react";
 import { useToast } from "../context/ToastContext";
 import IconPicker from "./IconPicker";
@@ -172,15 +173,24 @@ const WalletModal: React.FC<Props> = ({
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
           className="bg-white dark:bg-zinc-900 sm:rounded-[2.5rem] rounded-t-[2.5rem] w-full sm:max-w-md relative z-10 shadow-2xl border border-slate-100 dark:border-white/10 flex flex-col max-h-[90vh]"
         >
-        <div
-          ref={scrollRef}
-          className="p-8 overflow-y-auto custom-scrollbar flex-1"
-        >
-          <h2 className="text-2xl font-bold mb-6">
+        <div className="flex items-center justify-between px-8 pt-8 pb-0 shrink-0">
+          <h2 className="text-2xl font-bold">
             {walletToEdit
               ? t("walletModal.editWallet")
               : t("walletModal.addNewWallet")}
           </h2>
+          <button
+            onClick={onClose}
+            className="p-2 -mr-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
+            aria-label="Close"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div
+          ref={scrollRef}
+          className="p-8 overflow-y-auto custom-scrollbar flex-1"
+        >
 
           {!walletToEdit && (
             <div className="flex bg-slate-100 dark:bg-black p-1.5 rounded-2xl mb-6">

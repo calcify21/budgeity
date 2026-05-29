@@ -1,6 +1,6 @@
 export type TransactionType = "income" | "expense" | "transfer";
 export type WalletType = "cash" | "bank" | "savings";
-export type RecurringFrequency = "daily" | "weekly" | "monthly" | "yearly";
+export type RecurringFrequency = "daily" | "weekly" | "monthly" | "yearly" | "custom";
 export type SpendingNature = "must" | "need" | "want";
 export type TimeRange =
   | "this_month"
@@ -162,9 +162,9 @@ export interface RecurringTransaction {
   name?: string;
   note?: string;
   categoryId: string;
-  subcategoryId?: string;
+  subCategoryId?: string;
   walletId: string;
-  frequency: "daily" | "weekly" | "monthly" | "yearly" | "custom";
+  frequency: RecurringFrequency;
   interval?: number;
   startDate: string;
   endDate?: string;
@@ -252,6 +252,17 @@ export interface OnboardingMeta {
   inviteEmail?: string;
   completedAt?: string;
   hearAboutUs?: string;
+}
+
+// ── Referral / Acquisition ───────────────────────────────────────────
+export interface ReferralOption {
+  id: string;
+  text: string;
+  iconName: string;
+  colorClass: string;
+  chartColor: string;
+  chartBg: string;
+  chartText: string;
 }
 
 export interface AppState {

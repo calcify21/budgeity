@@ -251,19 +251,20 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     );
 
     // FAB — final step of Phase 1
-    if (document.querySelector(".tour-fab-add")) {
+    const resolvedFabSelector = window.innerWidth < 1024 ? ".bottom-nav-floating .tour-fab-add" : ".tour-fab-add";
+    if (document.querySelector(resolvedFabSelector)) {
       steps.push({
-        element: ".tour-fab-add",
+        element: resolvedFabSelector,
         popover: {
           title: "＋ Add Transaction",
           description:
             "The <strong>most important button</strong> in Budgeity. Let's open it and walk through how to log expenses, income, and transfers!",
-          side: "left",
+          side: window.innerWidth < 1024 ? "top" : "left",
           align: "end",
           onNextClick: () => {
             // Transition to Phase 2: open the modal
             isTransitioning.current = true;
-            const fab = document.querySelector(".tour-fab-add") as HTMLElement;
+            const fab = document.querySelector(resolvedFabSelector) as HTMLElement;
             if (fab) fab.click();
 
             driverObj.current?.destroy();
@@ -360,12 +361,27 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     createDriver();
     isTransitioning.current = false;
 
+    const isMobile = window.innerWidth < 1024;
+
+    if (isMobile) {
+      isTransitioning.current = true;
+      // Open the bottom sheet More Menu programmatically
+      const moreBtn = document.querySelector(".tour-nav-more") as HTMLElement;
+      if (moreBtn) moreBtn.click();
+
+      waitForElement(".tour-nav-more-sheet .tour-nav-dashboard", () => {
+        isTransitioning.current = false;
+        driveMobilePhase3();
+      });
+      return;
+    }
+
+    // ── Desktop Sidebar Flow ──
     const steps: any[] = [];
 
     const navStep = (selector: string, title: string, description: string) => {
       const el = document.querySelector(selector);
       if (el) {
-        // Pre-scroll then add
         steps.push({
           element: selector,
           popover: {
@@ -374,7 +390,6 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
             side: "right" as const,
             align: "start" as const,
             onNextClick: () => {
-              // Pre-scroll the NEXT element before driver moves to it
               const currentIdx = steps.findIndex(
                 (s: any) => s.element === selector,
               );
@@ -478,21 +493,16 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       "🪪 Account Info",
       "View <strong>display name</strong>, login method, account creation date, and other profile details.",
     );
-    navStep(
-      ".tour-nav-whats-new",
-      "✨ What's New",
-      "Stay updated with <strong>every feature release</strong>, improvement, and fix. Never miss a new capability.",
-    );
 
-    // ── Finale ──
+    // ── Desktop Finale ──
     steps.push({
       element: "body",
       popover: {
         title: "🚀 You're a Budgeity Pro!",
         description:
           "You've explored <strong>every corner</strong> of your financial command center:<br/><br/>✅ Log expenses from the <strong>＋ button</strong><br/>✅ Track progress on the <strong>Dashboard</strong><br/>✅ Set <strong>Budgets</strong> to control spending<br/>✅ Create <strong>Goals</strong> to save smarter<br/>✅ Automate with <strong>Recurring Rules</strong><br/>✅ <strong>Export</strong> data for your records<br/><br/>Restart this tour anytime from <strong>Settings</strong>. Happy budgeting! 🎉",
-        side: "left",
-        align: "start",
+        side: "left" as const,
+        align: "start" as const,
         onNextClick: () => {
           driverObj.current?.destroy();
           completeTour();
@@ -506,6 +516,120 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       scrollNavIntoView(steps[0].element);
     }
 
+    driverObj.current?.setSteps(steps);
+    driverObj.current?.drive();
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  MOBILE PHASE 3 — Unified Highlight Flow inside open More Menu Sheet
+  // ══════════════════════════════════════════════════════════════════════
+
+  const driveMobilePhase3 = () => {
+    createDriver();
+    isTransitioning.current = false;
+    const steps: any[] = [];
+
+    const sheetSelector = (selector: string) =>
+      `.tour-nav-more-sheet ${selector}`;
+
+    const sheetStep = (selector: string, title: string, description: string, isLast = false) => {
+      const scopedSelector = sheetSelector(selector);
+      const el = document.querySelector(scopedSelector);
+      if (el) {
+        steps.push({
+          element: scopedSelector,
+          popover: {
+            title,
+            description,
+            side: "top" as const,
+            align: "start" as const,
+            onNextClick: () => {
+              if (isLast) {
+                // Close sheet and go to Finale
+                isTransitioning.current = true;
+                const closeBtn = document.querySelector(".tour-nav-more-close") as HTMLElement;
+                if (closeBtn) closeBtn.click();
+
+                driverObj.current?.destroy();
+                setTimeout(() => {
+                  driveFinale();
+                }, 400);
+              } else {
+                // Pre-scroll the next sheet item
+                const currentIdx = steps.findIndex(
+                  (s: any) => s.element === scopedSelector,
+                );
+                const nextStep = steps[currentIdx + 1];
+                if (nextStep?.element) {
+                  scrollNavIntoView(nextStep.element);
+                }
+                setTimeout(() => driverObj.current?.moveNext(), 200);
+              }
+            },
+            onPrevClick: () => {
+              // Pre-scroll the previous sheet item
+              const currentIdx = steps.findIndex(
+                (s: any) => s.element === scopedSelector,
+              );
+              const prevStep = steps[currentIdx - 1];
+              if (prevStep?.element) {
+                scrollNavIntoView(prevStep.element);
+              }
+              setTimeout(() => driverObj.current?.movePrevious(), 200);
+            }
+          }
+        });
+      }
+    };
+
+    sheetStep(".tour-nav-dashboard", "🏠 Dashboard", "Your <strong>command center</strong> — everything you just explored lives here. Fully customizable layout.", false);
+    sheetStep(".tour-nav-transactions", "📝 Transactions", "The <strong>universal ledger</strong>. Every expense, income, and transfer with smart filters by date, category, wallet, and type. Full edit/delete support.", false);
+    sheetStep(".tour-nav-wallets", "👛 Wallets", "Create unlimited <strong>Cash</strong>, <strong>Bank</strong>, and <strong>Savings</strong> accounts. Each tracks its own balance. Transfer money between wallets with full audit trail.", false);
+    sheetStep(".tour-nav-analytics", "📊 Analytics", "Interactive charts: <strong>category breakdown</strong>, spending trends, <strong>budget vs actual</strong>, and household <strong>member filtering</strong>.", false);
+    sheetStep(".tour-nav-analytics-v2", "📊 Analytics V2", "The <strong>next-generation</strong> analytics dashboard with even more visual insights, deeper drill-downs, and new chart types.", false);
+    sheetStep(".tour-nav-reports", "📑 Reports", "Generate <strong>downloadable reports</strong> in PDF, CSV, or Excel. Filter by date range and wallet for tax season or personal records.", false);
+    sheetStep(".tour-nav-budgets", "💵 Budgets", "Set <strong>monthly spending limits</strong> per category. Visual progress bars show how close you are. Overspending triggers red warnings.", false);
+    sheetStep(".tour-nav-goals", "🎯 Savings Goals", "Create <strong>savings targets</strong> with name, amount, and deadline. Link a wallet and watch your <strong>progress bar</strong> fill up.", false);
+    sheetStep(".tour-nav-subscriptions", "🔄 Subscriptions", "Automate <strong>rent, subscriptions, salary</strong> — any periodic transaction. Budgeity's engine auto-logs them on their due dates.", false);
+    sheetStep(".tour-nav-shopping", "🛍️ Shopping List", "Plan purchases with <strong>estimated costs</strong>. Tap ✅ to mark bought — auto-creates an expense transaction and updates your accounts!", false);
+    sheetStep(".tour-nav-categories", "🏷️ Categories", "Fully customizable <strong>spending taxonomy</strong>. Add, reorder, or delete categories and subcategories to match your lifestyle.", false);
+    sheetStep(".tour-nav-export", "📤 Export", "Download your financial data in <strong>PDF, Excel, or CSV</strong>. Choose date ranges and wallets. Your data is always yours.", false);
+    sheetStep(".tour-nav-settings", "⚙️ Settings", "Configure <strong>currency</strong>, number system, <strong>App Lock</strong> (PIN/Pattern/Biometrics), language, and <strong>restart this tour</strong>.", false);
+    sheetStep(".tour-nav-account", "🪪 Account Info", "View <strong>display name</strong>, login method, account creation date, and other profile details.", true);
+
+    // Pre-scroll first element
+    if (steps.length > 0) {
+      scrollNavIntoView(steps[0].element);
+    }
+
+    driverObj.current?.setSteps(steps);
+    driverObj.current?.drive();
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  //  FINALE — Universal App Tour Completion Modal
+  // ══════════════════════════════════════════════════════════════════════
+
+  const driveFinale = () => {
+    createDriver();
+    isTransitioning.current = false;
+    const steps = [
+      {
+        element: "body",
+        popover: {
+          title: "🚀 You're a Budgeity Pro!",
+          description:
+            "You've explored <strong>every corner</strong> of your financial command center:<br/><br/>✅ Log expenses from the <strong>＋ button</strong><br/>✅ Track progress on the <strong>Dashboard</strong><br/>✅ Set <strong>Budgets</strong> to control spending<br/>✅ Create <strong>Goals</strong> to save smarter<br/>✅ Automate with <strong>Recurring Rules</strong><br/>✅ <strong>Export</strong> data for your records<br/><br/>Restart this tour anytime from <strong>Settings</strong>. Happy budgeting! 🎉",
+          side: "left" as const,
+          align: "start" as const,
+          onNextClick: () => {
+            driverObj.current?.destroy();
+            completeTour();
+            isTourActive.current = false;
+          },
+        },
+      }
+    ];
     driverObj.current?.setSteps(steps);
     driverObj.current?.drive();
   };

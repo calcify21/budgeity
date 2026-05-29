@@ -9,7 +9,6 @@ import {
   PiggyBank,
   Target,
   Plus,
-  MoreHorizontal,
   Menu,
   BarChart3,
   Repeat,
@@ -21,6 +20,7 @@ import {
   Sparkles,
   Shield,
   Users,
+  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../utils";
@@ -62,7 +62,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
 
 
   // Full catalog of possible items with outline and solid icons
-  const allItems: Record<string, { icon: any; label: string }> = {
+  const allItems: Record<string, { icon: LucideIcon; label: string }> = {
     "/dashboard": { icon: LayoutDashboard, label: t("common.dashboard") },
     "/analytics": { icon: BarChart3, label: t("common.analytics") },
     "/analytics-v2": { icon: BarChart3, label: t("common.analytics_v2") },
@@ -76,7 +76,6 @@ const BottomNav: React.FC<BottomNavProps> = ({
     "/export": { icon: Download, label: t("common.export") },
     "/settings": { icon: Settings, label: t("common.settings") },
     "/account-info": { icon: UserCircle, label: t("common.account_info") },
-    "/whats-new": { icon: Sparkles, label: t("common.whats_new") },
     "/admin/feedback": { icon: Shield, label: t("common.user_feedback") },
     "/admin/referrals": { icon: Users, label: "Referrals" },
   };
@@ -102,8 +101,8 @@ const BottomNav: React.FC<BottomNavProps> = ({
   const maxPinned = isTablet ? 6 : 4;
   const activePinned = pinnedIds.slice(0, maxPinned);
 
-  const leftItems: any[] = [];
-  const rightItems: any[] = [];
+  const leftItems: { to: string; icon: LucideIcon; label: string }[] = [];
+  const rightItems: { to: string; icon: LucideIcon; label: string }[] = [];
 
   const half = Math.ceil(activePinned.length / 2);
   activePinned.forEach((id, index) => {
@@ -119,14 +118,13 @@ const BottomNav: React.FC<BottomNavProps> = ({
   return (
     <>
       <AnimatePresence>
-        {!isDesktop && (
-          <motion.div
-            key="bottom-nav-root"
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 100, opacity: 0 }}
-            className="fixed z-50 bottom-3 sm:bottom-6 left-0 right-0 px-3 sm:px-4 flex justify-center pointer-events-none"
-          >
+        <motion.div
+          key="bottom-nav-root"
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          className="tour-bottom-nav-container fixed z-50 bottom-3 sm:bottom-6 left-0 right-0 px-3 sm:px-4 flex justify-center pointer-events-none"
+        >
             <div
               className={cn(
                 "bottom-nav-floating backdrop-blur-3xl border border-white/20 dark:border-white/10 flex items-center justify-evenly pb-[env(safe-area-inset-bottom,4px)] transition-all duration-300 w-full rounded-[2rem] sm:rounded-[2.5rem] p-1.5 sm:p-2 pointer-events-auto",
@@ -147,7 +145,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
                   onClick={onAddClick}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="group relative flex items-center justify-center w-12 h-12 rounded-full shadow-lg shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
+                  className="tour-fab-add group relative flex items-center justify-center w-12 h-12 rounded-full shadow-lg shadow-brand-500/40 hover:shadow-brand-500/60 transition-all duration-500 focus:outline-none focus:ring-4 focus:ring-brand-500/30"
                   aria-label="Add Transaction"
                 >
                   <div className="absolute inset-[-4px] bg-gradient-to-r from-brand-400 via-indigo-500 to-purple-500 rounded-full opacity-50 blur-md group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -181,7 +179,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
 
               <button
                 onClick={() => setIsMoreOpen(true)}
-                className="flex flex-col items-center justify-center min-w-[48px] sm:min-w-[64px] h-14 rounded-2xl text-slate-400 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors shrink-0"
+                className="tour-nav-more flex flex-col items-center justify-center min-w-[48px] sm:min-w-[64px] h-14 rounded-2xl text-slate-400 dark:text-zinc-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors shrink-0"
               >
                 <div className="h-6 flex items-center justify-center">
                   <Menu size={24} strokeWidth={1.5} />
@@ -189,7 +187,6 @@ const BottomNav: React.FC<BottomNavProps> = ({
               </button>
             </div>
           </motion.div>
-        )}
       </AnimatePresence>
 
       <NavMoreSheet
@@ -207,7 +204,7 @@ const BottomNav: React.FC<BottomNavProps> = ({
   );
 };
 
-const NavItem: React.FC<{ item: any; isActive: boolean }> = ({
+const NavItem: React.FC<{ item: { to: string; icon: LucideIcon; label: string }; isActive: boolean }> = ({
   item,
   isActive,
 }) => {
@@ -218,6 +215,7 @@ const NavItem: React.FC<{ item: any; isActive: boolean }> = ({
       to={item.to}
       className={cn(
         "flex flex-col items-center justify-center min-w-[48px] sm:min-w-[64px] h-14 relative group outline-none select-none isolate",
+        `tour-nav-${item.to.replace("/", "") || "dashboard"}`,
         isActive
           ? "text-brand-600 dark:text-brand-400"
           : "text-slate-400 dark:text-zinc-500",

@@ -32,6 +32,7 @@ import {
   Home,
   Users,
   ChevronDown,
+  type LucideIcon,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../utils";
@@ -43,16 +44,37 @@ import { useEscapeKey } from "../../hooks/useEscapeKey";
 import { useClickOutside } from "../../hooks/useClickOutside";
 import { Reorder, useDragControls } from "framer-motion";
 
-const ReorderGroup = Reorder.Group as any;
-const ReorderItem = Reorder.Item as any;
-const MotionDiv = motion.div as any;
+// Reorder generics need explicit type parameter to avoid inference errors
+const ReorderGroup = Reorder.Group as React.ComponentType<React.ComponentProps<typeof Reorder.Group<string>>>;
+const ReorderItem = Reorder.Item as React.ComponentType<React.ComponentProps<typeof Reorder.Item<string>>>;
+
+interface NavItem {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+}
+
+const getTourNavClass = (path: string) => {
+  const tourClassByPath: Record<string, string> = {
+    "/shopping-list": "tour-nav-shopping",
+    "/account-info": "tour-nav-account",
+  };
+
+  return tourClassByPath[path] ?? `tour-nav-${path.replace("/", "")}`;
+};
+
+interface ItemVariants {
+  hidden: { opacity: number; y: number };
+  show: { opacity: number; y: number; transition: object };
+}
 
 interface ReorderItemPinProps {
-  item: { to: string; icon: any; label: string };
+  item: NavItem;
   isPinned?: boolean;
   onToggle?: () => void;
   isCustomizing?: boolean;
-  itemVariants?: any;
+  itemVariants?: ItemVariants;
+  onClose?: () => void;
 }
 
 const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
@@ -61,6 +83,7 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
   onToggle,
   isCustomizing,
   itemVariants,
+  onClose,
 }) => {
   const controls = useDragControls();
   const location = useLocation();
@@ -129,8 +152,10 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
       ) : (
         <Link
           to={item.to}
+          onClick={onClose}
           className={cn(
             "flex-1 flex items-center justify-between py-2.5 px-3 rounded-2xl transition-all group",
+            getTourNavClass(item.to),
             isActive
               ? "bg-brand-50 dark:bg-brand-500/10 text-brand-600 dark:text-brand-400 font-bold"
               : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5 active:scale-[0.98]",
@@ -184,7 +209,7 @@ const ReorderItemPin: React.FC<ReorderItemPinProps> = ({
   }
 
   return (
-    <motion.div variants={itemVariants} className="w-full">
+    <motion.div variants={itemVariants as any} className="w-full">
       {content}
     </motion.div>
   );
@@ -294,7 +319,6 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
         items: [
           { to: "/settings", icon: Settings, label: t("common.settings") },
           { to: "/account-info", icon: UserCircle, label: t("common.account_info") },
-          { to: "/whats-new", icon: Sparkles, label: t("common.whats_new") },
         ],
       },
     ];
@@ -397,7 +421,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
   // Split links for customization - CRITICAL: Sort pinnedLinks to match pinnedIds order
   const pinnedLinks = displayPinnedIds
     .map((id) => navLinks.find((l) => l.to === id))
-    .filter(Boolean) as { to: string; icon: any; label: string }[];
+    .filter(Boolean) as NavItem[];
 
   const unpinnedLinks = navLinks.filter(
     (l) => !displayPinnedIds.includes(l.to),
@@ -480,7 +504,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 350 }} // Snappier entry
-            className="fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] rounded-t-[2.5rem] z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-200 dark:border-white/5 pb-[env(safe-area-inset-bottom,24px)] overflow-hidden will-change-transform"
+            className="tour-nav-more-sheet fixed bottom-0 left-0 right-0 bg-white dark:bg-[#121212] rounded-t-[2.5rem] z-[70] shadow-[0_-10px_40px_rgba(0,0,0,0.2)] border-t border-slate-200 dark:border-white/5 pb-[env(safe-area-inset-bottom,24px)] overflow-hidden will-change-transform"
           >
             {/* Handle */}
             <div className="flex justify-center pt-4 pb-2">
@@ -529,7 +553,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                 </button>
                 <button
                   onClick={onClose}
-                  className="w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors active:scale-90 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
+                  className="tour-nav-more-close w-9 h-9 flex items-center justify-center bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors active:scale-90 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
                 >
                   <X size={20} />
                 </button>
@@ -581,6 +605,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                             key={item.to}
                             item={item}
                             itemVariants={itemVariants}
+                            onClose={onClose}
                           />
                         ))
                       )}
@@ -668,7 +693,7 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                             </button>
                             <AnimatePresence>
                               {expandedSections[section] && (
-                                <MotionDiv
+                                <motion.div
                                   initial={{ height: 0, opacity: 0 }}
                                   animate={{ height: "auto", opacity: 1 }}
                                   exit={{ height: 0, opacity: 0 }}
@@ -680,9 +705,10 @@ const NavMoreSheet: React.FC<NavMoreSheetProps> = ({
                                       key={item.to}
                                       item={item}
                                       itemVariants={itemVariants}
+                                      onClose={onClose}
                                     />
                                   ))}
-                                </MotionDiv>
+                                </motion.div>
                               )}
                             </AnimatePresence>
                           </React.Fragment>

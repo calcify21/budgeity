@@ -29,7 +29,6 @@ const ShoppingList = React.lazy(() => import("./pages/ShoppingList"));
 const Settings = React.lazy(() => import("./pages/Settings"));
 const AccountInfo = React.lazy(() => import("./pages/AccountInfo"));
 const HouseholdSettings = React.lazy(() => import("./pages/HouseholdSettings"));
-const WhatsNew = React.lazy(() => import("./pages/WhatsNew"));
 const AdminFeedback = React.lazy(() => import("./pages/AdminFeedback"));
 const AdminReferrals = React.lazy(() => import("./pages/AdminReferrals"));
 
@@ -87,6 +86,18 @@ const AppContent: React.FC = () => {
     syncEngineResults,
   } = useData();
 
+  // Keep stable refs so the recurring-engine effect always reads fresh data
+  // without those arrays being reactive deps (which would cause infinite loops
+  // since syncEngineResults writes back to transactions/wallets/goals).
+  const transactionsRef = React.useRef(transactions);
+  const walletsRef = React.useRef(wallets);
+  const goalsRef = React.useRef(goals);
+  const syncEngineResultsRef = React.useRef(syncEngineResults);
+  React.useEffect(() => { transactionsRef.current = transactions; });
+  React.useEffect(() => { walletsRef.current = wallets; });
+  React.useEffect(() => { goalsRef.current = goals; });
+  React.useEffect(() => { syncEngineResultsRef.current = syncEngineResults; });
+
   const { activeWorkspace, currentHousehold } = useHousehold();
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [showLoader, setShowLoader] = React.useState(true);
@@ -113,15 +124,17 @@ const AppContent: React.FC = () => {
     }
   }, [isLoadingData]);
 
-  // Run the background recurring engine whenever data loads or rules change
+  // Run the background recurring engine whenever data loads or rules change.
+  // Reads transactions/wallets/goals via refs to avoid adding them as deps
+  // (they are mutated by syncEngineResults, which would cause infinite loops).
   React.useEffect(() => {
     if (isLoadingData) return;
 
     const result = processRecurringTransactions(
       recurringTransactions,
-      transactions,
-      wallets,
-      goals,
+      transactionsRef.current,
+      walletsRef.current,
+      goalsRef.current,
     );
 
     if (result) {
@@ -137,7 +150,7 @@ const AppContent: React.FC = () => {
       );
 
       // Sync everything at once atomically to prevent render loops
-      syncEngineResults(
+      syncEngineResultsRef.current(
         result.newTransactions,
         result.updatedRules,
         result.updatedWallets,
@@ -148,6 +161,7 @@ const AppContent: React.FC = () => {
     }
   }, [
     isLoadingData,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     recurringTransactions.map((r) => r.nextDueDate).join(","),
   ]);
 
@@ -263,7 +277,6 @@ const AppContent: React.FC = () => {
                 element={<HouseholdSettings />}
               />
 
-              <Route path="/whats-new" element={<WhatsNew />} />
               <Route path="/admin/feedback" element={<AdminFeedback />} />
               <Route path="/admin/referrals" element={<AdminReferrals />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />

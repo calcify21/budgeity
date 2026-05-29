@@ -10,7 +10,7 @@ import { useAvatar } from "../hooks/useAvatar";
 import { useToast } from "../context/ToastContext";
 import { OnboardingWizardPayload } from "../context/DataContext";
 import { PrimaryGoal, WalletType } from "../types";
-import { CURRENCIES, ONBOARDING_REFERRAL_OPTIONS } from "../constants";
+import { CURRENCIES, ONBOARDING_REFERRAL_OPTIONS, ACCENT_THEMES } from "../constants";
 import CustomSelect from "./CustomSelect";
 import AppLockSettings from "./applock/AppLockSettings";
 import AvatarCropModal from "./AvatarCropModal";
@@ -29,6 +29,7 @@ import {
   ArrowLeft,
   Wallet,
   Landmark,
+  PiggyBank,
   Sun,
   Moon,
   EyeOff,
@@ -77,6 +78,7 @@ interface WizardState {
   numberSystem: "IN" | "INTL" | "AUTO";
   wallets: WalletEntry[];
   theme: "light" | "dark";
+  accentTheme: string;
   hideAmounts: boolean;
   trackingMode: "solo" | "shared";
   householdName: string;
@@ -277,6 +279,7 @@ const OnboardingWizard: React.FC = () => {
       { id: "2", name: "Bank Account", type: "bank", balance: "", color: "#3b82f6", enabled: true },
     ],
     theme: currentTheme,
+    accentTheme: "emerald",
     hideAmounts: false,
     trackingMode: "solo",
     householdName: "",
@@ -284,6 +287,16 @@ const OnboardingWizard: React.FC = () => {
     wantsPin: false,
     language: i18n.language,
   });
+
+  const [dots, setDots] = useState(".");
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setDots((prev) => (prev.length >= 3 ? "." : prev + "."));
+    }, 450);
+    return () => clearInterval(interval);
+  }, []);
+
+
 
   useEffect(() => {
     if (user && !wizard.displayName) {
@@ -318,7 +331,7 @@ const OnboardingWizard: React.FC = () => {
       case 4:
         return !!wizard.currency;
       case 5:
-        return wizard.wallets.some((w) => w.enabled);
+        return true; // Let them proceed even with 0 wallets (will fallback to default Cash)
       case 6:
         return true;
       case 7:
@@ -470,6 +483,7 @@ const OnboardingWizard: React.FC = () => {
         currency: wizard.currency,
         numberSystem: wizard.numberSystem,
         theme: wizard.theme,
+        accentTheme: wizard.accentTheme,
         hideAmounts: wizard.hideAmounts,
         primaryGoal: wizard.primaryGoal || "track_spending",
         wallets: walletsPayload,
@@ -659,10 +673,13 @@ const OnboardingWizard: React.FC = () => {
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.6 }}
-        className="w-full flex items-center justify-center gap-1.5 py-2 px-4 bg-brand-500/5 border border-brand-500/10 rounded-full max-w-xs text-xs font-bold text-brand-600 dark:text-brand-400"
+        className="w-full flex items-center justify-center gap-1.5 py-3 px-6 bg-brand-500/5 border border-brand-500/10 rounded-full max-w-xs text-sm font-bold text-brand-600 dark:text-brand-400 cursor-default transition-all duration-300 backdrop-blur-sm select-none"
       >
-        <Sparkles size={14} className="animate-spin-slow" />
-        <span>Magical setup wizard starting...</span>
+        <Sparkles size={16} className="animate-spin-slow text-indigo-500 shrink-0" />
+        <span className="flex items-center">
+          Let's start
+          <span className="inline-block w-5 text-left ml-0.5">{dots}</span>
+        </span>
       </motion.div>
 
       {/* Legal Links */}
@@ -901,124 +918,164 @@ const OnboardingWizard: React.FC = () => {
     </div>
   );
 
-  const renderStep5 = () => (
-    <div className="space-y-6">
-      <div className="text-center">
-        <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-          <Wallet size={28} className="text-white" />
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Your Accounts
-        </h2>
-        <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-          Set up your starting balances
-        </p>
-      </div>
+  const renderStep5 = () => {
+    const walletTypeOptions = [
+      { value: "cash", label: "Cash" },
+      { value: "bank", label: "Bank" },
+      { value: "savings", label: "Savings" },
+    ];
 
-      <div>
-        <AnimatePresence initial={false}>
-          {wizard.wallets.map((w, idx) => {
-            const Icon = w.type === "cash" ? Wallet : Landmark;
-            return (
+    return (
+      <div className="space-y-6">
+        <div className="text-center">
+          <div className="w-14 h-14 mx-auto mb-4 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <Wallet size={28} className="text-white" />
+          </div>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+            Your Accounts
+          </h2>
+          <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
+            Set up your starting balances
+          </p>
+        </div>
+
+        <div>
+          <AnimatePresence initial={false}>
+            {wizard.wallets.length === 0 ? (
               <MotionDiv
-                key={w.id}
-                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                transition={{ duration: 0.2 }}
+                key="empty-state"
+                initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                animate={{ opacity: 1, height: "auto", scale: 1 }}
+                exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                transition={{ duration: 0.25, ease: "easeInOut" }}
                 className="overflow-hidden"
               >
-                <div
-                  className="rounded-2xl border-2 border-brand-500/30 bg-white dark:bg-zinc-900 shadow-sm transition-all duration-200"
-                >
-                  <div className="p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center"
-                      style={{ backgroundColor: w.color + "20" }}
-                    >
-                      <Icon size={20} style={{ color: w.color }} />
-                    </div>
-                    <div>
-                      <div className="font-bold text-sm text-slate-900 dark:text-white">
-                        {w.type === "cash" ? "Cash Wallet" : "Bank Account"}
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        {w.type === "cash" ? "Physical cash on hand" : "Your primary bank"}
-                      </div>
-                    </div>
-                  </div>
-                  {idx > 0 && (
-                    <button
-                      onClick={() => {
-                        const newWallets = wizard.wallets.filter((_, i) => i !== idx);
-                        update("wallets", newWallets);
-                      }}
-                      className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
-                    >
-                      <X size={16} />
-                    </button>
-                  )}
+                <div className="text-center py-8 bg-slate-50 dark:bg-zinc-900 border border-dashed border-slate-200 dark:border-zinc-800 rounded-3xl mb-4">
+                  <p className="text-sm font-semibold text-slate-400 dark:text-zinc-500 mb-1">No accounts configured</p>
+                  <p className="text-xs text-slate-400 dark:text-zinc-500 px-4">Add a new account below, or continue to start with a default Cash wallet.</p>
                 </div>
+              </MotionDiv>
+            ) : (
+              wizard.wallets.map((w, idx) => {
+                const Icon = w.type === "cash" ? Wallet : w.type === "savings" ? PiggyBank : Landmark;
+                return (
+                  <MotionDiv
+                    key={w.id}
+                    initial={{ opacity: 0, height: 0, scale: 0.95, marginBottom: 0 }}
+                    animate={{ opacity: 1, height: "auto", scale: 1, marginBottom: 16 }}
+                    exit={{ opacity: 0, height: 0, scale: 0.95, marginBottom: 0 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    className="overflow-visible"
+                  >
+                    <div className="rounded-2xl border-2 border-brand-500/30 bg-white dark:bg-zinc-900 shadow-sm transition-all duration-200">
+                      <div className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-10 h-10 rounded-xl flex items-center justify-center"
+                              style={{ backgroundColor: w.color + "20" }}
+                            >
+                              <Icon size={20} style={{ color: w.color }} />
+                            </div>
+                            <div>
+                              <div className="font-bold text-sm text-slate-900 dark:text-white">
+                                {w.type === "cash" && "Cash Wallet"}
+                                {w.type === "bank" && "Bank Account"}
+                                {w.type === "savings" && "Savings Account"}
+                              </div>
+                              <div className="text-[11px] text-slate-500">
+                                {w.type === "cash" && "Physical cash on hand"}
+                                {w.type === "bank" && "Your primary bank"}
+                                {w.type === "savings" && "Your savings & deposits"}
+                              </div>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const newWallets = wizard.wallets.filter((_, i) => i !== idx);
+                              update("wallets", newWallets);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                      Name
-                    </label>
-                    <input
-                      value={w.name}
-                      onChange={(e) => {
-                        const newWallets = [...wizard.wallets];
-                        newWallets[idx] = { ...newWallets[idx], name: e.target.value };
-                        update("wallets", newWallets);
-                      }}
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                      placeholder="Account name"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                      Balance
-                    </label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={w.balance}
-                      onChange={(e) => {
-                        const newWallets = [...wizard.wallets];
-                        newWallets[idx] = { ...newWallets[idx], balance: e.target.value };
-                        update("wallets", newWallets);
-                      }}
-                      className="w-full px-3 py-2.5 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </MotionDiv>
-            );
-          })}
-        </AnimatePresence>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                              Name
+                            </label>
+                            <input
+                              value={w.name}
+                              onChange={(e) => {
+                                const newWallets = [...wizard.wallets];
+                                newWallets[idx] = { ...newWallets[idx], name: e.target.value };
+                                update("wallets", newWallets);
+                              }}
+                              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                              placeholder="Account name"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                              Type
+                            </label>
+                            <CustomSelect
+                              value={w.type}
+                              onChange={(val) => {
+                                const newWallets = [...wizard.wallets];
+                                newWallets[idx] = { ...newWallets[idx], type: val as WalletType };
+                                update("wallets", newWallets);
+                              }}
+                              options={walletTypeOptions}
+                              placeholder="Select type"
+                              preventScrollIntoView={true}
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
+                              Balance
+                            </label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              value={w.balance}
+                              onChange={(e) => {
+                                const newWallets = [...wizard.wallets];
+                                newWallets[idx] = { ...newWallets[idx], balance: e.target.value };
+                                update("wallets", newWallets);
+                              }}
+                              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
+                              placeholder="0.00"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </MotionDiv>
+                );
+              })
+            )}
+          </AnimatePresence>
 
-        <button
-          onClick={() => {
-            const colors = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899", "#ef4444"];
-            const newWallets = [...wizard.wallets, {
-              id: Math.random().toString(), name: "", type: "bank" as WalletType, balance: "", color: colors[wizard.wallets.length % colors.length], enabled: true
-            }];
-            update("wallets", newWallets);
-          }}
-          className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl text-slate-500 dark:text-zinc-400 font-bold hover:bg-slate-50 dark:hover:bg-zinc-900/50 hover:text-brand-500 transition-colors"
-        >
-          <Plus size={18} />
-          Add another account
-        </button>
+          <button
+            onClick={() => {
+              const colors = ["#10b981", "#3b82f6", "#f59e0b", "#8b5cf6", "#ec4899", "#ef4444"];
+              const newWallets = [...wizard.wallets, {
+                id: Math.random().toString(), name: "", type: "bank" as WalletType, balance: "", color: colors[wizard.wallets.length % colors.length], enabled: true
+              }];
+              update("wallets", newWallets);
+            }}
+            className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl text-slate-500 dark:text-zinc-400 font-bold hover:bg-slate-50 dark:hover:bg-zinc-900/50 hover:text-brand-500 transition-colors"
+          >
+            <Plus size={18} />
+            Add another account
+          </button>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderStep6 = () => (
     <div className="space-y-6">
@@ -1068,6 +1125,37 @@ const OnboardingWizard: React.FC = () => {
               )}
             />
           </button>
+        </div>
+
+        {/* Accent Theme Selection */}
+        <div className="p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl">
+          <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
+            Accent Theme Color
+          </label>
+          <div className="flex flex-wrap items-center justify-center gap-4 py-1">
+            {ACCENT_THEMES.map((accent) => {
+              const isActive = wizard.accentTheme === accent.id;
+              return (
+                <button
+                  key={accent.id}
+                  onClick={() => {
+                    update("accentTheme", accent.id);
+                    document.documentElement.setAttribute("data-theme", accent.id);
+                  }}
+                  className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center text-white border-2 transition-all duration-300 hover:scale-110 active:scale-95 shadow-md",
+                    isActive
+                      ? "border-brand-500 ring-4 ring-brand-500/25 scale-105"
+                      : "border-transparent hover:border-slate-300 dark:hover:border-zinc-700"
+                  )}
+                  style={{ backgroundColor: accent.color }}
+                  title={accent.name}
+                >
+                  {isActive && <Check size={18} strokeWidth={3} className="drop-shadow-md" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Privacy Mode */}

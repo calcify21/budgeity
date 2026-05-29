@@ -472,6 +472,19 @@
   border-width: 0 !important; /* Hide arrow for cleaner floating look (optional, but cleaner) */
 }
 
+/* Elevate active tour containers above the driver.js overlay to allow spotlight highlights to elevate above backdrop */
+body.driver-active .tour-bottom-nav-container {
+  z-index: 20000 !important;
+}
+
+body.driver-active .tour-nav-more-sheet {
+  z-index: 20000 !important;
+}
+
+body.driver-active .tour-transaction-modal {
+  z-index: 20000 !important;
+}
+
 @layer utilities {
 
 }

@@ -380,13 +380,13 @@ const WhatsNew: React.FC = () => {
         />
         <ChangeItem
           icon={Globe}
-          title="Global Hindi Translation"
+          title="Universal Hindi Translation"
           description="Budgeity is now fully accessible in Hindi! Instantly toggle your language preference in Settings and enjoy a completely localized, premium financial experience across every single page."
         />
         <ChangeItem
           icon={LayoutDashboard}
           title="2050-Style Dashboard UI"
-          description="Experience our next-generation interface featuring stunning frosted glassmorphism cards and a fluid staggered bento-grid layout."
+          description="Experience our next-generation interface featuring stunning frosted glassmorphic cards and a fluid staggered bento-grid layout."
         />
         <ChangeItem
           icon={Compass}
