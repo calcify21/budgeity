@@ -67,6 +67,7 @@ import { useAvatar } from "../hooks/useAvatar";
 import ChangePhotoModal from "./ChangePhotoModal";
 import AvatarCropModal from "./AvatarCropModal";
 import FullPhotoViewModal from "./FullPhotoViewModal";
+import ProfileDropdown from "./ProfileDropdown";
 
 // Custom Logout Icon for Specific Animation
 const CustomLogoutIcon = ({ size = 20 }: { size?: number }) => (
@@ -257,7 +258,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   const [isHouseholdModalOpen, setIsHouseholdModalOpen] = useState(false);
   const [isWorkspaceSwitcherOpen, setIsWorkspaceSwitcherOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [showInviteBanner, setShowInviteBanner] = useState(true);
   const { hideAmounts, toggleHideAmounts, theme, toggleTheme, isAdmin } = useData();
   const { user, logout } = useAuth();
@@ -311,12 +311,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
 
   // Dismissal logic
-  const profileDropdownRef = useRef<HTMLDivElement>(null);
   const workspaceSwitcherRef = useRef<HTMLDivElement>(null);
-  const profileContainerRef = useRef<HTMLDivElement>(null);
   const workspaceContainerRef = useRef<HTMLDivElement>(null);
 
-  useEscapeKey(isProfileDropdownOpen, () => setIsProfileDropdownOpen(false));
   useEscapeKey(isWorkspaceSwitcherOpen, () =>
     setIsWorkspaceSwitcherOpen(false),
   );
@@ -327,7 +324,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEscapeKey(showFullPhoto, () => setShowFullPhoto(false));
   useEscapeKey(isTxModalOpen, () => setIsTxModalOpen(false));
 
-  useClickOutside(profileContainerRef, () => setIsProfileDropdownOpen(false));
   useClickOutside(workspaceContainerRef, () =>
     setIsWorkspaceSwitcherOpen(false),
   );
@@ -1121,134 +1117,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </button>
             </Tooltip>
 
-            {/* User Profile Dropdown */}
-            <div className="relative" ref={profileContainerRef}>
-              <button
-                onClick={() => setIsProfileDropdownOpen((prev) => !prev)}
-                className="tour-nav-profile flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-              >
-                <UserAvatar
-                  name={user?.displayName}
-                  avatarBase64={avatarBase64}
-                  photoURL={user?.photoURL}
-                  size={32}
-                />
-                <span className="hidden sm:block font-medium text-sm text-slate-700 dark:text-slate-200 max-w-[100px] truncate">
-                  {user?.displayName || "User"}
-                </span>
-                <ChevronDown
-                  size={14}
-                  className="text-slate-400 hidden sm:block"
-                />
-              </button>
-
-              <AnimatePresence>
-                {isProfileDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                    className="absolute right-0 top-full mt-2 w-[360px] max-w-[calc(100vw-2rem)] bg-white dark:bg-[#2d2e30] rounded-[28px] shadow-2xl border border-slate-200 dark:border-white/5 z-50 overflow-hidden text-center p-4"
-                    style={{ originX: 1, originY: 0 }}
-                  >
-                    {/* Header with Exit */}
-                    <div className="flex items-center justify-between mb-2 px-2">
-                      <div className="flex-1 text-center">
-                        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                          {user?.email}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                        className="p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors text-slate-500"
-                      >
-                        <X size={20} />
-                      </button>
-                    </div>
-
-                    {/* Main Profile Info */}
-                    <div className="flex flex-col items-center py-4">
-                      <div className="relative group mb-4">
-                        <UserAvatar
-                          name={user?.displayName}
-                          avatarBase64={avatarBase64}
-                          photoURL={user?.photoURL}
-                          size={80}
-                          editable
-                          onEditClick={() => {
-                            setIsProfileDropdownOpen(false);
-                            setIsChangePhotoOpen(true);
-                          }}
-                          className="border-4 border-slate-50 dark:border-zinc-800 shadow-md"
-                        />
-                      </div>
-
-                      <h2 className="text-2xl font-normal text-slate-900 dark:text-white mb-4">
-                        Hi, {user?.displayName?.split(" ")[0] || "User"}!
-                      </h2>
-
-                      <button
-                        onClick={() => {
-                          setIsProfileDropdownOpen(false);
-                          navigate("/account-info");
-                        }}
-                        className="px-6 py-2.5 rounded-full border border-slate-300 dark:border-slate-600 text-sm font-medium text-brand-600 dark:text-brand-300 hover:bg-brand-50 dark:hover:bg-brand-500/10 transition-colors mb-2"
-                      >
-                        Manage your Budgeity Account
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsProfileDropdownOpen(false);
-                          navigate("/settings");
-                        }}
-                        className="px-6 py-2.5 rounded-full bg-slate-50 border border-slate-200 dark:bg-zinc-800 dark:border-zinc-700 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-zinc-700 transition-colors mb-6 shadow-sm"
-                      >
-                        Tweak your Budgeity experience
-                      </button>
-                    </div>
-
-                    {/* Action Row */}
-                    <div className="flex gap-2 mb-4">
-                      {/* Add account button removed as requested */}
-                      <button
-                        onClick={() => {
-                          setIsProfileDropdownOpen(false);
-                          logout();
-                        }}
-                        className="flex-1 flex items-center justify-center gap-3 p-4 rounded-3xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors group"
-                      >
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 group-hover:bg-white dark:group-hover:bg-zinc-800 transition-colors">
-                          <LogOutIconAnimated size={20} />
-                        </div>
-                        <span className="font-medium text-sm text-slate-700 dark:text-slate-200">
-                          Sign out
-                        </span>
-                      </button>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
-                      <Link
-                        to="/privacy-policy"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                        className="hover:underline"
-                      >
-                        Privacy Policy
-                      </Link>
-                      <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
-                      <Link
-                        to="/terms-of-service"
-                        onClick={() => setIsProfileDropdownOpen(false)}
-                        className="hover:underline"
-                      >
-                        Terms of Service
-                      </Link>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <ProfileDropdown
+              onEditPhotoClick={() => setIsChangePhotoOpen(true)}
+              onViewPhotoClick={() => setShowFullPhoto(true)}
+            />
           </div>
         </header>
 

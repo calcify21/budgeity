@@ -1812,14 +1812,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({
   const resetData = () => syncState(INITIAL_STATE);
 
   const formatAmount = (amount: number) => {
-    let locale = "en-US";
+    let locale = state.language === "hi" ? "hi-IN-u-nu-deva" : state.language === "fr" ? "fr-FR" : "en-US";
     const indianCurrencies = ["INR", "PKR", "BDT", "NPR", "LKR"];
     const sys = state.numberSystem || "AUTO";
     if (
       sys === "IN" ||
       (sys === "AUTO" && indianCurrencies.includes(state.currency))
     )
-      locale = "en-IN";
+      locale = state.language === "hi" ? "hi-IN-u-nu-deva" : "en-IN";
     return formatCurrency(amount, state.currency, state.hideAmounts, locale);
   };
 

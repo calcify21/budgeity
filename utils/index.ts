@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import * as LucideIcons from "lucide-react";
+import i18next from "i18next";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -261,46 +262,14 @@ export const formatAmountInWords = (
   system: "IN" | "INTL" | "AUTO" = "AUTO",
   currency: string = "USD",
 ): string => {
-  if (amount === 0) return "Zero";
-  if (isNaN(amount)) return "Not a Number";
-  if (!isFinite(amount)) return "Infinity";
+  if (amount === 0) return i18next.t("numbers.zero");
+  if (isNaN(amount)) return i18next.t("numbers.nan");
+  if (!isFinite(amount)) return i18next.t("numbers.infinity");
 
-  const ones = [
-    "",
-    "One",
-    "Two",
-    "Three",
-    "Four",
-    "Five",
-    "Six",
-    "Seven",
-    "Eight",
-    "Nine",
-  ];
-  const teens = [
-    "Ten",
-    "Eleven",
-    "Twelve",
-    "Thirteen",
-    "Fourteen",
-    "Fifteen",
-    "Sixteen",
-    "Seventeen",
-    "Eighteen",
-    "Nineteen",
-  ];
-  const tens = [
-    "",
-    "",
-    "Twenty",
-    "Thirty",
-    "Forty",
-    "Fifty",
-    "Sixty",
-    "Seventy",
-    "Eighty",
-    "Ninety",
-  ];
+  const ones = i18next.t("numbers.ones", { returnObjects: true }) as string[];
+  const teens = i18next.t("numbers.teens", { returnObjects: true }) as string[];
+  const tens = i18next.t("numbers.tens", { returnObjects: true }) as string[];
+  const hundredStr = i18next.t("numbers.scales.hundred");
 
   const convertLessThanOneThousand = (n: number): string => {
     if (n === 0 || isNaN(n) || !isFinite(n)) return "";
@@ -309,21 +278,21 @@ export const formatAmountInWords = (
     const ten = Math.floor(n / 10);
     const one = n % 10;
     if (n < 100) return `${tens[ten]} ${ones[one]}`.trim();
-    return `${ones[Math.floor(n / 100)]} Hundred ${convertLessThanOneThousand(n % 100)}`.trim();
+    return `${ones[Math.floor(n / 100)]} ${hundredStr} ${convertLessThanOneThousand(n % 100)}`.trim();
   };
 
   const formatIndian = (num: number): string => {
     if (num === 0 || isNaN(num) || !isFinite(num)) return "";
     if (num < 1000) return convertLessThanOneThousand(num);
     const scaleValues = [
-      { v: 100000000000000000, n: "Shankh" },
-      { v: 1000000000000000, n: "Padma" },
-      { v: 10000000000000, n: "Neel" },
-      { v: 100000000000, n: "Kharab" },
-      { v: 1000000000, n: "Arab" },
-      { v: 10000000, n: "Crore" },
-      { v: 100000, n: "Lakh" },
-      { v: 1000, n: "Thousand" },
+      { v: 100000000000000000, n: i18next.t("numbers.scales.shankh") },
+      { v: 1000000000000000, n: i18next.t("numbers.scales.padma") },
+      { v: 10000000000000, n: i18next.t("numbers.scales.neel") },
+      { v: 100000000000, n: i18next.t("numbers.scales.kharab") },
+      { v: 1000000000, n: i18next.t("numbers.scales.arab") },
+      { v: 10000000, n: i18next.t("numbers.scales.crore") },
+      { v: 100000, n: i18next.t("numbers.scales.lakh") },
+      { v: 1000, n: i18next.t("numbers.scales.thousand") },
     ];
 
     for (const scale of scaleValues) {
@@ -342,12 +311,12 @@ export const formatAmountInWords = (
     if (num === 0 || isNaN(num) || !isFinite(num)) return "";
     if (num < 1000) return convertLessThanOneThousand(num);
     const scaleValues = [
-      { v: 1000000000000000000, n: "Quintillion" },
-      { v: 1000000000000000, n: "Quadrillion" },
-      { v: 1000000000000, n: "Trillion" },
-      { v: 1000000000, n: "Billion" },
-      { v: 1000000, n: "Million" },
-      { v: 1000, n: "Thousand" },
+      { v: 1000000000000000000, n: i18next.t("numbers.scales.quintillion") },
+      { v: 1000000000000000, n: i18next.t("numbers.scales.quadrillion") },
+      { v: 1000000000000, n: i18next.t("numbers.scales.trillion") },
+      { v: 1000000000, n: i18next.t("numbers.scales.billion") },
+      { v: 1000000, n: i18next.t("numbers.scales.million") },
+      { v: 1000, n: i18next.t("numbers.scales.thousand") },
     ];
 
     for (const scale of scaleValues) {
@@ -368,17 +337,10 @@ export const formatAmountInWords = (
     (system === "AUTO" && indianCurrencies.includes(currency));
 
   let integerPart = Math.floor(Math.abs(amount));
-
-  let result = "";
-
-  if (useIndianSystem) {
-    result = formatIndian(integerPart);
-  } else {
-    result = formatIntl(integerPart);
-  }
+  let result = useIndianSystem ? formatIndian(integerPart) : formatIntl(integerPart);
 
   result = result.trim();
-  if (!result) result = "Zero";
+  if (!result) result = i18next.t("numbers.zero");
 
   return result;
 };

@@ -267,6 +267,7 @@ const OnboardingWizard: React.FC = () => {
   const [otherReferralText, setOtherReferralText] = useState("");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const otherInputContainerRef = useRef<HTMLDivElement>(null);
 
   const [wizard, setWizard] = useState<WizardState>({
     primaryGoal: "track_spending",
@@ -303,6 +304,14 @@ const OnboardingWizard: React.FC = () => {
       update("displayName", user.displayName || user.email?.split("@")[0] || "");
     }
   }, [user]);
+
+  useEffect(() => {
+    if (wizard.hearAboutUs === "other") {
+      setTimeout(() => {
+        otherInputContainerRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 100);
+    }
+  }, [wizard.hearAboutUs]);
 
   const update = <K extends keyof WizardState>(key: K, value: WizardState[K]) => {
     setWizard((prev) => ({ ...prev, [key]: value }));
@@ -544,9 +553,9 @@ const OnboardingWizard: React.FC = () => {
   }));
 
   const numberSystemOptions = [
-    { value: "AUTO", label: "Auto (Based on Currency)", subLabel: "Recommended" },
-    { value: "IN", label: "Indian System", subLabel: "12,34,567.89" },
-    { value: "INTL", label: "International System", subLabel: "1,234,567.89" },
+    { value: "AUTO", label: t("settingsPage.autoSystem"), subLabel: t("settingsPage.recommended") },
+    { value: "IN", label: t("settingsPage.indianSystem"), subLabel: t("settingsPage.indianExample") },
+    { value: "INTL", label: t("settingsPage.intlSystem"), subLabel: t("settingsPage.intlExample") },
   ];
 
   const languageOptions = [
@@ -599,10 +608,10 @@ const OnboardingWizard: React.FC = () => {
             transition={{ delay: 0.7 }}
           >
             <h1 className="text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
-              You're All Set! 🎉
+              {t("onboarding.all_set")}
             </h1>
             <p className="text-slate-500 dark:text-zinc-400 mt-3 text-lg">
-              Your financial command center is ready.
+              {t("onboarding.ready_desc")}
             </p>
           </MotionDiv>
 
@@ -612,7 +621,7 @@ const OnboardingWizard: React.FC = () => {
             transition={{ delay: 1.2 }}
           >
             <p className="text-sm text-slate-400 dark:text-zinc-500">
-              Entering dashboard in a moment...
+              {t("onboarding.entering_desc")}
             </p>
           </MotionDiv>
         </MotionDiv>
@@ -633,6 +642,7 @@ const OnboardingWizard: React.FC = () => {
           stiffness: 100,
           damping: 15,
           delay: 0.2,
+          filter: { type: "tween", ease: "easeOut", duration: 0.5 },
         }}
         className="relative w-32 h-32 flex items-center justify-center"
       >
@@ -652,10 +662,16 @@ const OnboardingWizard: React.FC = () => {
         <motion.h1
           initial={{ opacity: 0, y: 30, filter: "blur(5px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          transition={{ type: "spring", stiffness: 100, damping: 20, delay: 0.5 }}
+          transition={{
+            type: "spring",
+            stiffness: 100,
+            damping: 20,
+            delay: 0.5,
+            filter: { type: "tween", ease: "easeOut", duration: 0.4 },
+          }}
           className="text-4xl sm:text-5xl font-black tracking-tight text-slate-900 dark:text-white"
         >
-          Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-indigo-600 dark:from-brand-400 dark:to-indigo-400">Budgeity</span>
+          {t("onboarding.welcome")} <span className="bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-indigo-600 dark:from-brand-400 dark:to-indigo-400">Budgeity</span>
         </motion.h1>
         
         <motion.p
@@ -664,20 +680,20 @@ const OnboardingWizard: React.FC = () => {
           transition={{ duration: 0.5, delay: 0.7 }}
           className="text-base sm:text-lg text-slate-500 dark:text-zinc-400 max-w-sm mx-auto font-medium"
         >
-          Your premium, secure, and beautiful financial command center. Take control of your money with style.
+          {t("onboarding.welcome_desc")}
         </motion.p>
       </div>
 
       {/* Interactive Micro-animations element */}
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 1, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.6 }}
         className="w-full flex items-center justify-center gap-1.5 py-3 px-6 bg-brand-500/5 border border-brand-500/10 rounded-full max-w-xs text-sm font-bold text-brand-600 dark:text-brand-400 cursor-default transition-all duration-300 backdrop-blur-sm select-none"
       >
         <Sparkles size={16} className="animate-spin-slow text-indigo-500 shrink-0" />
         <span className="flex items-center">
-          Let's start
+          {t("onboarding.lets_start")}
           <span className="inline-block w-5 text-left ml-0.5">{dots}</span>
         </span>
       </motion.div>
@@ -694,7 +710,7 @@ const OnboardingWizard: React.FC = () => {
           target="_blank"
           className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors underline underline-offset-4"
         >
-          Privacy Policy
+          {t("onboarding.privacy_policy")}
         </Link>
         <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-zinc-800" />
         <Link
@@ -702,7 +718,7 @@ const OnboardingWizard: React.FC = () => {
           target="_blank"
           className="hover:text-brand-500 dark:hover:text-brand-400 transition-colors underline underline-offset-4"
         >
-          Terms of Service
+          {t("onboarding.terms_of_service")}
         </Link>
       </motion.div>
     </div>
@@ -715,10 +731,10 @@ const OnboardingWizard: React.FC = () => {
           <UserCircle size={28} className="text-white" />
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-          Your Profile
+          {t("onboarding.profile")}
         </h2>
         <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-          Please confirm your display name and email address
+          {t("onboarding.profile_desc")}
         </p>
       </div>
 
@@ -726,7 +742,7 @@ const OnboardingWizard: React.FC = () => {
         {/* Email Address - Read only */}
         <div>
           <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
-            Registered Email Address
+            {t("onboarding.registered_email")}
           </label>
           <div className="relative flex items-center">
             <Mail className="absolute left-4 text-slate-400" size={18} />
@@ -743,7 +759,7 @@ const OnboardingWizard: React.FC = () => {
         {/* Display Name - Editable */}
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-            What should we call you? (Display Name)
+            {t("onboarding.display_name_label")}
           </label>
           <div className="relative flex items-center">
             <UserCircle className="absolute left-4 text-brand-500" size={18} />
@@ -751,13 +767,13 @@ const OnboardingWizard: React.FC = () => {
               type="text"
               value={wizard.displayName}
               onChange={(e) => update("displayName", e.target.value)}
-              placeholder="e.g. Shruti Jain"
+              placeholder={t("onboarding.display_name_placeholder")}
               className="w-full pl-12 pr-4 py-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:border-brand-500 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-950 dark:text-white transition-all"
             />
           </div>
           {wizard.displayName.trim().length === 0 && (
             <p className="text-xs text-rose-500 font-bold ml-4 mt-1">
-              Please enter your name to proceed.
+              {t("onboarding.display_name_error")}
             </p>
           )}
         </div>
@@ -773,10 +789,10 @@ const OnboardingWizard: React.FC = () => {
             <Sparkles size={30} className="text-white animate-pulse" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-            How did you hear about us?
+            {t("onboarding.referral_title")}
           </h2>
           <p className="text-slate-500 dark:text-zinc-400 mt-2 text-sm font-medium">
-            Help us understand how you found Budgeity
+            {t("onboarding.referral_subtitle")}
           </p>
         </div>
 
@@ -812,7 +828,7 @@ const OnboardingWizard: React.FC = () => {
                       ? "font-bold text-brand-600 dark:text-brand-400"
                       : "font-semibold text-slate-700 dark:text-zinc-300 group-hover:text-slate-900 dark:group-hover:text-white"
                   )}>
-                    {opt.text}
+                    {t(`onboarding.referral.${opt.id}` as any)}
                   </div>
                 </div>
               </button>
@@ -822,18 +838,19 @@ const OnboardingWizard: React.FC = () => {
 
         {wizard.hearAboutUs === "other" && (
           <motion.div
+            ref={otherInputContainerRef}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="space-y-2"
           >
             <label className="block text-xs font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-wider">
-              Where did you hear about us? (Optional)
+              {t("onboarding.referral_other_label")}
             </label>
             <input
               type="text"
               value={otherReferralText}
               onChange={(e) => setOtherReferralText(e.target.value)}
-              placeholder="e.g. A specific blog post, podcast, or website..."
+              placeholder={t("onboarding.referral_other_placeholder")}
               className="w-full px-4 py-3 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 focus:border-brand-500 rounded-2xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500/20 text-slate-950 dark:text-white transition-all shadow-sm"
             />
           </motion.div>
@@ -849,17 +866,17 @@ const OnboardingWizard: React.FC = () => {
           <Globe size={28} className="text-white" />
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Localization
+          {t("onboarding.localization_title")}
         </h2>
         <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-          Set your currency and number format
+          {t("onboarding.localization_subtitle")}
         </p>
       </div>
 
       <div className="space-y-5">
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-            Currency
+            {t("onboarding.currency")}
           </label>
           <div className="flex gap-2">
             <div className="flex-1">
@@ -868,7 +885,7 @@ const OnboardingWizard: React.FC = () => {
                 onChange={(v) => update("currency", v)}
                 options={currencyOptions}
                 searchable
-                placeholder="Select Currency"
+                placeholder={t("settingsPage.preferencePlaceholder")}
               />
             </div>
             <button
@@ -882,7 +899,7 @@ const OnboardingWizard: React.FC = () => {
                 <Globe size={18} />
               )}
               <span className="hidden sm:inline">
-                {isLoadingLocation ? "Locating..." : "Auto"}
+                {isLoadingLocation ? t("onboarding.locating") : t("onboarding.auto_btn")}
               </span>
             </button>
           </div>
@@ -890,19 +907,19 @@ const OnboardingWizard: React.FC = () => {
 
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-            Number Format
+            {t("onboarding.number_format")}
           </label>
           <CustomSelect
             value={wizard.numberSystem}
             onChange={(v) => update("numberSystem", v as any)}
             options={numberSystemOptions}
-            placeholder="Select Number System"
+            placeholder={t("settingsPage.selectNumberSystem")}
           />
         </div>
 
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
-            Language
+            {t("onboarding.language")}
           </label>
           <CustomSelect
             value={wizard.language}
@@ -911,7 +928,7 @@ const OnboardingWizard: React.FC = () => {
               i18n.changeLanguage(v as string);
             }}
             options={languageOptions}
-            placeholder="Select Language"
+            placeholder={t("settingsPage.selectLanguage")}
           />
         </div>
       </div>
@@ -920,9 +937,9 @@ const OnboardingWizard: React.FC = () => {
 
   const renderStep5 = () => {
     const walletTypeOptions = [
-      { value: "cash", label: "Cash" },
-      { value: "bank", label: "Bank" },
-      { value: "savings", label: "Savings" },
+      { value: "cash", label: t("walletModal.cash") },
+      { value: "bank", label: t("walletModal.bank") },
+      { value: "savings", label: t("walletModal.savings") },
     ];
 
     return (
@@ -932,10 +949,10 @@ const OnboardingWizard: React.FC = () => {
             <Wallet size={28} className="text-white" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Your Accounts
+            {t("onboarding.accounts_title")}
           </h2>
           <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-            Set up your starting balances
+            {t("onboarding.accounts_subtitle")}
           </p>
         </div>
 
@@ -979,14 +996,14 @@ const OnboardingWizard: React.FC = () => {
                             </div>
                             <div>
                               <div className="font-bold text-sm text-slate-900 dark:text-white">
-                                {w.type === "cash" && "Cash Wallet"}
-                                {w.type === "bank" && "Bank Account"}
-                                {w.type === "savings" && "Savings Account"}
+                                {w.type === "cash" && t("walletModal.cash")}
+                                {w.type === "bank" && t("walletModal.bank")}
+                                {w.type === "savings" && t("walletModal.savings")}
                               </div>
                               <div className="text-[11px] text-slate-500">
-                                {w.type === "cash" && "Physical cash on hand"}
-                                {w.type === "bank" && "Your primary bank"}
-                                {w.type === "savings" && "Your savings & deposits"}
+                                {w.type === "cash" && t("walletModal.cashDesc")}
+                                {w.type === "bank" && t("walletModal.bankDesc")}
+                                {w.type === "savings" && t("walletModal.savingsDesc")}
                               </div>
                             </div>
                           </div>
@@ -1004,7 +1021,7 @@ const OnboardingWizard: React.FC = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                              Name
+                              {t("walletModal.nameLabel")}
                             </label>
                             <input
                               value={w.name}
@@ -1014,12 +1031,12 @@ const OnboardingWizard: React.FC = () => {
                                 update("wallets", newWallets);
                               }}
                               className="w-full px-3 py-2.5 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                              placeholder="Account name"
+                              placeholder={t("walletModal.namePlaceholder")}
                             />
                           </div>
                           <div>
                             <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                              Type
+                              {t("walletModal.typeLabel")}
                             </label>
                             <CustomSelect
                               value={w.type}
@@ -1035,7 +1052,7 @@ const OnboardingWizard: React.FC = () => {
                           </div>
                           <div>
                             <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                              Balance
+                              {t("walletModal.balanceLabel")}
                             </label>
                             <input
                               type="number"
@@ -1070,7 +1087,7 @@ const OnboardingWizard: React.FC = () => {
             className="w-full flex items-center justify-center gap-2 py-4 border-2 border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl text-slate-500 dark:text-zinc-400 font-bold hover:bg-slate-50 dark:hover:bg-zinc-900/50 hover:text-brand-500 transition-colors"
           >
             <Plus size={18} />
-            Add another account
+            {t("onboarding.add_another_member")}
           </button>
         </div>
       </div>
@@ -1088,10 +1105,10 @@ const OnboardingWizard: React.FC = () => {
           )}
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Appearance
+          {t("onboarding.appearance_title")}
         </h2>
         <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-          Customize how Budgeity looks and feels
+          {t("onboarding.appearance_subtitle")}
         </p>
       </div>
 
@@ -1104,10 +1121,10 @@ const OnboardingWizard: React.FC = () => {
             </div>
             <div>
               <div className="font-bold text-slate-900 dark:text-white">
-                Dark Mode
+                {t("onboarding.dark_mode")}
               </div>
               <div className="text-xs text-slate-500 dark:text-zinc-400">
-                Easy on the eyes, especially at night
+                {t("onboarding.dark_mode_desc")}
               </div>
             </div>
           </div>
@@ -1130,7 +1147,7 @@ const OnboardingWizard: React.FC = () => {
         {/* Accent Theme Selection */}
         <div className="p-4 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-2xl">
           <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-4">
-            Accent Theme Color
+            {t("onboarding.accent_theme")}
           </label>
           <div className="flex flex-wrap items-center justify-center gap-4 py-1">
             {ACCENT_THEMES.map((accent) => {
@@ -1166,10 +1183,10 @@ const OnboardingWizard: React.FC = () => {
             </div>
             <div>
               <div className="font-bold text-slate-900 dark:text-white">
-                Privacy Mode
+                {t("onboarding.privacy_mode")}
               </div>
               <div className="text-xs text-slate-500 dark:text-zinc-400">
-                Hide balances from prying eyes
+                {t("onboarding.privacy_mode_desc")}
               </div>
             </div>
           </div>
@@ -1199,10 +1216,10 @@ const OnboardingWizard: React.FC = () => {
           <UserCircle size={28} className="text-white" />
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Profile & Security
+          {t("onboarding.security_title")}
         </h2>
         <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-          Personalize and secure your account
+          {t("onboarding.security_subtitle")}
         </p>
       </div>
 
@@ -1220,10 +1237,10 @@ const OnboardingWizard: React.FC = () => {
             </div>
             <div>
               <div className="font-bold text-slate-900 dark:text-white">
-                Profile Photo
+                {t("onboarding.profile_photo")}
               </div>
               <div className="text-xs text-slate-500 dark:text-zinc-400">
-                {pendingAvatarBase64 ? "Photo set ✓" : "Add your photo"}
+                {pendingAvatarBase64 ? t("onboarding.photo_set") : t("onboarding.add_photo")}
               </div>
             </div>
           </div>
@@ -1232,7 +1249,7 @@ const OnboardingWizard: React.FC = () => {
             className="px-4 py-2 text-sm font-bold bg-slate-100 dark:bg-zinc-800 hover:bg-brand-50 dark:hover:bg-brand-500/10 text-slate-700 dark:text-zinc-300 hover:text-brand-600 rounded-xl transition-colors flex items-center gap-2"
           >
             <Camera size={16} />
-            Upload
+            {t("onboarding.upload_btn")}
           </button>
           <input
             ref={fileInputRef}
@@ -1246,7 +1263,7 @@ const OnboardingWizard: React.FC = () => {
         {/* Solo vs Shared — Shows unconditionally now */}
         <div>
           <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
-            Who are you tracking with?
+            {t("onboarding.tracking_title")}
           </label>
           <div className="grid grid-cols-2 gap-3">
               <button
@@ -1259,8 +1276,8 @@ const OnboardingWizard: React.FC = () => {
                 )}
               >
                 <UserCircle size={24} className="text-brand-500 mb-2" />
-                <div className="font-bold text-sm dark:text-white">Just Me</div>
-                <div className="text-[11px] text-slate-500 dark:text-zinc-400">Personal tracking</div>
+                <div className="font-bold text-sm dark:text-white">{t("onboarding.just_me")}</div>
+                <div className="text-[11px] text-slate-500 dark:text-zinc-400">{t("onboarding.personal_tracking")}</div>
               </button>
               <button
                 onClick={() => update("trackingMode", "shared")}
@@ -1272,8 +1289,8 @@ const OnboardingWizard: React.FC = () => {
                 )}
               >
                 <Users size={24} className="text-purple-500 mb-2" />
-                <div className="font-bold text-sm dark:text-white">With Family</div>
-                <div className="text-[11px] text-slate-500 dark:text-zinc-400">Shared household</div>
+                <div className="font-bold text-sm dark:text-white">{t("onboarding.with_family")}</div>
+                <div className="text-[11px] text-slate-500 dark:text-zinc-400">{t("onboarding.shared_household")}</div>
               </button>
             </div>
           </div>
@@ -1290,19 +1307,19 @@ const OnboardingWizard: React.FC = () => {
               <div className="space-y-3 pt-1">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1">
-                    Household Name
+                    {t("onboarding.household_name")}
                   </label>
                   <input
                     value={wizard.householdName}
                     onChange={(e) => update("householdName", e.target.value)}
                     className="w-full px-4 py-3 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                    placeholder="e.g., My Family"
+                    placeholder={t("onboarding.household_placeholder")}
                   />
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
                     <label className="block text-[10px] font-bold text-slate-400 uppercase">
-                      Invite Members (optional)
+                      {t("onboarding.invite_members")}
                     </label>
                   </div>
                   <div>
@@ -1332,7 +1349,7 @@ const OnboardingWizard: React.FC = () => {
                                     update("inviteEmails", newEmails);
                                   }}
                                   className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-medium outline-none focus:ring-2 focus:ring-brand-500 dark:text-white"
-                                  placeholder="partner@email.com"
+                                  placeholder={t("onboarding.invite_placeholder")}
                                 />
                               </div>
                               {wizard.inviteEmails.length > 1 && (
@@ -1354,7 +1371,7 @@ const OnboardingWizard: React.FC = () => {
                         onClick={() => update("inviteEmails", [...wizard.inviteEmails, { id: Math.random().toString(), email: "" }])}
                         className="text-brand-500 pt-1 text-xs font-bold flex items-center gap-1 hover:text-brand-600 transition-colors"
                       >
-                        <Plus size={14} /> Add another member
+                        <Plus size={14} /> {t("onboarding.add_another_member")}
                       </button>
                     </div>
                   </div>
@@ -1374,10 +1391,10 @@ const OnboardingWizard: React.FC = () => {
           <ShieldCheck size={28} className="text-white" />
         </div>
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          App Security
+          {t("onboarding.app_security_title")}
         </h2>
         <p className="text-slate-500 dark:text-zinc-400 mt-1 text-sm">
-          Lock the app with biometrics, pattern, or a PIN
+          {t("onboarding.app_security_subtitle")}
         </p>
       </div>
 
@@ -1429,7 +1446,7 @@ const OnboardingWizard: React.FC = () => {
         {/* Step Label */}
         <div className="text-center mb-2">
           <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500 uppercase tracking-widest">
-            Step {step} of {TOTAL_STEPS}
+            {t("onboarding.step_label", { step, total: TOTAL_STEPS })}
           </span>
         </div>
 
@@ -1459,7 +1476,7 @@ const OnboardingWizard: React.FC = () => {
                 className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-slate-500 hover:text-slate-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors rounded-xl hover:bg-slate-100 dark:hover:bg-zinc-800"
               >
                 <ArrowLeft size={16} />
-                Back
+                {t("onboarding.prev_btn")}
               </button>
             ) : (
               <div />
@@ -1480,7 +1497,7 @@ const OnboardingWizard: React.FC = () => {
                   disabled={!canProceed()}
                   className="flex items-center gap-2 px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-2xl shadow-xl shadow-brand-500/20 transition-all active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Continue
+                  {t("onboarding.next_btn")}
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -1494,7 +1511,7 @@ const OnboardingWizard: React.FC = () => {
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    Get Started
+                    {t("onboarding.finish_btn")}
                     <Sparkles size={18} />
                   </>
                 )}

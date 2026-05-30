@@ -3,6 +3,7 @@ import { driver, Driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useData } from "./DataContext";
+import { useTranslation } from "react-i18next";
 
 interface TourContextType {
   startTour: () => void;
@@ -43,6 +44,7 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
   const { tourCompleted, completeTour, isLoadingData, isOnboarding } =
     useData();
   const driverObj = useRef<Driver | null>(null);
@@ -60,10 +62,10 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       stageRadius: 16,
       popoverClass: "budgeity-tour-popover",
       steps: [],
-      nextBtnText: "Next",
-      prevBtnText: "Back",
-      doneBtnText: "🎉 Let's Go!",
-      progressText: "{{current}} of {{total}}",
+      nextBtnText: t("tour.nextBtnText"),
+      prevBtnText: t("tour.prevBtnText"),
+      doneBtnText: t("tour.doneBtnText"),
+      progressText: `${t("tour.progressCurrent")} {{current}} ${t("tour.progressOf")} {{total}}`,
       onHighlightStarted: (element) => {
         // Auto-scroll sidebar nav items into the visible area
         if (element && (element as HTMLElement).closest?.("nav")) {
@@ -92,7 +94,7 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
   // Initialize
   useEffect(() => {
     createDriver();
-  }, [completeTour]);
+  }, [completeTour, t]);
 
   const startTour = () => {
     if (!driverObj.current) createDriver();
@@ -154,8 +156,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     // Welcome
     add(
       "body",
-      "👋 Welcome to Budgeity!",
-      "Your intelligent financial command center is ready. We'll walk you through <strong>every feature</strong> so you become a power user in minutes!",
+      t("tour.welcome_title"),
+      t("tour.welcome_desc"),
       "left",
       "start",
     );
@@ -163,29 +165,29 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     // Header
     add(
       ".tour-nav-workspace",
-      "🔄 Workspace Switcher",
-      "Toggle between your <strong>Personal</strong> space and shared <strong>Households</strong>. Each workspace has its own wallets, budgets, and analytics.",
+      t("tour.workspace_switcher_title"),
+      t("tour.workspace_switcher_desc"),
       "bottom",
       "start",
     );
     add(
       ".tour-nav-theme",
-      "🌗 Theme Toggle",
-      "Switch between <strong>Light</strong> and <strong>Dark Mode</strong> instantly. Your preference syncs across devices.",
+      t("tour.theme_toggle_title"),
+      t("tour.theme_toggle_desc"),
       "bottom",
       "end",
     );
     add(
       ".tour-nav-lock",
-      "🔒 Instant App Lock",
-      "Need to step away? Head here to <strong>manually lock Budgeity</strong> instantly. High-security financial data stays protected.",
+      t("tour.instant_app_lock_title"),
+      t("tour.instant_app_lock_desc"),
       "bottom",
       "end",
     );
     add(
       ".tour-nav-profile",
-      "👤 Profile Menu",
-      "Access your <strong>avatar</strong>, <strong>account settings</strong>, and <strong>logout</strong> from this dropdown.",
+      t("tour.profile_menu_title"),
+      t("tour.profile_menu_desc"),
       "bottom",
       "end",
     );
@@ -193,15 +195,15 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     // Dashboard controls
     add(
       ".tour-dash-time-range",
-      "📅 Time Range",
-      "Controls <strong>every widget</strong> simultaneously. Pick This Month, Last 3 Months, This Year, or a Custom Range — all charts update instantly.",
+      t("tour.time_range_title"),
+      t("tour.time_range_desc"),
       "bottom",
       "end",
     );
     add(
       ".tour-dash-edit-layout",
-      "⚙️ Edit Layout",
-      "<strong>Drag & drop</strong> to reorder widgets, toggle them on/off, and craft the perfect dashboard for your goals.",
+      t("tour.edit_layout_title"),
+      t("tour.edit_layout_desc"),
       "bottom",
       "end",
     );
@@ -209,43 +211,43 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     // Widgets
     add(
       ".tour-net-worth",
-      "💰 Net Worth",
-      "Your <strong>total wealth</strong> across all wallets and goals. Updates with every transaction automatically.",
+      t("tour.net_worth_title"),
+      t("tour.net_worth_desc"),
       "bottom",
       "start",
     );
     add(
       ".tour-income-expense",
-      "📊 Income & Expense",
-      "Two cards: <strong>green = Income</strong>, <strong>red = Expenses</strong>. Transfers between your own wallets are excluded for accuracy.",
+      t("tour.income_expense_title"),
+      t("tour.income_expense_desc"),
       "bottom",
       "start",
     );
     add(
       ".tour-dash-snapshot",
-      "📈 Financial Snapshot",
-      "• <strong>Savings Rate</strong> — % of income you're keeping<br/>• <strong>Daily Burn</strong> — avg spend per day<br/>• <strong>Projected Spend</strong> — estimated total with ⚠️ overspend alerts",
+      t("tour.snapshot_title"),
+      t("tour.snapshot_desc"),
       "top",
       "start",
     );
     add(
       ".tour-balance-trend",
-      "📉 Balance Trend",
-      "Interactive line chart showing <strong>how your balance changes over time</strong>. Spot patterns and track growth visually.",
+      t("tour.balance_trend_title"),
+      t("tour.balance_trend_desc"),
       "top",
       "start",
     );
     add(
       ".tour-dash-wallet-flow",
-      "🏦 Wallet Flow",
-      "See money flowing <strong>in and out of each wallet</strong> individually. Understand your routing patterns at a glance.",
+      t("tour.wallet_flow_title"),
+      t("tour.wallet_flow_desc"),
       "top",
       "start",
     );
     add(
       ".tour-dash-planned",
-      "🛒 Planned Spending",
-      "Total estimated cost of your <strong>active Shopping List</strong> items. Click to jump to your list.",
+      t("tour.planned_spending_title"),
+      t("tour.planned_spending_desc"),
       "top",
       "start",
     );
@@ -256,9 +258,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       steps.push({
         element: resolvedFabSelector,
         popover: {
-          title: "＋ Add Transaction",
-          description:
-            "The <strong>most important button</strong> in Budgeity. Let's open it and walk through how to log expenses, income, and transfers!",
+          title: t("tour.add_transaction_title"),
+          description: t("tour.add_transaction_desc"),
           side: window.innerWidth < 1024 ? "top" : "left",
           align: "end",
           onNextClick: () => {
@@ -295,9 +296,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       steps.push({
         element: ".tour-trans-type",
         popover: {
-          title: "💱 Transaction Type",
-          description:
-            "Toggle between <strong>Expense</strong>, <strong>Income</strong>, or <strong>Transfer</strong>. This determines how the amount affects your wallets.",
+          title: t("tour.transaction_type_title"),
+          description: t("tour.transaction_type_desc"),
           side: "bottom",
           align: "start",
         },
@@ -309,9 +309,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       steps.push({
         element: ".tour-trans-amount",
         popover: {
-          title: "🧮 Smart Calculator",
-          description:
-            "Type an amount using the number pad below. Supports <strong>math expressions</strong> like <code>50+30</code> or <code>1200÷4</code> — it auto-evaluates!",
+          title: t("tour.smart_calculator_title"),
+          description: t("tour.smart_calculator_desc"),
           side: "top",
           align: "start",
         },
@@ -323,9 +322,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       steps.push({
         element: ".tour-trans-next",
         popover: {
-          title: "➡️ Step Flow",
-          description:
-            "Tap <strong>Next</strong> to proceed through 3 steps:<br/>1. <strong>Amount</strong> + Wallet<br/>2. <strong>Category</strong> + Subcategory<br/>3. <strong>Details</strong> — Date, Notes, and Must/Need/Want spending tags<br/><br/>Let's close this and continue the tour!",
+          title: t("tour.step_flow_title"),
+          description: t("tour.step_flow_desc"),
           side: "top",
           align: "start",
           onNextClick: () => {
@@ -417,90 +415,89 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
     // ── Main ──
     navStep(
       ".tour-nav-dashboard",
-      "🏠 Dashboard",
-      "Your <strong>command center</strong> — everything you just explored lives here. Fully customizable layout.",
+      t("tour.dashboard_title"),
+      t("tour.dashboard_desc"),
     );
     navStep(
       ".tour-nav-transactions",
-      "📝 Transactions",
-      "The <strong>universal ledger</strong>. Every expense, income, and transfer with smart filters by date, category, wallet, and type. Full edit/delete support.",
+      t("tour.transactions_title"),
+      t("tour.transactions_desc"),
     );
     navStep(
       ".tour-nav-wallets",
-      "👛 Wallets",
-      "Create unlimited <strong>Cash</strong>, <strong>Bank</strong>, and <strong>Savings</strong> accounts. Each tracks its own balance. Transfer money between wallets with full audit trail.",
+      t("tour.wallets_title"),
+      t("tour.wallets_desc"),
     );
 
     // ── Insights ──
     navStep(
       ".tour-nav-analytics",
-      "📊 Analytics",
-      "Interactive charts: <strong>category breakdown</strong>, spending trends, <strong>budget vs actual</strong>, and household <strong>member filtering</strong>.",
+      t("tour.analytics_title"),
+      t("tour.analytics_desc"),
     );
     navStep(
       ".tour-nav-analytics-v2",
-      "📊 Analytics V2",
-      "The <strong>next-generation</strong> analytics dashboard with even more visual insights, deeper drill-downs, and new chart types.",
+      t("tour.analytics_v2_title"),
+      t("tour.analytics_v2_desc"),
     );
     navStep(
       ".tour-nav-reports",
-      "📑 Reports",
-      "Generate <strong>downloadable reports</strong> in PDF, CSV, or Excel. Filter by date range and wallet for tax season or personal records.",
+      t("tour.reports_title"),
+      t("tour.reports_desc"),
     );
 
     // ── Planning ──
     navStep(
       ".tour-nav-budgets",
-      "💵 Budgets",
-      "Set <strong>monthly spending limits</strong> per category. Visual progress bars show how close you are. Overspending triggers red warnings.",
+      t("tour.budgets_title"),
+      t("tour.budgets_desc"),
     );
     navStep(
       ".tour-nav-goals",
-      "🎯 Savings Goals",
-      "Create <strong>savings targets</strong> with name, amount, and deadline. Link a wallet and watch your <strong>progress bar</strong> fill up.",
+      t("tour.goals_title"),
+      t("tour.goals_desc"),
     );
     navStep(
       ".tour-nav-subscriptions",
-      "🔄 Subscriptions",
-      "Automate <strong>rent, subscriptions, salary</strong> — any periodic transaction. Budgeity's engine auto-logs them on their due dates.",
+      t("tour.subscriptions_title"),
+      t("tour.subscriptions_desc"),
     );
     navStep(
       ".tour-nav-shopping",
-      "🛍️ Shopping List",
-      "Plan purchases with <strong>estimated costs</strong>. Tap ✅ to mark bought — auto-creates an expense transaction and updates your accounts!",
+      t("tour.shopping_title"),
+      t("tour.shopping_desc"),
     );
 
     // ── Management ──
     navStep(
       ".tour-nav-categories",
-      "🏷️ Categories",
-      "Fully customizable <strong>spending taxonomy</strong>. Add, reorder, or delete categories and subcategories to match your lifestyle.",
+      t("tour.categories_title"),
+      t("tour.categories_desc"),
     );
     navStep(
       ".tour-nav-export",
-      "📤 Export",
-      "Download your financial data in <strong>PDF, Excel, or CSV</strong>. Choose date ranges and wallets. Your data is always yours.",
+      t("tour.export_title"),
+      t("tour.export_desc"),
     );
 
     // ── General ──
     navStep(
       ".tour-nav-settings",
-      "⚙️ Settings",
-      "Configure <strong>currency</strong>, number system, <strong>App Lock</strong> (PIN/Pattern/Biometrics), language, and <strong>restart this tour</strong>.",
+      t("tour.settings_title"),
+      t("tour.settings_desc"),
     );
     navStep(
       ".tour-nav-account",
-      "🪪 Account Info",
-      "View <strong>display name</strong>, login method, account creation date, and other profile details.",
+      t("tour.account_title"),
+      t("tour.account_desc"),
     );
 
     // ── Desktop Finale ──
     steps.push({
       element: "body",
       popover: {
-        title: "🚀 You're a Budgeity Pro!",
-        description:
-          "You've explored <strong>every corner</strong> of your financial command center:<br/><br/>✅ Log expenses from the <strong>＋ button</strong><br/>✅ Track progress on the <strong>Dashboard</strong><br/>✅ Set <strong>Budgets</strong> to control spending<br/>✅ Create <strong>Goals</strong> to save smarter<br/>✅ Automate with <strong>Recurring Rules</strong><br/>✅ <strong>Export</strong> data for your records<br/><br/>Restart this tour anytime from <strong>Settings</strong>. Happy budgeting! 🎉",
+        title: t("tour.finale_title"),
+        description: t("tour.finale_desc"),
         side: "left" as const,
         align: "start" as const,
         onNextClick: () => {
@@ -582,20 +579,20 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     };
 
-    sheetStep(".tour-nav-dashboard", "🏠 Dashboard", "Your <strong>command center</strong> — everything you just explored lives here. Fully customizable layout.", false);
-    sheetStep(".tour-nav-transactions", "📝 Transactions", "The <strong>universal ledger</strong>. Every expense, income, and transfer with smart filters by date, category, wallet, and type. Full edit/delete support.", false);
-    sheetStep(".tour-nav-wallets", "👛 Wallets", "Create unlimited <strong>Cash</strong>, <strong>Bank</strong>, and <strong>Savings</strong> accounts. Each tracks its own balance. Transfer money between wallets with full audit trail.", false);
-    sheetStep(".tour-nav-analytics", "📊 Analytics", "Interactive charts: <strong>category breakdown</strong>, spending trends, <strong>budget vs actual</strong>, and household <strong>member filtering</strong>.", false);
-    sheetStep(".tour-nav-analytics-v2", "📊 Analytics V2", "The <strong>next-generation</strong> analytics dashboard with even more visual insights, deeper drill-downs, and new chart types.", false);
-    sheetStep(".tour-nav-reports", "📑 Reports", "Generate <strong>downloadable reports</strong> in PDF, CSV, or Excel. Filter by date range and wallet for tax season or personal records.", false);
-    sheetStep(".tour-nav-budgets", "💵 Budgets", "Set <strong>monthly spending limits</strong> per category. Visual progress bars show how close you are. Overspending triggers red warnings.", false);
-    sheetStep(".tour-nav-goals", "🎯 Savings Goals", "Create <strong>savings targets</strong> with name, amount, and deadline. Link a wallet and watch your <strong>progress bar</strong> fill up.", false);
-    sheetStep(".tour-nav-subscriptions", "🔄 Subscriptions", "Automate <strong>rent, subscriptions, salary</strong> — any periodic transaction. Budgeity's engine auto-logs them on their due dates.", false);
-    sheetStep(".tour-nav-shopping", "🛍️ Shopping List", "Plan purchases with <strong>estimated costs</strong>. Tap ✅ to mark bought — auto-creates an expense transaction and updates your accounts!", false);
-    sheetStep(".tour-nav-categories", "🏷️ Categories", "Fully customizable <strong>spending taxonomy</strong>. Add, reorder, or delete categories and subcategories to match your lifestyle.", false);
-    sheetStep(".tour-nav-export", "📤 Export", "Download your financial data in <strong>PDF, Excel, or CSV</strong>. Choose date ranges and wallets. Your data is always yours.", false);
-    sheetStep(".tour-nav-settings", "⚙️ Settings", "Configure <strong>currency</strong>, number system, <strong>App Lock</strong> (PIN/Pattern/Biometrics), language, and <strong>restart this tour</strong>.", false);
-    sheetStep(".tour-nav-account", "🪪 Account Info", "View <strong>display name</strong>, login method, account creation date, and other profile details.", true);
+    sheetStep(".tour-nav-dashboard", t("tour.dashboard_title"), t("tour.dashboard_desc"), false);
+    sheetStep(".tour-nav-transactions", t("tour.transactions_title"), t("tour.transactions_desc"), false);
+    sheetStep(".tour-nav-wallets", t("tour.wallets_title"), t("tour.wallets_desc"), false);
+    sheetStep(".tour-nav-analytics", t("tour.analytics_title"), t("tour.analytics_desc"), false);
+    sheetStep(".tour-nav-analytics-v2", t("tour.analytics_v2_title"), t("tour.analytics_v2_desc"), false);
+    sheetStep(".tour-nav-reports", t("tour.reports_title"), t("tour.reports_desc"), false);
+    sheetStep(".tour-nav-budgets", t("tour.budgets_title"), t("tour.budgets_desc"), false);
+    sheetStep(".tour-nav-goals", t("tour.goals_title"), t("tour.goals_desc"), false);
+    sheetStep(".tour-nav-subscriptions", t("tour.subscriptions_title"), t("tour.subscriptions_desc"), false);
+    sheetStep(".tour-nav-shopping", t("tour.shopping_title"), t("tour.shopping_desc"), false);
+    sheetStep(".tour-nav-categories", t("tour.categories_title"), t("tour.categories_desc"), false);
+    sheetStep(".tour-nav-export", t("tour.export_title"), t("tour.export_desc"), false);
+    sheetStep(".tour-nav-settings", t("tour.settings_title"), t("tour.settings_desc"), false);
+    sheetStep(".tour-nav-account", t("tour.account_title"), t("tour.account_desc"), true);
 
     // Pre-scroll first element
     if (steps.length > 0) {
@@ -617,9 +614,8 @@ export const TourProvider: React.FC<{ children: React.ReactNode }> = ({
       {
         element: "body",
         popover: {
-          title: "🚀 You're a Budgeity Pro!",
-          description:
-            "You've explored <strong>every corner</strong> of your financial command center:<br/><br/>✅ Log expenses from the <strong>＋ button</strong><br/>✅ Track progress on the <strong>Dashboard</strong><br/>✅ Set <strong>Budgets</strong> to control spending<br/>✅ Create <strong>Goals</strong> to save smarter<br/>✅ Automate with <strong>Recurring Rules</strong><br/>✅ <strong>Export</strong> data for your records<br/><br/>Restart this tour anytime from <strong>Settings</strong>. Happy budgeting! 🎉",
+          title: t("tour.finale_title"),
+          description: t("tour.finale_desc"),
           side: "left" as const,
           align: "start" as const,
           onNextClick: () => {

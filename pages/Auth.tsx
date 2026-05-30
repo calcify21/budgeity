@@ -267,19 +267,26 @@ const Auth: React.FC = () => {
             className="w-full bg-white dark:bg-black lg:bg-transparent lg:dark:bg-transparent lg:border-none lg:shadow-none bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border border-slate-200 dark:border-zinc-800 p-8 rounded-[2.5rem] shadow-2xl relative"
           >
             <div className="text-center mb-6">
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
-              {mode === "login" && "Welcome Back"}
-              {mode === "signup" && "Create Account"}
-              {mode === "forgot" && "Reset Password"}
-            </h1>
-            <p className="text-slate-500 dark:text-slate-400">
-              {mode === "login" &&
-                "Enter your credentials to access your finance dashboard."}
-              {mode === "signup" &&
-                "Start tracking your money smartly with Budgeity."}
-              {mode === "forgot" && "Enter your email to receive a reset link."}
-            </p>
-          </div>
+              <div className="flex justify-center mb-4 lg:hidden">
+                <img
+                  src={logo}
+                  alt="Budgeity Logo"
+                  className="w-16 h-16 drop-shadow-md object-contain hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 tracking-tight">
+                {mode === "login" && "Welcome Back"}
+                {mode === "signup" && "Create Account"}
+                {mode === "forgot" && "Reset Password"}
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400">
+                {mode === "login" &&
+                  "Enter your credentials to access your finance dashboard."}
+                {mode === "signup" &&
+                  "Start tracking your money smartly with Budgeity."}
+                {mode === "forgot" && "Enter your email to receive a reset link."}
+              </p>
+            </div>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <AnimatePresence mode="wait">

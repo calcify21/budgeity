@@ -1,10 +1,9 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { Wallet, TrendingUp } from "lucide-react";
 import { useData } from "../../context/DataContext";
 import { useHousehold } from "../../context/HouseholdContext";
 import { formatAmountInWords } from "../../utils";
-import { filterTransactionsByRange } from "../../utils/analytics";
 import { TimeRange } from "../../types";
 
 interface NetWorthWidgetProps {
@@ -18,14 +17,9 @@ export const NetWorthWidget: React.FC<NetWorthWidgetProps> = ({
   customStartDate,
   customEndDate,
 }) => {
-  const { t } = useTranslation();
-  const { wallets, goals, transactions, formatAmount, numberSystem, currency } = useData();
+  const { t, i18n } = useTranslation();
+  const { wallets, goals, formatAmount, numberSystem, currency } = useData();
   const { activeWorkspace, currentHousehold, currentMembers } = useHousehold();
-
-  const filteredTransactions = useMemo(
-    () => filterTransactionsByRange(transactions, timeRange, customStartDate, customEndDate),
-    [transactions, timeRange, customStartDate, customEndDate],
-  );
 
   const isHouseholdMode = activeWorkspace.type === "household";
 
@@ -43,10 +37,10 @@ export const NetWorthWidget: React.FC<NetWorthWidgetProps> = ({
       <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-indigo-500/10 blur-[80px] rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
       <div className="relative z-10 flex flex-col justify-between h-full min-h-[200px]">
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 w-fit backdrop-blur-md">
-            <Wallet size={14} className="text-brand-600 dark:text-brand-400" />
-            <span className="text-xs font-semibold text-slate-600 dark:text-zinc-300 tracking-wider uppercase">
+        <div className="flex justify-between items-start gap-3">
+          <div className="inline-flex flex-none items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md">
+            <Wallet size={14} className="flex-none text-brand-600 dark:text-brand-400" />
+            <span className="max-w-[4.75rem] text-xs font-semibold leading-tight text-slate-600 dark:text-zinc-300 tracking-wider uppercase">
               {isHouseholdMode
                 ? t("dashboard.household_net_worth", {
                     name: currentHousehold?.name || "Household",
@@ -54,8 +48,8 @@ export const NetWorthWidget: React.FC<NetWorthWidgetProps> = ({
                 : t("dashboard.your_net_worth")}
             </span>
           </div>
-          <div className="text-slate-500 dark:text-zinc-500 text-sm font-medium">
-            {new Date().toLocaleDateString("en-US", {
+          <div className="flex-none whitespace-nowrap text-slate-500 dark:text-zinc-500 text-sm font-medium">
+            {new Date().toLocaleDateString(i18n.language, {
               weekday: "long",
               month: "long",
               day: "numeric",
@@ -79,7 +73,7 @@ export const NetWorthWidget: React.FC<NetWorthWidgetProps> = ({
           <div className="flex items-center gap-2 text-slate-500 dark:text-zinc-400 text-sm flex-wrap">
             <TrendingUp size={16} className="text-emerald-500" />
             <span>
-              Total across {wallets.length} wallets and {goals.length} goals
+              {t("dashboard.net_worth_footer", { wallets: wallets.length, goals: goals.length })}
             </span>
             {isHouseholdMode && currentMembers.length > 0 && (
               <div className="flex -space-x-2 ml-2">
